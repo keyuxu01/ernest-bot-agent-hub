@@ -43,7 +43,7 @@ export default async function Home() {
         />
         <ol>
           <li>
-            Get started by editing <code>apps/web/app/page.tsx</code>
+            Get started by editing <code>apps/agentic-rag-client/app/page.tsx</code>
           </li>
           <li>Shared API response: {greeting}</li>
         </ol>
@@ -73,7 +73,7 @@ export default async function Home() {
             Read our docs
           </a>
         </div>
-        <Button appName="web" className={styles.secondary}>
+        <Button appName="agentic-rag-client" className={styles.secondary}>
           Open alert
         </Button>
       </main>
