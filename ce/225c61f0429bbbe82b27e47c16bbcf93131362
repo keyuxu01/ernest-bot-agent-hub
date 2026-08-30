@@ -1,0 +1,74 @@
+apps/agentic-rag-business-service/src/app.service.ts
+  s_d433c2b29f1f93::t_ef8901df04fa9b 2,6-7
+apps/agentic-rag-business-service/.env.example
+  s_d433c2b29f1f93::t_d3e7c5163b5cfd 1
+packages/types/src/greeting.ts
+  s_d433c2b29f1f93::t_ef8901df04fa9b 1-3
+apps/agentic-rag-business-service/eslint.config.mjs
+  s_d433c2b29f1f93::t_320ef7c50d2b64 1
+  s_d433c2b29f1f93::t_9f579c86a82b09 2-4
+apps/web/app/page.tsx
+  s_d433c2b29f1f93::t_d3e7c5163b5cfd 3,22-31,48
+turbo.json
+  s_d433c2b29f1f93::t_320ef7c50d2b64 9
+  s_d433c2b29f1f93::t_d3e7c5163b5cfd 4
+packages/types/tsconfig.json
+  s_d433c2b29f1f93::t_ef8901df04fa9b 2-4,6-7
+packages/types/package.json
+  s_d433c2b29f1f93::t_ef8901df04fa9b 1-19
+apps/agentic-rag-business-service/package.json
+  s_d433c2b29f1f93::t_d3e7c5163b5cfd 12
+  s_d433c2b29f1f93::t_9f579c86a82b09 18-19,34,36,45
+  s_d433c2b29f1f93::t_ef8901df04fa9b 35
+packages/eslint-config/package.json
+  s_d433c2b29f1f93::t_9f579c86a82b09 8
+.gitignore
+  s_d433c2b29f1f93::t_9f579c86a82b09 29
+apps/agentic-rag-business-service/src/app.controller.ts
+  s_d433c2b29f1f93::t_ef8901df04fa9b 2,10
+apps/web/package.json
+  s_d433c2b29f1f93::t_d3e7c5163b5cfd 14
+apps/web/lib/api.ts
+  s_d433c2b29f1f93::t_d3e7c5163b5cfd 1-2,7-16
+  s_2600d86f462bc2::t_cb8dc8caba9cb2 3-6
+packages/types/src/index.ts
+  s_d433c2b29f1f93::t_ef8901df04fa9b 1
+packages/types/eslint.config.mjs
+  s_d433c2b29f1f93::t_ef8901df04fa9b 1-4
+apps/agentic-rag-business-service/src/app.controller.spec.ts
+  s_d433c2b29f1f93::t_ef8901df04fa9b 19
+apps/agentic-rag-business-service/tsconfig.json
+  s_d433c2b29f1f93::t_9f579c86a82b09 2
+apps/agentic-rag-business-service/src/main.ts
+  s_d433c2b29f1f93::t_d3e7c5163b5cfd 6
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_d433c2b29f1f93::t_8384e7e54bba14 7
+  s_d433c2b29f1f93::t_ef8901df04fa9b 22
+packages/eslint-config/node.js
+  s_d433c2b29f1f93::t_320ef7c50d2b64 1-2,19
+  s_d433c2b29f1f93::t_9f579c86a82b09 3-18,20-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.43-trip",
+  "base_commit_sha": "ce225c61f0429bbbe82b27e47c16bbcf93131362",
+  "prompts": {},
+  "sessions": {
+    "s_2600d86f462bc2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a052fe-41bb-7980-9e17-303a09d6ee60",
+        "model": "unknown"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_d433c2b29f1f93": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a052fe-41bb-7980-9e17-303a09d6ee60",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
