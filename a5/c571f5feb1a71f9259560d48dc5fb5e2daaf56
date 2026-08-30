@@ -1,0 +1,25 @@
+.agents/skills/setup-turbo-nest-service/SKILL.md
+  s_d433c2b29f1f93::t_cef737fd9d2983 1-45
+.agents/skills/setup-turbo-nest-service/scripts/verify_workspace.py
+  s_d433c2b29f1f93::t_cef737fd9d2983 1-121
+.agents/skills/setup-turbo-nest-service/references/shared-contracts.md
+  s_d433c2b29f1f93::t_cef737fd9d2983 1-31
+.agents/skills/setup-turbo-nest-service/agents/openai.yaml
+  s_d433c2b29f1f93::t_cef737fd9d2983 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.43-trip",
+  "base_commit_sha": "a5c571f5feb1a71f9259560d48dc5fb5e2daaf56",
+  "prompts": {},
+  "sessions": {
+    "s_d433c2b29f1f93": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a052fe-41bb-7980-9e17-303a09d6ee60",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
