@@ -1,0 +1,151 @@
+.agents/skills/next-best-practices/runtime-selection.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-39
+.agents/skills/next-best-practices/error-handling.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-227
+.agents/skills/next-best-practices/self-hosting.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-371
+.agents/skills/nestjs-best-practices/rules/micro-use-queues.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-252
+.agents/skills/next-best-practices/metadata.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-301
+.agents/skills/nestjs-best-practices/rules/arch-avoid-circular-deps.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-80
+.agents/skills/nestjs-best-practices/rules/security-rate-limiting.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-125
+.agents/skills/nestjs-best-practices/rules/arch-feature-modules.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-82
+.agents/skills/nestjs-best-practices/rules/api-use-interceptors.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-202
+.agents/skills/nestjs-best-practices/SKILL.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-131
+.agents/skills/nestjs-best-practices/rules/db-use-transactions.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-140
+.agents/skills/nestjs-best-practices/rules/db-avoid-n-plus-one.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-139
+.agents/skills/next-best-practices/parallel-routes.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-287
+.agents/skills/nestjs-best-practices/rules/_template.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-28
+.agents/skills/nestjs-best-practices/rules/security-use-guards.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-135
+.agents/skills/nestjs-best-practices/rules/di-prefer-constructor-injection.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-86
+.agents/skills/nestjs-best-practices/rules/api-use-dto-serialization.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-182
+.agents/skills/nestjs-best-practices/rules/security-validate-all-input.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-150
+.agents/skills/nestjs-best-practices/rules/_sections.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-56
+.agents/skills/nestjs-best-practices/rules/di-scope-awareness.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-94
+.agents/skills/nestjs-best-practices/rules/perf-lazy-loading.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-121
+.agents/skills/nestjs-best-practices/rules/error-handle-async-errors.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-125
+.agents/skills/nestjs-best-practices/rules/perf-use-caching.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-128
+.agents/skills/next-best-practices/hydration-error.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-91
+.agents/skills/nestjs-best-practices/rules/di-use-interfaces-tokens.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-101
+.agents/skills/next-best-practices/suspense-boundaries.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-67
+.agents/skills/nestjs-best-practices/rules/di-liskov-substitution.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-221
+.agents/skills/nestjs-best-practices/rules/micro-use-health-checks.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-226
+.agents/skills/nestjs-best-practices/rules/error-throw-http-exceptions.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-114
+.agents/skills/next-best-practices/data-patterns.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-297
+.agents/skills/next-best-practices/debug-tricks.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-105
+.agents/skills/next-best-practices/route-handlers.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-146
+.agents/skills/nestjs-best-practices/rules/test-e2e-supertest.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-178
+.agents/skills/nestjs-best-practices/rules/arch-use-repository-pattern.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-97
+.agents/skills/nestjs-best-practices/rules/arch-use-events.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-108
+.agents/skills/nestjs-best-practices/rules/security-sanitize-output.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-139
+.agents/skills/nestjs-best-practices/rules/micro-use-patterns.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-167
+.agents/skills/next-best-practices/functions.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-108
+.agents/skills/nestjs-best-practices/rules/error-use-exception-filters.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-140
+.agents/skills/nestjs-best-practices/rules/devops-graceful-shutdown.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-222
+.agents/skills/nestjs-best-practices/rules/di-interface-segregation.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-165
+.agents/skills/nestjs-best-practices/rules/perf-async-hooks.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-109
+.agents/skills/nestjs-best-practices/rules/db-use-migrations.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-129
+.agents/skills/nestjs-best-practices/rules/di-avoid-service-locator.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-104
+.agents/skills/next-best-practices/font.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-245
+.agents/skills/nestjs-best-practices/rules/arch-module-sharing.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-141
+.agents/skills/next-best-practices/image.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-173
+.agents/skills/nestjs-best-practices/rules/arch-single-responsibility.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-106
+.agents/skills/nestjs-best-practices/rules/test-use-testing-module.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-153
+.agents/skills/nestjs-best-practices/rules/api-versioning.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-191
+.agents/skills/next-best-practices/file-conventions.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-140
+.agents/skills/next-best-practices/async-patterns.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-87
+.agents/skills/nestjs-best-practices/rules/devops-use-config-module.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-167
+.agents/skills/next-best-practices/bundling.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-180
+.agents/skills/next-best-practices/directives.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-73
+.agents/skills/next-best-practices/rsc-boundaries.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-159
+.agents/skills/nestjs-best-practices/rules/security-auth-jwt.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-146
+.agents/skills/nestjs-best-practices/rules/perf-optimize-database.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-131
+.agents/skills/next-best-practices/SKILL.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-151
+.agents/skills/nestjs-best-practices/rules/api-use-pipes.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-205
+.agents/skills/nestjs-best-practices/rules/devops-use-logging.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-232
+.agents/skills/nestjs-best-practices/rules/test-mock-external-services.md
+  s_d433c2b29f1f93::t_e4a3bb44cac564 1-179
+.agents/skills/next-best-practices/scripts.md
+  s_2600d86f462bc2::t_f65d4eeca482c7 1-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.43-trip",
+  "base_commit_sha": "9831ceb95a9c2d45af96d21d02cec087a22e234e",
+  "prompts": {},
+  "sessions": {
+    "s_2600d86f462bc2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a052fe-41bb-7980-9e17-303a09d6ee60",
+        "model": "unknown"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_d433c2b29f1f93": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a052fe-41bb-7980-9e17-303a09d6ee60",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
