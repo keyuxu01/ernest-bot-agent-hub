@@ -1,0 +1,27 @@
+apps/agentic-rag-client/app/page.tsx
+  s_d433c2b29f1f93::t_e0180bab1d9e4b 46,76
+apps/agentic-rag-client/AGENTS.md
+  s_d433c2b29f1f93::t_e0180bab1d9e4b 3
+README.md
+  s_d433c2b29f1f93::t_e0180bab1d9e4b 20-21,96,102-104
+apps/agentic-rag-client/package.json
+  s_d433c2b29f1f93::t_e0180bab1d9e4b 2
+apps/agentic-rag-client/AI_CODING_RULES.md
+  s_d433c2b29f1f93::t_e0180bab1d9e4b 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.43-trip",
+  "base_commit_sha": "106dc18c24a2ea5eb2c75cea75d590a4bcaaa28b",
+  "prompts": {},
+  "sessions": {
+    "s_d433c2b29f1f93": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a052fe-41bb-7980-9e17-303a09d6ee60",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
