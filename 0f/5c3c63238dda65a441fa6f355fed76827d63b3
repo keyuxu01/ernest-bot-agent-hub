@@ -1,0 +1,30 @@
+apps/web/AI_CODING_RULES.md
+  s_2600d86f462bc2::t_f0f2e79e75ff46 1-13,15,17-960
+  s_d433c2b29f1f93::t_f82cd053736a94 14,16
+apps/web/AGENTS.md
+  s_d433c2b29f1f93::t_f82cd053736a94 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.43-trip",
+  "base_commit_sha": "0f5c3c63238dda65a441fa6f355fed76827d63b3",
+  "prompts": {},
+  "sessions": {
+    "s_2600d86f462bc2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a052fe-41bb-7980-9e17-303a09d6ee60",
+        "model": "unknown"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_d433c2b29f1f93": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a052fe-41bb-7980-9e17-303a09d6ee60",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
