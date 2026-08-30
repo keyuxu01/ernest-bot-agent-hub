@@ -1,0 +1,4 @@
+interface:
+  display_name: "Set Up Turbo Nest Service"
+  short_description: "Integrate NestJS services into Turborepo workspaces"
+  default_prompt: "Use $setup-turbo-nest-service to add or integrate a NestJS backend in this Turborepo."
