@@ -1,0 +1,33 @@
+{
+  "$schema": "https://github.com/dyoshikawa/rulesync/releases/latest/download/config-schema.json",
+
+  "targets": {
+    "claudecode": {
+      "rules": {
+        "ruleDiscoveryMode": "explicit"
+      },
+      "commands": false
+    },
+
+    "cursor": {
+      "rules": true,
+      "commands": false
+    },
+
+    "codexcli": {
+      "rules": true,
+      "commands": false
+    },
+
+    "agentsmd": {
+      "rules": true,
+      "commands": false
+    }
+  },
+
+  "outputRoots": ["."],
+
+  "delete": true,
+  "verbose": true,
+  "silent": false
+}

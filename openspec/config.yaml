@@ -1,0 +1,10 @@
+schema: spec-driven
+
+context: |
+  Tech stack: TypeScript, Turborepo, pnpm, Next.js (App Router), NestJS, React, Vitest.
+  Repository: ernest-bot-agent-pub.
+  - apps/agentic-rag-client — Next.js frontend
+  - apps/agentic-rag-business-service — NestJS backend
+  - packages/types, packages/ui — shared code
+  Frontend coding rules: apps/agentic-rag-client/AI_CODING_RULES.md
+  Backend: follow NestJS module conventions and .agents/skills/nestjs-best-practices/
