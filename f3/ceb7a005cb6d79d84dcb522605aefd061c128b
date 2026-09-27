@@ -1,0 +1,209 @@
+package.json
+  s_e2e82d8a95861d::t_968c2236aa2194 11-13
+.rulesync/skills/next-best-practices/error-handling.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-227
+.rulesync/skills/next-best-practices/image.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-173
+.rulesync/skills/next-best-practices/bundling.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-180
+.rulesync/skills/nestjs-best-practices/rules/di-scope-awareness.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-94
+.rulesync/skills/next-best-practices/suspense-boundaries.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-67
+.rulesync/skills/nestjs-best-practices/rules/api-use-pipes.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-205
+.rulesync/skills/nestjs-best-practices/rules/security-rate-limiting.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-125
+docs/architecture/decisions/0001-use-zod-contracts.md
+  s_e2e82d8a95861d::t_9f1171e702e309 1-31
+.rulesync/skills/nestjs-best-practices/rules/arch-module-sharing.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-141
+.rulesync/skills/nestjs-best-practices/rules/api-use-interceptors.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 2-5,8-202
+.rulesync/skills/nestjs-best-practices/rules/micro-use-patterns.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 2-5,8-49,51-164,167
+.rulesync/skills/nestjs-best-practices/rules/_template.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-28
+.rulesync/skills/nestjs-best-practices/rules/test-mock-external-services.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-179
+.rulesync/skills/nestjs-best-practices/rules/perf-optimize-database.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-131
+.rulesync/skills/nestjs-best-practices/rules/arch-use-events.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-108
+.rulesync/rules/backend.md
+  s_e2e82d8a95861d::t_9f1171e702e309 1-46
+.rulesync/skills/next-best-practices/metadata.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-301
+.rulesync/skills/nestjs-best-practices/rules/arch-avoid-circular-deps.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-80
+.rulesync/skills/nestjs-best-practices/rules/di-prefer-constructor-injection.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-86
+.rulesync/skills/next-best-practices/font.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1,3,5-43,46-50,52-54,57-83,85-114,117,119-121,123-147,150-156,158-159,162,164,166-170,172-177,180-245
+.rulesync/skills/next-best-practices/rsc-boundaries.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-159
+.rulesync/skills/nestjs-best-practices/rules/devops-use-config-module.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-167
+.rulesync/skills/openspec-archive-change/SKILL.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 3-15
+rulesync.jsonc
+  s_e2e82d8a95861d::t_8ae72fe5835cca 35,40,45,50
+  s_e2e82d8a95861d::t_968c2236aa2194 9,15,21,27,32-33,37-38,42-43,47-48,53
+  s_5ac379ebe83c59::t_f92ce24e2da1db 7,10,16,22,28-29,36,41,46,51-52,59
+  s_e2e82d8a95861d::t_0c1be4651f0dbc 34,39,44,49
+.rulesync/skills/nestjs-best-practices/rules/arch-feature-modules.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-82
+.rulesync/skills/nestjs-best-practices/rules/security-sanitize-output.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-139
+.gitignore
+  s_5ac379ebe83c59::t_e008d16420fe3d 40-60
+.rulesync/skills/nestjs-best-practices/rules/perf-use-caching.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-128
+.rulesync/skills/nestjs-best-practices/rules/security-validate-all-input.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-150
+docs/architecture/decisions/0004-evaluate-orpc.md
+  s_e2e82d8a95861d::t_9f1171e702e309 1-40
+.rulesync/skills/nestjs-best-practices/rules/di-interface-segregation.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-165
+.rulesync/skills/nestjs-best-practices/rules/error-use-exception-filters.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-140
+.rulesync/skills/nestjs-best-practices/rules/micro-use-queues.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 2-5,8-41,44-249,252
+.rulesync/skills/setup-turbo-nest-service/agents/openai.yaml
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-4
+.rulesync/skills/next-best-practices/async-patterns.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-87
+.rulesync/skills/openspec-apply-change/SKILL.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 3-15
+.rulesync/skills/nestjs-best-practices/SKILL.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 3-14
+.rulesync/skills/next-best-practices/debug-tricks.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-105
+.rulesync/rules/overview.md
+  s_e2e82d8a95861d::t_0df1142bb68571 17-24
+  s_e2e82d8a95861d::t_9f1171e702e309 31-40
+  s_5ac379ebe83c59::t_f92ce24e2da1db 41-49
+.rulesync/skills/openspec-explore/SKILL.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 3-16
+.rulesync/skills/nestjs-best-practices/rules/arch-use-repository-pattern.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-6,8,10,12,14-20,22-33,35-37,39,41-97
+.rulesync/rules/contracts.md
+  s_e2e82d8a95861d::t_9f1171e702e309 1-49
+.rulesync/skills/next-best-practices/scripts.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-141
+.rulesync/skills/nestjs-best-practices/rules/security-use-guards.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-135
+README.md
+  s_e2e82d8a95861d::t_08842b7270c1cb 72
+  s_e2e82d8a95861d::t_968c2236aa2194 66-71,73-78
+  s_e2e82d8a95861d::t_9f1171e702e309 3,49-53
+.rulesync/skills/nestjs-best-practices/rules/db-use-transactions.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-140
+.rulesync/skills/nestjs-best-practices/rules/micro-use-health-checks.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 2-5,8-36,38-183,185,187-223,226
+.rulesync/skills/nestjs-best-practices/rules/devops-use-logging.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-232
+docs/architecture/decisions/0005-evaluate-mcp-nest.md
+  s_e2e82d8a95861d::t_968c2236aa2194 1-44
+.rulesync/skills/openspec-sync-specs/SKILL.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 3-16
+.rulesync/skills/setup-turbo-nest-service/SKILL.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 3-11
+.rulesync/skills/nestjs-best-practices/rules/perf-lazy-loading.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-121
+.rulesync/skills/nestjs-best-practices/rules/api-versioning.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-191
+docs/architecture/decisions/0002-use-shadcn-tailwind.md
+  s_e2e82d8a95861d::t_9f1171e702e309 1-30
+.rulesync/skills/nestjs-best-practices/rules/arch-single-responsibility.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-106
+.rulesync/skills/next-best-practices/directives.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-73
+.rulesync/skills/nestjs-best-practices/rules/di-liskov-substitution.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-221
+.rulesync/skills/nestjs-best-practices/rules/error-throw-http-exceptions.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-114
+.rulesync/skills/nestjs-best-practices/rules/_sections.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-56
+docs/architecture/README.md
+  s_e2e82d8a95861d::t_9f1171e702e309 1-35,42-44,51-70,75,78-86
+  s_e2e82d8a95861d::t_968c2236aa2194 77
+  s_e2e82d8a95861d::t_0df1142bb68571 36-41,45-50,71-74,76
+rulesync.lock
+  s_e2e82d8a95861d::t_b263eaf7d62152 1-45
+.rulesync/skills/nestjs-best-practices/rules/di-avoid-service-locator.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-104
+.rulesync/skills/nestjs-best-practices/rules/test-use-testing-module.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-153
+.rulesync/skills/next-best-practices/functions.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-108
+.rulesync/skills/next-best-practices/route-handlers.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-146
+.rulesync/skills/nestjs-best-practices/rules/perf-async-hooks.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-109
+.rulesync/rules/mcp.md
+  s_e2e82d8a95861d::t_968c2236aa2194 43-44
+  s_e2e82d8a95861d::t_9f1171e702e309 1-42
+.rulesync/skills/next-best-practices/SKILL.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 3-8
+.rulesync/skills/nestjs-best-practices/rules/db-use-migrations.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-129
+.rulesync/skills/next-best-practices/file-conventions.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-140
+.rulesync/skills/next-best-practices/self-hosting.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1,3,5,7,9-13,16,19-24,27,29,31-32,34-38,40-45,47-49,51,53-55,57-60,62,64-66,68,71,73-74,76-88,91,93,95-108,111-113,116,118,120,122-124,126,128,130-134,138,140-142,144-145,147-149,152-154,156-161,163-179,181-184,188-210,212-222,226,228-238,240,242,244,246-248,250-256,260,262,264-270,274-279,282,284,286-288,290-292,295,297,299-306,309,311,313-316,319-323,325,327,329-334,336-339,343,345-353,355,357,359-362,364-365,367-370
+.rulesync/skills/next-best-practices/data-patterns.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1,3,5,8-22,25,27,29-43,46-50,52,54,56-58,60,62-63,65,67-68,70-71,73-74,77-88,91-95,97-100,102,104,106-108,110-114,116-121,124-128,130-132,134,136,139-143,145-146,149,152-161,164,167-181,183-186,188-191,194,197-198,200-202,204-205,209-211,213-214,216-217,219,221-224,227,229,231,233-237,240-244,248,250-252,254-255,257-261,263-266,268,270,272-275,277-278,280-282,284-285,288,290,292-297
+.rulesync/skills/openspec-propose/SKILL.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 3-16
+.rulesync/skills/nestjs-best-practices/rules/test-e2e-supertest.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-178
+.rulesync/skills/next-best-practices/runtime-selection.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-39
+.rulesync/skills/nestjs-best-practices/rules/security-auth-jwt.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-146
+.rulesync/skills/nestjs-best-practices/rules/api-use-dto-serialization.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-182
+.rulesync/skills/setup-turbo-nest-service/scripts/verify_workspace.py
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-121
+.rulesync/skills/nestjs-best-practices/rules/error-handle-async-errors.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-125
+.rulesync/skills/nestjs-best-practices/rules/di-use-interfaces-tokens.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-101
+.rulesync/skills/next-best-practices/hydration-error.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-91
+.rulesync/skills/next-best-practices/parallel-routes.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1,3,5,8-20,23,25-42,45,47,50-53,56,58,60,63-79,82,85-100,103,105,108-153,156,158-161,163-166,168,170,172-177,179,181,183-186,188,190-204,207,209,211,213,215,217,219,222-227,230,232-234,236,238,240-244,247,250-261,264,266-281,285-287
+.rulesync/skills/setup-turbo-nest-service/references/shared-contracts.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-31
+.rulesync/skills/nestjs-best-practices/rules/devops-graceful-shutdown.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 1-222
+.rulesync/skills/nestjs-best-practices/rules/db-avoid-n-plus-one.md
+  s_5ac379ebe83c59::t_0e8adf7a4b4bdf 2-5,8,10,12,14-20,22-25,27-29,31-139
+docs/architecture/decisions/0003-separate-ai-stream-rpc-and-mcp.md
+  s_e2e82d8a95861d::t_9f1171e702e309 1-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "f3ceb7a005cb6d79d84dcb522605aefd061c128b",
+  "prompts": {},
+  "sessions": {
+    "s_5ac379ebe83c59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a0e1fc-1273-7ae1-897c-0b8f12e782c2",
+        "model": "unknown"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_e2e82d8a95861d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e1fc-1273-7ae1-897c-0b8f12e782c2",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
