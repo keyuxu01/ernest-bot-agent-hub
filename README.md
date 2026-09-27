@@ -37,6 +37,7 @@
 ├── packages/
 │   ├── eslint-config/                   # 共享 ESLint 配置
 │   ├── contracts/                       # Zod 运行时契约及推导类型
+│   │   └── src/orpc/                    # 独立的 oRPC contract 入口
 │   ├── typescript-config/               # 共享 TypeScript 配置
 │   └── ui/                              # 共享 React UI 组件
 ├── turbo.json                           # Turbo 任务与缓存配置
@@ -51,6 +52,8 @@
 当前系统边界、协议分工和技术选型状态见
 [`docs/architecture/README.md`](docs/architecture/README.md)。重要选型使用 ADR 记录，
 OpenSpec 继续负责具体变更的提案、设计和实施任务。
+
+oRPC 的启动、调用和新增接口流程见 [`docs/guides/orpc.md`](docs/guides/orpc.md)。
 
 ## 环境要求
 
@@ -68,13 +71,14 @@ pnpm install
 本仓库使用 RuleSync 统一维护 `.rulesync/rules` 和 `.rulesync/skills`。首次开发或拉取这些目录的
 更新后，请允许 RuleSync 写入本地 Agent 配置目录，并执行：
 
-```bash
-pnpm agent:sync
-```
+| 命令                | 用途                                                         |
+| ------------------- | ------------------------------------------------------------ |
+| `pnpm agent:sync`   | 根据 `rulesync.lock` 安装固定版本的 Skills 并生成 Agent 配置 |
+| `pnpm agent:update` | 主动升级远程 Skills、更新 lock 并重新生成                    |
+| `pnpm agent:check`  | 在 CI 或提交前检查生成结果是否与 RuleSync 源文件一致         |
 
-该命令按照 `rulesync.lock` 安装固定版本的外部 Skills，再为 Codex、Claude Code 和 Cursor
-生成各自的 rules 与 skills。生成文件已加入 `.gitignore`，不得手工修改；需要调整时只修改
-`.rulesync` 源文件。需要主动升级远程 Skills 时使用 `pnpm agent:update`。
+首次开发先执行 `pnpm agent:sync`。生成文件已加入 `.gitignore`，不得手工修改；需要调整时只修改
+`.rulesync` 源文件。
 
 ## 本地开发
 
@@ -98,6 +102,25 @@ pnpm --filter mcp-app-collections dev
 ```bash
 PORT=9081 pnpm --filter mcp-app-collections dev
 ```
+
+## oRPC 快速验证
+
+分别启动业务服务和前端：
+
+```bash
+pnpm --filter agentic-rag-business-service dev
+pnpm --filter agentic-rag-client dev
+```
+
+可访问：
+
+- 前端：`http://localhost:3000`
+- Typed greeting：`http://localhost:8080/api/greeting`
+- OpenAPI JSON：`http://localhost:8080/openapi.json`
+- 兼容旧接口：`http://localhost:8080/`
+
+本项目使用稳定 oRPC v1；不要复制 v2 beta 的 `.meta(openapi(...))` 等 API。完整开发流程见
+[`docs/guides/orpc.md`](docs/guides/orpc.md)。
 
 ## 构建与检查
 

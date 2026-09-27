@@ -28,6 +28,34 @@ describe('AppController (e2e)', () => {
       });
   });
 
+  it('/api/greeting (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/api/greeting')
+      .expect(200)
+      .expect({ message: 'Hello World!' })
+      .expect((response) => {
+        expect(GreetingResponseSchema.safeParse(response.body).success).toBe(
+          true,
+        );
+      });
+  });
+
+  it('/openapi.json (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/openapi.json')
+      .expect(200)
+      .expect((response) => {
+        expect(response.body.openapi).toBe('3.1.1');
+        expect(response.body.paths?.['/api/greeting']?.get).toMatchObject({
+          summary: 'Get the service greeting',
+          tags: ['Greeting'],
+        });
+        expect(
+          response.body.paths?.['/api/greeting']?.get?.responses?.['200'],
+        ).toBeDefined();
+      });
+  });
+
   afterEach(async () => {
     await app.close();
   });

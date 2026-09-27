@@ -19,6 +19,16 @@ Continue defining reusable payload schemas in `@repo/contracts`. MCP handlers re
 delegate business behavior to services or use cases. The official MCP TypeScript SDK v2 remains the fallback
 if the NestJS wrapper blocks required protocol functionality.
 
+## Stability Check
+
+As of 2026-09-27, `@rekog/mcp-nest` v2 is a stable release line: npm publishes `2.0.7` under the `latest`
+tag, and the required `@modelcontextprotocol/core`, `@modelcontextprotocol/node` and
+`@modelcontextprotocol/server` packages publish stable `2.1.0` releases under `latest`. The core framework
+is therefore eligible for the PoC without prerelease dependencies.
+
+The built-in authorization-server feature is still documented as Beta. The first PoC must either omit it or
+use an external authorization server; adopting the built-in authorization server requires a separate review.
+
 ## Acceptance Criteria
 
 - Streamable HTTP works with the MCP Inspector and the intended Agent hosts.

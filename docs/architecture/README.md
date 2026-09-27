@@ -42,12 +42,12 @@ The database and vector-store technologies are intentionally undecided in the fi
 
 ## Protocol Boundaries
 
-| Boundary                           | Protocol                                             | Status             |
-| ---------------------------------- | ---------------------------------------------------- | ------------------ |
-| Interactive agent output to Web UI | Vercel AI SDK UI stream / compatible AG-UI transport | Accepted           |
-| Agent to tools and resources       | MCP                                                  | Accepted           |
-| Web to business service            | HTTP with Zod contracts; oRPC is under evaluation    | Current / Proposed |
-| Third-party HTTP documentation     | OpenAPI through the oRPC evaluation                  | Proposed           |
+| Boundary                           | Protocol                                             | Status        |
+| ---------------------------------- | ---------------------------------------------------- | ------------- |
+| Interactive agent output to Web UI | Vercel AI SDK UI stream / compatible AG-UI transport | Accepted      |
+| Agent to tools and resources       | MCP                                                  | Accepted      |
+| Web to business service            | HTTP with Zod contracts; stable oRPC v1 PoC          | Current / PoC |
+| Third-party HTTP documentation     | Generated OpenAPI at `/openapi.json` for the PoC     | PoC           |
 
 AI streaming endpoints keep their native stream framing and are not wrapped in ordinary RPC responses.
 MCP remains an Agent-facing protocol and does not replace standard business APIs.

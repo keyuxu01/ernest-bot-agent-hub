@@ -14,6 +14,25 @@ Run a limited oRPC contract-first proof of concept before adopting it broadly. K
 `@repo/contracts`, add RPC contracts as a separate explicit export surface, implement them in NestJS and
 consume them from Next.js without importing backend source.
 
+The PoC uses only versions published under npm's `latest` tag. Prerelease lines such as `beta` and `next`
+are excluded unless a later ADR explicitly approves them.
+
+## Implemented PoC Slice
+
+The first integration slice uses stable oRPC v1 packages (`1.15.4`, with `@orpc/nest` at `1.15.3`):
+
+- `@repo/contracts/orpc` exposes the contract while the root package entry remains limited to base Zod
+  schemas and inferred types.
+- NestJS implements `GET /api/greeting` through `@orpc/nest` and delegates to the existing application
+  service.
+- Next.js calls the operation through `OpenAPILink` with client-side response validation.
+- `GET /openapi.json` exposes the generated OpenAPI document.
+- The legacy `GET /` endpoint remains available during evaluation.
+
+This slice validates the framework wiring only. The ADR remains Proposed until a representative
+knowledge-base query and mutation, authentication context, typed business errors and operational
+observability have also been evaluated.
+
 The PoC should cover a representative knowledge-base query and mutation, authentication context, typed
 business errors, output validation, Next.js server/client consumption and OpenAPI generation. Existing HTTP
 controllers remain in place until the PoC is accepted.

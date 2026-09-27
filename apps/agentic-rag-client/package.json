@@ -12,6 +12,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@orpc/client": "1.15.4",
+    "@orpc/contract": "1.15.4",
+    "@orpc/openapi-client": "1.15.4",
     "@repo/contracts": "workspace:*",
     "@repo/ui": "workspace:*",
     "next": "16.3.2",
