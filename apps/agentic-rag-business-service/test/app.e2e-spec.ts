@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GreetingResponseSchema } from '@repo/contracts';
+import {
+  GreetingResponseSchema,
+  HealthProbeResponseSchema,
+  ServiceIdentityResponseSchema,
+} from '@repo/contracts';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from './../src/app.module.js';
@@ -53,6 +57,42 @@ describe('AppController (e2e)', () => {
         expect(
           response.body.paths?.['/api/greeting']?.get?.responses?.['200'],
         ).toBeDefined();
+      });
+  });
+
+  it('/health/live (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/health/live')
+      .expect(200)
+      .expect((response) => {
+        expect(HealthProbeResponseSchema.safeParse(response.body).success).toBe(
+          true,
+        );
+        expect(response.body.status).toBe('ok');
+      });
+  });
+
+  it('/health/ready (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/health/ready')
+      .expect(200)
+      .expect((response) => {
+        expect(HealthProbeResponseSchema.safeParse(response.body).success).toBe(
+          true,
+        );
+        expect(response.body.status).toBe('ok');
+      });
+  });
+
+  it('/health/whoami (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/health/whoami')
+      .expect(200)
+      .expect('Cache-Control', 'no-store')
+      .expect((response) => {
+        expect(
+          ServiceIdentityResponseSchema.safeParse(response.body).success,
+        ).toBe(true);
       });
   });
 

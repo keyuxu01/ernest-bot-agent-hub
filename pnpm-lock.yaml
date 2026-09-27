@@ -38,6 +38,9 @@ importers:
       '@nestjs/platform-express':
         specifier: ^12.0.1
         version: 12.0.1(@nestjs/common@12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.0.1)(supports-color@7.2.0)
+      '@nestjs/terminus':
+        specifier: 12.1.0
+        version: 12.1.0(@nestjs/common@12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.0.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@orpc/nest':
         specifier: 1.15.3
         version: 1.15.3(@nestjs/common@12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.0.1)(express@5.2.1(supports-color@7.2.0))(rxjs@7.8.2)
@@ -123,12 +126,18 @@ importers:
       '@orpc/openapi-client':
         specifier: 1.15.4
         version: 1.15.4
+      '@orpc/tanstack-query':
+        specifier: 1.15.4
+        version: 1.15.4(@orpc/client@1.15.4)(@tanstack/query-core@5.104.0)
       '@repo/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@tanstack/react-query':
+        specifier: 5.104.0
+        version: 5.104.0(react@19.2.8)
       next:
         specifier: 16.3.2
         version: 16.3.2(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.3.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -138,6 +147,9 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -985,6 +997,58 @@ packages:
       prettier:
         optional: true
 
+  '@nestjs/terminus@12.1.0':
+    resolution: {integrity: sha512-bag1KT1Pk2KpDhXh6fhf3F7IpRGs8IMSdPaD1+9hclP3hSAIkCYN/YUhkAY+2G7OuoUmyDuKVb7MgNw+L5ZBbQ==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+    peerDependencies:
+      '@grpc/grpc-js': '*'
+      '@grpc/proto-loader': '*'
+      '@mikro-orm/core': '*'
+      '@mikro-orm/nestjs': '*'
+      '@nestjs/axios': ^4.0.0 || ^12.0.0
+      '@nestjs/common': ^11.0.0 || ^12.0.0
+      '@nestjs/core': ^11.0.0 || ^12.0.0
+      '@nestjs/microservices': ^11.0.0 || ^12.0.0
+      '@nestjs/mongoose': ^11.0.0 || ^12.0.0
+      '@nestjs/sequelize': ^11.0.0 || ^12.0.0
+      '@nestjs/swagger': ^11.0.0 || ^12.0.0
+      '@nestjs/typeorm': ^11.0.0 || ^12.0.0
+      '@prisma/client': '*'
+      mongoose: '*'
+      reflect-metadata: ^0.1.12 || ^0.2.0
+      rxjs: ^7.1.0
+      sequelize: '*'
+      typeorm: '*'
+    peerDependenciesMeta:
+      '@grpc/grpc-js':
+        optional: true
+      '@grpc/proto-loader':
+        optional: true
+      '@mikro-orm/core':
+        optional: true
+      '@mikro-orm/nestjs':
+        optional: true
+      '@nestjs/axios':
+        optional: true
+      '@nestjs/microservices':
+        optional: true
+      '@nestjs/mongoose':
+        optional: true
+      '@nestjs/sequelize':
+        optional: true
+      '@nestjs/swagger':
+        optional: true
+      '@nestjs/typeorm':
+        optional: true
+      '@prisma/client':
+        optional: true
+      mongoose:
+        optional: true
+      sequelize:
+        optional: true
+      typeorm:
+        optional: true
+
   '@nestjs/testing@12.0.1':
     resolution: {integrity: sha512-prf3fsUaoKS6t04XcQt5aSTp68Po1GxUcbEBPv+3iqAef07hKQEO15r0jmmwA+rWZfONYT1UcV3YIylR++/tCg==}
     peerDependencies:
@@ -1265,6 +1329,12 @@ packages:
   '@orpc/standard-server@1.15.4':
     resolution: {integrity: sha512-woaFpUJavYPiqRQ0Eh716jOHRZ7o84mPpmEPS79bBUJNDilGEj2OBSjbHV2ez4FYdVnEnlbg+rYy7sX3PwwENA==}
 
+  '@orpc/tanstack-query@1.15.4':
+    resolution: {integrity: sha512-oP4XuCI5AuelIhhv722sGXzZNYTH4Y6ueS4H4TtIICdG9Q6tJeiERqyEk0dm3ebh3yo+iM/NVmcRkpUrgzIZzw==}
+    peerDependencies:
+      '@orpc/client': 1.15.4
+      '@tanstack/query-core': '>=5.80.2'
+
   '@orpc/zod@1.15.4':
     resolution: {integrity: sha512-k7W5yvagfcGztACr7qpB7Yyp3iMF9BzCJX9uDH9EEouuM2gt/WzsGtkDw//LTpPPsJQerltdKrdGfaWnbrGBhQ==}
     peerDependencies:
@@ -1397,6 +1467,14 @@ packages:
 
   '@swc/helpers@0.5.23':
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
+
+  '@tanstack/query-core@5.104.0':
+    resolution: {integrity: sha512-JrC2r/JQlXt7khBSdUpsgxNvybzOg+aITa+ARRMlP2AFo93Y8vIqz077rp+e61mJetSZ0T6AJbwW1JHer1vrPQ==}
+
+  '@tanstack/react-query@5.104.0':
+    resolution: {integrity: sha512-e1TZmDCQnWIfiDVryIHeA6Idj+Lfx1hORLOhXS/l5wcgvtVD4yYqbTDl378sGQKIi2cSgb0TEMC9cKK8GGoJEw==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@tokenizer/inflate@0.4.1':
     resolution: {integrity: sha512-2mAv+8pkG6GIZiF1kNg1jAjh27IDxEPKwdGul3snfztFerfPGI1LjDezZp3i7BElXompqEtPmoPx6c2wgtWsOA==}
@@ -4807,6 +4885,13 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
+  '@nestjs/terminus@12.1.0(@nestjs/common@12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.0.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
+    dependencies:
+      '@nestjs/common': 12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/core': 12.0.1(@nestjs/common@12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.0.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      reflect-metadata: 0.2.2
+      rxjs: 7.8.2
+
   '@nestjs/testing@12.0.1(@nestjs/common@12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.0.1)(@nestjs/platform-express@12.0.1)':
     dependencies:
       '@nestjs/common': 12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
@@ -5197,6 +5282,14 @@ snapshots:
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
+  '@orpc/tanstack-query@1.15.4(@orpc/client@1.15.4)(@tanstack/query-core@5.104.0)':
+    dependencies:
+      '@orpc/client': 1.15.4
+      '@orpc/shared': 1.15.4
+      '@tanstack/query-core': 5.104.0
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
   '@orpc/zod@1.15.4(@orpc/contract@1.15.4)(@orpc/server@1.15.4)(zod@4.4.3)':
     dependencies:
       '@orpc/contract': 1.15.4
@@ -5280,6 +5373,13 @@ snapshots:
   '@swc/helpers@0.5.23':
     dependencies:
       tslib: 2.8.1
+
+  '@tanstack/query-core@5.104.0': {}
+
+  '@tanstack/react-query@5.104.0(react@19.2.8)':
+    dependencies:
+      '@tanstack/query-core': 5.104.0
+      react: 19.2.8
 
   '@tokenizer/inflate@0.4.1(supports-color@7.2.0)':
     dependencies:

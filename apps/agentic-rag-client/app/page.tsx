@@ -1,6 +1,6 @@
 import Image, { type ImageProps } from 'next/image';
 import { Button } from '@repo/ui/button';
-import { getGreeting } from '../lib/api';
+import { Greeting } from '../components/greeting';
 import styles from './page.module.css';
 
 type Props = Omit<ImageProps, 'src'> & {
@@ -19,16 +19,7 @@ const ThemeImage = (props: Props) => {
   );
 };
 
-export default async function Home() {
-  let greeting = 'Business service is unavailable';
-
-  try {
-    const response = await getGreeting();
-    greeting = response.message;
-  } catch {
-    // Keep the page renderable while the independently deployed API is unavailable.
-  }
-
+export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -45,7 +36,9 @@ export default async function Home() {
           <li>
             Get started by editing <code>apps/agentic-rag-client/app/page.tsx</code>
           </li>
-          <li>Shared API response: {greeting}</li>
+          <li>
+            Shared API response: <Greeting />
+          </li>
         </ol>
 
         <div className={styles.ctas}>

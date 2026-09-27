@@ -26,12 +26,19 @@ The first integration slice uses stable oRPC v1 packages (`1.15.4`, with `@orpc/
 - NestJS implements `GET /api/greeting` through `@orpc/nest` and delegates to the existing application
   service.
 - Next.js calls the operation through `OpenAPILink` with client-side response validation.
+- Browser-rendered reads use the stable `@orpc/tanstack-query` v1 integration to derive query options and
+  cache keys from the same typed client; direct calls remain available for Server Components.
 - `GET /openapi.json` exposes the generated OpenAPI document.
 - The legacy `GET /` endpoint remains available during evaluation.
 
 This slice validates the framework wiring only. The ADR remains Proposed until a representative
 knowledge-base query and mutation, authentication context, typed business errors and operational
 observability have also been evaluated.
+
+The greeting integration now additionally demonstrates runtime-invalid response rejection, recoverable
+network failure, stable operation-derived query identity, typed invalidation and fresh-cache reuse. This is
+supporting evidence, but it does not satisfy the remaining knowledge-base mutation and authentication
+criteria.
 
 The PoC should cover a representative knowledge-base query and mutation, authentication context, typed
 business errors, output validation, Next.js server/client consumption and OpenAPI generation. Existing HTTP

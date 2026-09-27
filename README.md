@@ -14,7 +14,8 @@
 | `mcp-app-collections`          | NestJS  |           `8081` | MCP App Collections 服务 |
 
 两个 NestJS 服务支持通过 `PORT` 环境变量覆盖默认端口。前端默认通过
-`http://localhost:8080` 访问业务服务，可以使用 `API_BASE_URL` 修改接口地址。
+`http://localhost:8080` 访问业务服务；Server Component 可使用 `API_BASE_URL`，浏览器 query
+使用 `NEXT_PUBLIC_API_BASE_URL`。浏览器直接请求业务 API Origin，不经过 Vercel 同源代理。
 
 ## 项目结构
 
@@ -54,6 +55,8 @@
 OpenSpec 继续负责具体变更的提案、设计和实施任务。
 
 oRPC 的启动、调用和新增接口流程见 [`docs/guides/orpc.md`](docs/guides/orpc.md)。
+部署边界、RabbitMQ、Redis、Docker Compose 规划、NestJS 无状态约束及 Kubernetes 演进条件见
+[`docs/guides/deployment-and-infrastructure.md`](docs/guides/deployment-and-infrastructure.md)。
 
 ## 环境要求
 
@@ -122,6 +125,10 @@ pnpm --filter agentic-rag-client dev
 本项目使用稳定 oRPC v1；不要复制 v2 beta 的 `.meta(openapi(...))` 等 API。完整开发流程见
 [`docs/guides/orpc.md`](docs/guides/orpc.md)。
 
+交互式业务数据使用 `@orpc/tanstack-query` 生成 query options 和 keys，再由 TanStack Query 管理
+pending、error、缓存与失效。Server Component 和一次性 imperative 流程仍可直接调用 oRPC client；
+AI streaming 与 MCP 不进入普通 Query cache。
+
 ## 构建与检查
 
 ```bash
@@ -143,8 +150,9 @@ pnpm --filter mcp-app-collections test:e2e
 
 需要环境变量的应用在对应目录中提供 `.env.example`。常用变量如下：
 
-| 变量           | 使用方                         | 默认值                  | 说明             |
-| -------------- | ------------------------------ | ----------------------- | ---------------- |
-| `API_BASE_URL` | `agentic-rag-client`           | `http://localhost:8080` | 业务服务地址     |
-| `PORT`         | `agentic-rag-business-service` | `8080`                  | 业务服务监听端口 |
-| `PORT`         | `mcp-app-collections`          | `8081`                  | MCP 服务监听端口 |
+| 变量                       | 使用方                         | 默认值                  | 说明                        |
+| -------------------------- | ------------------------------ | ----------------------- | --------------------------- |
+| `API_BASE_URL`             | `agentic-rag-client` server    | `http://localhost:8080` | Server Component 业务地址   |
+| `NEXT_PUBLIC_API_BASE_URL` | `agentic-rag-client` browser   | `http://localhost:8080` | 浏览器可见的公开 API Origin |
+| `PORT`                     | `agentic-rag-business-service` | `8080`                  | 业务服务监听端口            |
+| `PORT`                     | `mcp-app-collections`          | `8081`                  | MCP 服务监听端口            |

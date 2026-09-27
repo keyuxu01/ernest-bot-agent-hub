@@ -4,11 +4,13 @@ import { ResponseValidationPlugin } from '@orpc/contract/plugins';
 import { OpenAPILink } from '@orpc/openapi-client/fetch';
 import type { GreetingResponse } from '@repo/contracts';
 import { BusinessApiContract } from '@repo/contracts/orpc';
+import { resolveApiBaseUrl } from '../utils/resolve-api-base-url';
 
-const apiBaseUrl = (process.env.API_BASE_URL ?? 'http://localhost:8080').replace(
-  /\/$/,
-  '',
-);
+const apiBaseUrl = resolveApiBaseUrl({
+  isBrowser: typeof window !== 'undefined',
+  publicBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+  serverBaseUrl: process.env.API_BASE_URL,
+});
 
 const businessApiLink = new OpenAPILink(BusinessApiContract, {
   url: apiBaseUrl,
@@ -16,6 +18,9 @@ const businessApiLink = new OpenAPILink(BusinessApiContract, {
   plugins: [new ResponseValidationPlugin(BusinessApiContract)],
 });
 
+/**
+ * @description Typed business API client shared by direct calls and TanStack Query utilities.
+ */
 const businessApiClient: ContractRouterClient<typeof BusinessApiContract> =
   createORPCClient(businessApiLink);
 
@@ -27,4 +32,4 @@ const getGreeting = async (): Promise<GreetingResponse> => {
   return businessApiClient.greeting();
 };
 
-export { getGreeting };
+export { businessApiClient, getGreeting };
