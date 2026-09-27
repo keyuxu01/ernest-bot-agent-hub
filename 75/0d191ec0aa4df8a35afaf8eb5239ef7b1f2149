@@ -1,0 +1,113 @@
+apps/agentic-rag-client/package.json
+  s_e2e82d8a95861d::t_366b4aa8732211 11-12,15,28-29
+packages/contracts/tsconfig.build.json
+  s_e2e82d8a95861d::t_328572770f51c6 1-8
+packages/contracts/src/greeting.ts
+  s_e2e82d8a95861d::t_7ed2ab7104dd4d 1-16
+packages/contracts/src/index.ts
+  s_e2e82d8a95861d::t_7ed2ab7104dd4d 2
+.rulesync/rules/frontend.md
+  s_e2e82d8a95861d::t_2df964ff901c21 282,284-288,290-297,302,305,922
+  s_5ac379ebe83c59::t_b502773fc1cf34 289,492,555-556,650
+  s_e2e82d8a95861d::t_8d47ce257a8353 75,78-79,89,173,175,177-182,184-206,210-212,221,223,235,237,242,250,255,257,267,835,839-841,849-851,857-859,867,882
+openspec/changes/share-zod-contracts/tasks.md
+  s_e2e82d8a95861d::t_328572770f51c6 3
+  s_e2e82d8a95861d::t_c792db8be2106c 4-6,10-12,16-17
+  s_e2e82d8a95861d::t_7c258200aee2ad 21
+  s_e2e82d8a95861d::t_3ab019e869e537 22
+  s_e2e82d8a95861d::t_2470b15f196354 1-2,7-9,13-15,18-20
+  s_e2e82d8a95861d::t_1c85bd4bdc54e0 23
+openspec/changes/share-zod-contracts/design.md
+  s_e2e82d8a95861d::t_80026892ae92cb 3,13,58,60,62-63,71,76
+  s_e2e82d8a95861d::t_db834b1db49537 1-2,4-12,14-57,59,61,64-70,72-75,77-82
+turbo.json
+  s_e2e82d8a95861d::t_328572770f51c6 15
+packages/contracts/package.json
+  s_e2e82d8a95861d::t_7ed2ab7104dd4d 2,15-19,25-26
+  s_e2e82d8a95861d::t_328572770f51c6 7-10,13
+apps/mcp-app-collections/src/app.controller.spec.ts
+  s_e2e82d8a95861d::t_8bbe46225e5876 2,20-23
+openspec/config.yaml
+  s_e2e82d8a95861d::t_c00e7fac899738 8-9
+apps/agentic-rag-business-service/package.json
+  s_e2e82d8a95861d::t_366b4aa8732211 35
+openspec/changes/share-zod-contracts/proposal.md
+  s_e2e82d8a95861d::t_6172849cb6d1b2 1-30
+packages/contracts/src/greeting.spec.ts
+  s_5ac379ebe83c59::t_b502773fc1cf34 6-8,11-16
+  s_e2e82d8a95861d::t_7ed2ab7104dd4d 1-5,9-10,17
+apps/agentic-rag-client/lib/api.ts
+  s_5ac379ebe83c59::t_b502773fc1cf34 1
+  s_e2e82d8a95861d::t_366b4aa8732211 8-12,19-24
+.agents/memories/frontend.md
+  s_e2e82d8a95861d::t_2a2a0d9be597e4 267,470,533-534,628
+  s_5ac379ebe83c59::t_a65b136ebf1fa6 53,56-57,67,151,153,155-160,162-184,188-190,199,201,213,215,220,228,233,235,245,260,262-266,268-275,280,283,813,817-819,827-829,835-837,845,860-861,900
+apps/mcp-app-collections/test/app.e2e-spec.ts
+  s_e2e82d8a95861d::t_8bbe46225e5876 3,23-28
+apps/mcp-app-collections/src/app.service.ts
+  s_e2e82d8a95861d::t_366b4aa8732211 7-9
+  s_5ac379ebe83c59::t_b502773fc1cf34 2
+openspec/changes/share-zod-contracts/specs/shared-runtime-contracts/spec.md
+  s_e2e82d8a95861d::t_db834b1db49537 1-55
+apps/mcp-app-collections/package.json
+  s_e2e82d8a95861d::t_366b4aa8732211 38
+README.md
+  s_e2e82d8a95861d::t_c00e7fac899738 39
+apps/agentic-rag-client/lib/api.test.ts
+  s_e2e82d8a95861d::t_366b4aa8732211 1-24,30-34
+  s_5ac379ebe83c59::t_b502773fc1cf34 25-29
+apps/mcp-app-collections/src/app.controller.ts
+  s_e2e82d8a95861d::t_366b4aa8732211 2
+apps/agentic-rag-business-service/src/app.controller.ts
+  s_e2e82d8a95861d::t_366b4aa8732211 2
+packages/contracts/tsconfig.json
+  s_e2e82d8a95861d::t_328572770f51c6 7
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_e2e82d8a95861d::t_8bbe46225e5876 2,23-28
+pnpm-lock.yaml
+  s_dafe19c928fcf0::t_784209769a7ef2 60-62,105,107,142-144,213-215,256-277,5118-5125,7513-7524,7553-7576
+.cursor/rules/frontend.mdc
+  s_e2e82d8a95861d::t_b2655aa9bf5b7b 187,824,834,867
+  s_e2e82d8a95861d::t_2a2a0d9be597e4 273,476,539-540,634
+  s_5ac379ebe83c59::t_a65b136ebf1fa6 59,62-63,73,157,159,161-166,168-186,188-190,194-196,205,207,219,221,226,234,239,241,251,266,268-272,274-281,286,289,819,823,825,833,835,841-843,851,866,906
+.claude/rules/frontend.md
+  s_e2e82d8a95861d::t_2a2a0d9be597e4 273,476,539-540,634
+  s_5ac379ebe83c59::t_a65b136ebf1fa6 59,62-63,73,157,159,161-166,168-190,194-196,205,207,219,221,226,234,239,241,251,266,268-272,274-281,286,289,819,823-825,833-835,841-843,851,866-867,906
+apps/agentic-rag-business-service/src/app.controller.spec.ts
+  s_e2e82d8a95861d::t_8bbe46225e5876 2,20-23
+apps/agentic-rag-business-service/src/app.service.ts
+  s_e2e82d8a95861d::t_366b4aa8732211 7
+  s_5ac379ebe83c59::t_b502773fc1cf34 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "750d191ec0aa4df8a35afaf8eb5239ef7b1f2149",
+  "prompts": {},
+  "sessions": {
+    "s_5ac379ebe83c59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a0e1fc-1273-7ae1-897c-0b8f12e782c2",
+        "model": "unknown"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_dafe19c928fcf0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e2e4-2256-7641-bb27-4a345bcf5295",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_e2e82d8a95861d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e1fc-1273-7ae1-897c-0b8f12e782c2",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
