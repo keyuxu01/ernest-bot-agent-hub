@@ -5,6 +5,7 @@ context: |
   Repository: ernest-bot-agent-pub.
   - apps/agentic-rag-client — Next.js frontend
   - apps/agentic-rag-business-service — NestJS backend
-  - packages/types, packages/ui — shared code
+  - packages/contracts — shared Zod runtime contracts and inferred types
+  - packages/ui — shared frontend components
   Frontend coding rules: .rulesync/rules/frontend.md, scoped to apps/agentic-rag-client/**, packages/ui/**, and apps/mcp-app-collections/web/** only.
   Backend: follow NestJS module conventions and .agents/skills/nestjs-best-practices/

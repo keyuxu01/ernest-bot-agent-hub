@@ -72,10 +72,11 @@ AI coding agent 必须遵守：
 推荐依赖方向：
 
 ```text
-components → hooks → utils/helpers → constants
+components → hooks → utils/helpers → schemas → constants
 ```
 
-类型文件只提供类型声明，不参与运行时逻辑。
+`types` 文件只提供前端本地的类型声明，不参与运行时逻辑。
+`schemas` 包含 Zod 运行时契约，可以依赖 `constants`，但禁止依赖 hooks 或 components。
 
 ### 1.1 Forbidden Dependencies
 
@@ -85,6 +86,7 @@ components → hooks → utils/helpers → constants
 - `utils/helpers` 禁止依赖 `hooks`、`components`
 - `hooks` 禁止依赖 `components`
 - `types` 禁止包含运行时代码
+- `schemas` 禁止依赖 `hooks`、`components`
 - `index.ts` 禁止包含业务逻辑、运行时逻辑、副作用逻辑
 
 ---
@@ -168,19 +170,46 @@ export * from './user';
 
 ## 3. Type Rules
 
-### 3.1 Type Location
+### 3.1 Schema-backed Boundary Contracts
 
-跨模块共享类型必须放在对应 scope 的 `types` 文件夹下。
+所有跨应用、跨进程或来自不可信输入的数据契约必须使用 Zod Schema 定义，包括：
 
-类型文件必须按 scope 拆分。
+- API request / response
+- MCP Tool input / output
+- MCP Widget `structuredContent`
+- 表单提交数据
+- URL 参数和环境变量
+- 外部文件或第三方服务数据
 
-示例：
+跨应用共享契约必须放在 `@repo/contracts`。仅当前端模块内部使用的运行时契约放在对应 scope 的 `schemas` 文件夹。
+
+每一个公开的数据契约必须同时导出 Schema 和由该 Schema 推导出的 Type。Schema 是唯一真相源，禁止另外手写结构相同的 `interface` 或 `type`。
+
+```ts
+const UserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
+type User = z.output<typeof UserSchema>;
+
+export type { User };
+export { UserSchema };
+```
+
+外部数据必须在 API、MCP、表单等信任边界通过 Schema 校验。校验后的推导类型可以在内部正常传递，不要求每个函数重复解析。
+
+### 3.2 Type Location
+
+`types` 文件夹只用于不跨越外部信任边界的前端本地类型，例如 component props、hook 参数/返回值和临时 UI state。
+
+本地类型文件必须按 scope 拆分。
 
 ```text
 types/
-  user.ts
-  order.ts
-  search.ts
+  components.ts
+  hooks.ts
+  ui-state.ts
   index.ts
 ```
 
@@ -189,9 +218,9 @@ types/
 - 类型只在当前文件内部使用
 - 类型不是 props 类型
 - 类型不会被其他组件、hooks、utils 复用
-- 类型不会表达业务领域含义
+- 类型不会表达跨边界数据契约
 
-### 3.2 Props Type Location
+### 3.3 Props Type Location
 
 组件 props 类型必须定义在对应 scope 的 `types` 文件中。
 
@@ -203,17 +232,14 @@ types/
 - 避免子组件 props 从父组件类型中隐式推导
 - 提升跨组件阅读和维护体验
 
-### 3.3 Type Naming
+### 3.4 Type Naming
 
-来自 service / API 原始返回的数据类型，建议使用 `DTO` 后缀。
+来自 service / API 的原始输入类型使用 `DTO` 后缀，并且必须通过对应 Schema 的 `z.input` 推导。
 
 DTO 字段定义必须与接口文档保持一致，接口文档地址：`<!-- TODO: 替换为实际接口文档平台 URL -->`。
 
 ```ts
-type UserDTO = {
-  id: string;
-  user_name: string;
-};
+type UserDTO = z.input<typeof UserSchema>;
 ```
 
 经过 adapter 转换后，前端实际使用的数据类型，必须使用 `UTO` 后缀。
@@ -221,16 +247,14 @@ type UserDTO = {
 `UTO` 强调该类型是原始 API 数据经过 adapter 转换后的产物，字段命名、结构和原始 DTO 可能不同。未经转换直接使用的类型不应使用 `UTO` 后缀。
 
 ```ts
-type UserUTO = {
-  id: string;
-  userName: string;
-};
+type UserUTO = z.output<typeof UserSchema>;
 ```
 
 `DTO` 表示后端或 service 原始数据结构。
 `UTO` 表示前端 UI / hook / component 实际消费的数据结构。
+禁止手写与 Schema 输入或输出结构重复的 DTO / UTO。
 
-### 3.4 Shared Type Reuse
+### 3.5 Shared Type Reuse
 
 多个 methods / components / hooks 使用同一种类型结构时，必须抽取为共享类型。
 
@@ -240,7 +264,7 @@ type UserUTO = {
 
 复杂类型推导必须增加注释说明原因。
 
-### 3.5 Type Comment
+### 3.6 Type Comment
 
 所有导出的类型必须有多行注释，说明类型语义。
 
@@ -255,23 +279,30 @@ type UserUTO = {
 
 ```ts
 /**
- * @description UserDTO is the raw user data returned by service.
- * It should not be used directly by UI components.
+ * @description Validate and transform raw user data returned by service.
  */
-type UserDTO = {
-  id: string;
-  user_name: string;
-};
+const UserSchema = z
+  .object({
+    id: z.string(),
+    user_name: z.string(),
+  })
+  .transform(value => ({
+    id: value.id,
+    userName: value.user_name,
+  }));
+
+/**
+ * @description Raw user data accepted from service.
+ */
+type UserDTO = z.input<typeof UserSchema>;
 
 /**
  * @description UserUTO is the frontend user model used by hooks and components.
  */
-type UserUTO = {
-  id: string;
-  userName: string;
-};
+type UserUTO = z.output<typeof UserSchema>;
 
 export type { UserDTO, UserUTO };
+export { UserSchema };
 ```
 
 ---
@@ -458,7 +489,7 @@ const formatPrice = (params: FormatPriceParams) => {
 
   return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency
+    currency,
   }).format(price);
 };
 
@@ -521,8 +552,8 @@ const safeParseJson = <T>(params: SafeParseJsonParams<T>) => {
       source: 'safeParseJson',
       error,
       extra: {
-        rawValue
-      }
+        rawValue,
+      },
     });
 
     return fallbackValue;
@@ -616,7 +647,7 @@ const UserCard = (props: UserCardProps) => {};
 也允许：
 
 ```tsx
-const UserCard: FC<UserCardProps> = (props) => {};
+const UserCard: FC<UserCardProps> = props => {};
 ```
 
 但同一文件内必须保持一致。
@@ -710,7 +741,6 @@ const useUserList = () => {};
 
 原因：可选参数是参数膨胀的早期信号，提前改为 object parameter 可避免后续因新增参数导致的大范围调用方重构。
 
-
 禁止：
 
 ```ts
@@ -802,11 +832,13 @@ hooks 不应该变成 service layer。
 
 ---
 
-## 8. DTO / UTO Adapter Rules
+## 8. DTO / UTO Schema and Adapter Rules
 
 ### 8.1 Adapter Responsibility
 
-DTO → UTO 的转换逻辑必须独立管理。
+DTO → UTO 的校验和简单结构转换优先由 Zod Schema 管理。
+
+DTO 必须通过 `z.input<typeof Schema>` 推导，UTO 必须通过 `z.output<typeof Schema>` 推导。
 
 禁止在 component 中直接消费复杂 DTO。
 
@@ -814,12 +846,17 @@ DTO → UTO 的转换逻辑必须独立管理。
 
 ### 8.2 Adapter Location
 
-DTO → UTO adapter 应放在对应 scope 的 utils/helpers 中。
+共享 Schema 必须放在 `@repo/contracts`；仅限前端模块内部的 Schema 放在对应 scope 的 `schemas` 中。
+
+只有不适合使用 Schema transform 表达的复杂业务转换，才拆分为对应 scope 的 utils/helpers adapter。
 
 示例：
 
 ```text
 user/
+  schemas/
+    user.ts
+    index.ts
   helpers/
     adapt-user-dto-to-uto.ts
     index.ts
@@ -827,7 +864,7 @@ user/
 
 ### 8.3 Adapter Naming
 
-adapter 函数命名必须表达转换方向。
+Schema 使用 `<Name>Schema` 命名，输入输出类型分别使用 `<Name>DTO` 和 `<Name>UTO`。复杂 adapter 函数命名必须表达转换方向。
 
 ```ts
 const adaptUserDTOToUTO = () => {};
@@ -841,6 +878,8 @@ adapter 必须有注释说明：
 - 输出 UTO 用途
 - 字段转换原因
 - 默认值 / fallback 策略
+
+所有导出的 Schema 必须有多行注释说明其验证边界和用途。
 
 ---
 
@@ -880,6 +919,7 @@ if (status === USER_STATUS.SUCCESS) {
 以下内容必须有多行注释：
 
 - exported type
+- exported schema
 - exported constant
 - exported function
 - exported hook

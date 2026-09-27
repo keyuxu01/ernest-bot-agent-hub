@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { GreetingResponseSchema } from '@repo/contracts';
 import request from 'supertest';
 import { AppModule } from './../src/app.module.js';
 
@@ -19,7 +20,12 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect({ message: 'Hello from mcp-app-collections!' });
+      .expect({ message: 'Hello from mcp-app-collections!' })
+      .expect((response) => {
+        expect(GreetingResponseSchema.safeParse(response.body).success).toBe(
+          true,
+        );
+      });
   });
 
   afterEach(async () => {

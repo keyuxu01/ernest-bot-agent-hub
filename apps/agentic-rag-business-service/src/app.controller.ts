@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import type { GreetingResponse } from '@repo/types';
+import type { GreetingResponse } from '@repo/contracts';
 import { AppService } from './app.service.js';
 
 @Controller()

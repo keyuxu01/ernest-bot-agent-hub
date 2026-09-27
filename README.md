@@ -36,7 +36,7 @@
 │       └── test/                        # e2e 测试
 ├── packages/
 │   ├── eslint-config/                   # 共享 ESLint 配置
-│   ├── types/                           # 前后端共享类型
+│   ├── contracts/                       # Zod 运行时契约及推导类型
 │   ├── typescript-config/               # 共享 TypeScript 配置
 │   └── ui/                              # 共享 React UI 组件
 ├── turbo.json                           # Turbo 任务与缓存配置
