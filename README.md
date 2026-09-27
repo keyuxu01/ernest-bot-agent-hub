@@ -1,6 +1,6 @@
 # Ernest Bot Agent
 
-基于 pnpm 与 Turborepo 的 TypeScript monorepo，包含两个 Next.js 应用、两个 NestJS 服务以及共享配置和类型包。
+基于 pnpm 与 Turborepo 的 TypeScript monorepo，包含两个 Next.js 应用、两个 NestJS 服务以及共享配置、契约和 UI 包。
 
 ## 应用与端口
 
@@ -46,6 +46,12 @@
 
 `dist/`、`.next/` 和 `.turbo/` 是构建或缓存目录，不属于源码结构。
 
+## 架构与技术决策
+
+当前系统边界、协议分工和技术选型状态见
+[`docs/architecture/README.md`](docs/architecture/README.md)。重要选型使用 ADR 记录，
+OpenSpec 继续负责具体变更的提案、设计和实施任务。
+
 ## 环境要求
 
 - Node.js `>= 24`
@@ -56,6 +62,19 @@
 ```bash
 pnpm install
 ```
+
+## 开发前同步 Agent 配置
+
+本仓库使用 RuleSync 统一维护 `.rulesync/rules` 和 `.rulesync/skills`。首次开发或拉取这些目录的
+更新后，请允许 RuleSync 写入本地 Agent 配置目录，并执行：
+
+```bash
+pnpm agent:sync
+```
+
+该命令按照 `rulesync.lock` 安装固定版本的外部 Skills，再为 Codex、Claude Code 和 Cursor
+生成各自的 rules 与 skills。生成文件已加入 `.gitignore`，不得手工修改；需要调整时只修改
+`.rulesync` 源文件。需要主动升级远程 Skills 时使用 `pnpm agent:update`。
 
 ## 本地开发
 

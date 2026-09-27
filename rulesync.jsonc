@@ -4,30 +4,57 @@
   "targets": {
     "claudecode": {
       "rules": {
-        "ruleDiscoveryMode": "explicit"
+        "ruleDiscoveryMode": "explicit",
       },
-      "commands": false
+      "commands": false,
+      "skills": true,
     },
 
     "cursor": {
       "rules": true,
-      "commands": false
+      "commands": false,
+      "skills": true,
     },
 
     "codexcli": {
       "rules": true,
-      "commands": false
+      "commands": false,
+      "skills": true,
     },
 
     "agentsmd": {
       "rules": true,
-      "commands": false
-    }
+      "commands": false,
+      "skills": false,
+    },
   },
+
+  "sources": [
+    {
+      "source": "https://github.com/vercel-labs/agent-skills.git",
+      "transport": "git",
+      "skills": ["react-best-practices"],
+    },
+    {
+      "source": "https://github.com/shadcn-ui/ui.git",
+      "transport": "git",
+      "skills": ["shadcn"],
+    },
+    {
+      "source": "https://github.com/vercel/ai.git",
+      "transport": "git",
+      "skills": ["use-ai-sdk"],
+    },
+    {
+      "source": "https://github.com/vercel/turborepo.git",
+      "transport": "git",
+      "skills": ["turborepo"],
+    },
+  ],
 
   "outputRoots": ["."],
 
   "delete": true,
   "verbose": true,
-  "silent": false
+  "silent": false,
 }

@@ -8,7 +8,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "cz": "git-cz",
-    "agent:sync": "rulesync generate"
+    "agent:sync": "rulesync install --frozen && rulesync generate",
+    "agent:update": "rulesync install --update && rulesync generate",
+    "agent:check": "rulesync generate --check"
   },
   "devDependencies": {
     "commitizen": "^4.3.1",
