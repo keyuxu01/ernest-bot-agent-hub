@@ -1,0 +1,93 @@
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_e2e82d8a95861d::t_5c8365fcc9b0bf 31-57
+  s_e2e82d8a95861d::t_38f1b9410448f2 58
+openspec/changes/integrate-orpc-poc/design.md
+  s_e2e82d8a95861d::t_1d460caff6067f 5,26,28,30,62
+  s_e2e82d8a95861d::t_2737fa1e07ac13 1-4,6-25,27,29,31-61,63-76
+README.md
+  s_e2e82d8a95861d::t_0b1b0ad83f23fd 56,75,80-81,106-122
+  s_5ac379ebe83c59::t_a0bcda39e1c7d7 74,76-77
+openspec/changes/integrate-orpc-poc/.openspec.yaml
+  s_e2e82d8a95861d::t_9dc2b3e2b192c0 1-2
+docs/architecture/decisions/0004-evaluate-orpc.md
+  s_e2e82d8a95861d::t_c5b0f525ab2475 20-35
+  s_e2e82d8a95861d::t_1d460caff6067f 17-19
+packages/contracts/src/orpc/business-api.spec.ts
+  s_e2e82d8a95861d::t_406a7c3b7c496e 15
+  s_e2e82d8a95861d::t_988c9c7e8195da 1-14,16-17
+apps/agentic-rag-client/package.json
+  s_e2e82d8a95861d::t_e3251d136cdf73 15-17
+apps/agentic-rag-business-service/src/business-api.controller.ts
+  s_e2e82d8a95861d::t_b7d90ef65bd13e 1-16
+openspec/changes/integrate-orpc-poc/specs/typed-business-api/spec.md
+  s_e2e82d8a95861d::t_20b1804840d1dc 1-56
+apps/agentic-rag-client/lib/api.ts
+  s_e2e82d8a95861d::t_e3b55879a6d5ab 1-6,13-17
+  s_e2e82d8a95861d::t_105273c94799c8 21
+docs/guides/orpc.md
+  s_e2e82d8a95861d::t_e3e359eb6a1af3 13,23,74-75,78,80-83,86-157
+  s_e2e82d8a95861d::t_0b1b0ad83f23fd 1-7,15-22,24-73,76-77,158-185
+  s_e2e82d8a95861d::t_964ea703d74189 8-12,14
+  s_e2e82d8a95861d::t_57cc8738a6df83 79,84-85
+apps/agentic-rag-business-service/package.json
+  s_e2e82d8a95861d::t_e3251d136cdf73 30-34,43-44
+packages/contracts/src/orpc/business-api.ts
+  s_e2e82d8a95861d::t_988c9c7e8195da 1-23
+apps/agentic-rag-business-service/src/app.module.ts
+  s_e2e82d8a95861d::t_b7d90ef65bd13e 2,5
+  s_e2e82d8a95861d::t_5c8365fcc9b0bf 6,10
+  s_e2e82d8a95861d::t_38f1b9410448f2 9
+openspec/changes/integrate-orpc-poc/proposal.md
+  s_e2e82d8a95861d::t_1d460caff6067f 12,29
+  s_e2e82d8a95861d::t_8905cbb0c3ca0e 1-11,13-28,30
+openspec/changes/integrate-orpc-poc/tasks.md
+  s_e2e82d8a95861d::t_c5b0f525ab2475 15
+  s_e2e82d8a95861d::t_7ce9e96c7c4ae0 4
+  s_e2e82d8a95861d::t_b766b1ecadce88 8
+  s_e2e82d8a95861d::t_c906763cb7220d 14
+  s_e2e82d8a95861d::t_94f09ee63d0bba 1-2,5-7,11-13,16-18
+  s_e2e82d8a95861d::t_3f2ce12170cb87 9-10
+  s_e2e82d8a95861d::t_9146be31dbaf50 19
+  s_e2e82d8a95861d::t_b58b85e821be0d 3
+  s_e2e82d8a95861d::t_e9acb24f72411e 20
+packages/contracts/package.json
+  s_e2e82d8a95861d::t_e3251d136cdf73 23
+  s_e2e82d8a95861d::t_988c9c7e8195da 10-13
+docs/architecture/decisions/0005-evaluate-mcp-nest.md
+  s_e2e82d8a95861d::t_d40121c3d20dd7 22-31
+packages/contracts/src/orpc/index.ts
+  s_e2e82d8a95861d::t_988c9c7e8195da 1
+apps/agentic-rag-business-service/src/openapi.controller.ts
+  s_e2e82d8a95861d::t_5c8365fcc9b0bf 1-21
+docs/architecture/README.md
+  s_e2e82d8a95861d::t_406a7c3b7c496e 45-50
+apps/agentic-rag-client/lib/api.test.ts
+  s_e2e82d8a95861d::t_e3b55879a6d5ab 15,36-40
+  s_e2e82d8a95861d::t_406a7c3b7c496e 26-31
+apps/agentic-rag-business-service/src/business-api.controller.spec.ts
+  s_e2e82d8a95861d::t_b7d90ef65bd13e 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "acb90376017453c2f3134173ede8e51e37918bcc",
+  "prompts": {},
+  "sessions": {
+    "s_5ac379ebe83c59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a0e1fc-1273-7ae1-897c-0b8f12e782c2",
+        "model": "unknown"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_e2e82d8a95861d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e1fc-1273-7ae1-897c-0b8f12e782c2",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
