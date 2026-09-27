@@ -1,9 +1,32 @@
+---
+root: false
+targets: ['claudecode', 'cursor', 'codexcli', 'agentsmd']
+description: 'Frontend coding rules'
+globs:
+  - 'apps/agentic-rag-client/**/*'
+  - 'packages/ui/**/*'
+  - 'apps/mcp-app-collections/web/**/*'
+claudecode:
+  paths:
+    - 'apps/agentic-rag-client/**/*'
+    - 'packages/ui/**/*'
+    - 'apps/mcp-app-collections/web/**/*'
+cursor:
+  alwaysApply: false
+  description: 'Frontend coding rules'
+  globs:
+    - 'apps/agentic-rag-client/**/*'
+    - 'packages/ui/**/*'
+    - 'apps/mcp-app-collections/web/**/*'
+---
+
 # AI Coding Rules
 
-本文件是当前项目的 AI coding 规范唯一真相源。
+本文件是当前仓库前端代码的 AI coding 规范唯一真相源。
 
 所有 coding agent 在创建、修改、重构代码时，必须优先遵守本文件。
-`CLAUDE.md`、`AGENTS.md`、`.cursor/rules/code-style.mdc`、`.kiro/steering/code-style.md` 只作为入口文件引用本规范，不允许定义额外代码风格规则。
+本文件是 RuleSync 唯一规则源；生成的 `CLAUDE.md`、`AGENTS.md`、
+`.cursor/rules/*.mdc` 等文件不得手工维护或定义额外代码风格规则。
 
 ---
 
@@ -11,9 +34,16 @@
 
 ### 0.1 Scope
 
-本规范仅适用于当前仓库的 `apps/agentic-rag-client` 前端子工程。
+本规范仅适用于当前仓库中的前端代码：
 
-该前端子工程是长期迭代的大型前端项目，代码生成必须优先保持现有架构风格，不允许引入新的组织范式。
+- `apps/agentic-rag-client/**`
+- `packages/ui/**`
+- `apps/mcp-app-collections/web/**`
+
+本规范不适用于 `apps/agentic-rag-business-service/**`、
+`apps/mcp-app-collections/src/**` 等后端代码。
+
+这些前端工程是长期迭代的项目，代码生成必须优先保持现有架构风格，不允许引入新的组织范式。
 
 禁止引入以下架构变化：
 
@@ -897,64 +927,3 @@ AI coding agent 必须遵守项目已有 lint 规则。
 如 lint 报错，必须优先修正代码结构，而不是关闭规则。
 
 ---
-
-## 12. Human Review Checklist
-
-### 12.1 Type Check
-
-- [ ] 跨模块共享类型是否放在 `types`
-- [ ] component props 是否放在对应 `types` 文件
-- [ ] exported type 是否在文件底部使用 `export type {}` 统一导出
-- [ ] `types/index.ts` 是否只做显式导出
-- [ ] 是否存在 `export *`
-- [ ] DTO / UTO 命名是否清晰
-- [ ] exported type 是否有多行注释
-
-### 12.2 Constant Check
-
-- [ ] 是否存在 magic string / magic number
-- [ ] 常量是否放在对应 scope 的 `constants`
-- [ ] exported constant 是否在文件底部统一导出
-- [ ] `constants/index.ts` 是否只做显式导出
-- [ ] 常量是否有多行注释说明含义和原因
-
-### 12.3 Utils / Helpers Check
-
-- [ ] 公共可复用函数是否放在对应模块的 `utils/helpers`
-- [ ] 函数是否使用箭头函数
-- [ ] 多参数函数是否使用 object parameter
-- [ ] exported function 是否在文件底部统一导出
-- [ ] 是否尽可能保持纯函数
-- [ ] try/catch 是否有异常埋点或日志
-- [ ] try/catch 是否有注释说明异常原因和降级策略
-- [ ] 复杂多分支是否优先考虑 switch-case
-
-### 12.4 Component Check
-
-- [ ] component 是否只负责 UI render
-- [ ] props 类型是否放在 `types`
-- [ ] component 文件是否超过 120 行
-- [ ] 是否在组件内部定义了子组件
-- [ ] 是否把复杂逻辑抽离到 hooks
-- [ ] 是否把数据转换抽离到 utils/helpers
-- [ ] exported component 是否有多行注释
-- [ ] 是否在文件底部统一导出
-
-### 12.5 Hooks Check
-
-- [ ] hook 是否使用 `useXxx` 命名
-- [ ] hook 入参是否为 object parameter
-- [ ] hook 是否有多行注释
-- [ ] hook 是否直接承载了复杂业务规则
-- [ ] 复杂业务判断是否拆到了 utils/helpers
-- [ ] 网络请求 hook 是否参考 TanStack Query 风格
-- [ ] exported hook 是否在文件底部统一导出
-
-### 12.6 General Check
-
-- [ ] 是否违反 `components → hooks → utils/helpers → constants` 的依赖方向
-- [ ] 是否引入了新架构范式
-- [ ] 是否做了与任务无关的大范围重构
-- [ ] 是否新增了不必要的依赖
-- [ ] 是否绕过 lint / TypeScript 检查
-- [ ] 是否保持了当前模块已有代码风格

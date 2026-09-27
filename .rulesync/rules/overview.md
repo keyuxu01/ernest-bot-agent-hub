@@ -10,15 +10,20 @@ cursor:
 
 # Project Rules
 
-Turborepo monorepo：`apps/agentic-rag-client`（Next.js）、`apps/agentic-rag-business-service`（NestJS）、`packages/*`。
+Turborepo monorepo：`apps/agentic-rag-client`（Next.js）、`apps/agentic-rag-business-service`（NestJS）、`apps/mcp-app-collections`（NestJS + MCP Widget）、`packages/*`。
 
 ## 编码规范
 
-| 子工程 | 规范来源 |
-| ------ | -------- |
-| 前端 `apps/agentic-rag-client` | `apps/agentic-rag-client/AI_CODING_RULES.md` |
-| 后端 `apps/agentic-rag-business-service` | `.agents/skills/nestjs-best-practices/SKILL.md` |
+| 代码范围 | 规范来源 |
+| -------- | -------- |
+| 前端 `apps/agentic-rag-client/**` | `.rulesync/rules/frontend.md` |
+| 前端组件 `packages/ui/**` | `.rulesync/rules/frontend.md` |
+| MCP Widget `apps/mcp-app-collections/web/**` | `.rulesync/rules/frontend.md` |
+| 后端 `apps/agentic-rag-business-service/**` | `.agents/skills/nestjs-best-practices/SKILL.md` |
+| MCP 后端 `apps/mcp-app-collections/src/**` | `.agents/skills/nestjs-best-practices/SKILL.md` |
 | Next.js | `.agents/skills/next-best-practices/SKILL.md` |
+
+前端 coding 规范仅应用于表中三个前端范围，不应用于 NestJS 或 MCP Server 代码。
 
 ## OpenSpec
 

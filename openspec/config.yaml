@@ -6,5 +6,5 @@ context: |
   - apps/agentic-rag-client — Next.js frontend
   - apps/agentic-rag-business-service — NestJS backend
   - packages/types, packages/ui — shared code
-  Frontend coding rules: apps/agentic-rag-client/AI_CODING_RULES.md
+  Frontend coding rules: .rulesync/rules/frontend.md, scoped to apps/agentic-rag-client/**, packages/ui/**, and apps/mcp-app-collections/web/** only.
   Backend: follow NestJS module conventions and .agents/skills/nestjs-best-practices/
