@@ -1,159 +1,108 @@
-# Turborepo starter
+# Ernest Bot Agent
 
-This Turborepo starter is maintained by the Turborepo core team.
+基于 pnpm 与 Turborepo 的 TypeScript monorepo，包含两个 Next.js 应用、两个 NestJS 服务以及共享配置和类型包。
 
-## Using this example
+## 应用与端口
 
-Run the following command:
+当前共有 **4 个应用**：
 
-```sh
-npx create-turbo@latest
+| 应用                           | 技术栈  | 本地开发默认端口 | 用途                     |
+| ------------------------------ | ------- | ---------------: | ------------------------ |
+| `agentic-rag-client`           | Next.js |           `3000` | Agentic RAG 前端         |
+| `docs`                         | Next.js |           `3001` | 项目文档站点             |
+| `agentic-rag-business-service` | NestJS  |           `8080` | Agentic RAG 业务服务     |
+| `mcp-app-collections`          | NestJS  |           `8081` | MCP App Collections 服务 |
+
+两个 NestJS 服务支持通过 `PORT` 环境变量覆盖默认端口。前端默认通过
+`http://localhost:8080` 访问业务服务，可以使用 `API_BASE_URL` 修改接口地址。
+
+## 项目结构
+
+```text
+.
+├── apps/
+│   ├── agentic-rag-client/             # Next.js 前端，端口 3000
+│   │   ├── app/                         # App Router 页面与样式
+│   │   ├── lib/                         # API 客户端等公共逻辑
+│   │   └── public/                      # 静态资源
+│   ├── docs/                            # Next.js 文档站点，端口 3001
+│   │   ├── app/
+│   │   └── public/
+│   ├── agentic-rag-business-service/   # NestJS 业务服务，端口 8080
+│   │   ├── src/                         # 模块、控制器和服务
+│   │   └── test/                        # e2e 测试
+│   └── mcp-app-collections/             # NestJS MCP 服务，端口 8081
+│       ├── src/                         # 模块、控制器和服务
+│       └── test/                        # e2e 测试
+├── packages/
+│   ├── eslint-config/                   # 共享 ESLint 配置
+│   ├── types/                           # 前后端共享类型
+│   ├── typescript-config/               # 共享 TypeScript 配置
+│   └── ui/                              # 共享 React UI 组件
+├── turbo.json                           # Turbo 任务与缓存配置
+├── pnpm-workspace.yaml                  # pnpm workspace 配置
+└── package.json                         # 根任务和工具版本
 ```
 
-## What's inside?
+`dist/`、`.next/` 和 `.turbo/` 是构建或缓存目录，不属于源码结构。
 
-This Turborepo includes the following packages/apps:
+## 环境要求
 
-### Apps and Packages
+- Node.js `>= 24`
+- pnpm `11.23.0`
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `agentic-rag-client`: the [Next.js](https://nextjs.org/) client application
-- `@repo/ui`: a stub React component library shared by both `agentic-rag-client` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## 安装依赖
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+pnpm install
 ```
 
-Without global `turbo`, use your package manager:
+## 本地开发
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm exec turbo build
-pnpm exec turbo build
+同时启动所有应用：
+
+```bash
+pnpm dev
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+启动单个应用：
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+```bash
+pnpm --filter agentic-rag-client dev
+pnpm --filter docs dev
+pnpm --filter agentic-rag-business-service dev
+pnpm --filter mcp-app-collections dev
 ```
 
-Without global `turbo`:
+覆盖 NestJS 服务端口时，建议只启动目标服务：
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+```bash
+PORT=9081 pnpm --filter mcp-app-collections dev
 ```
 
-### Develop
+## 构建与检查
 
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+```bash
+pnpm build
+pnpm lint
+pnpm check-types
 ```
 
-Without global `turbo`, use your package manager:
+运行 NestJS 服务测试：
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
+```bash
+pnpm --filter agentic-rag-business-service test
+pnpm --filter agentic-rag-business-service test:e2e
+pnpm --filter mcp-app-collections test
+pnpm --filter mcp-app-collections test:e2e
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## 环境变量
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+需要环境变量的应用在对应目录中提供 `.env.example`。常用变量如下：
 
-```sh
-turbo dev --filter=agentic-rag-client
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=agentic-rag-client
-pnpm exec turbo dev --filter=agentic-rag-client
-pnpm exec turbo dev --filter=agentic-rag-client
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+| 变量           | 使用方                         | 默认值                  | 说明             |
+| -------------- | ------------------------------ | ----------------------- | ---------------- |
+| `API_BASE_URL` | `agentic-rag-client`           | `http://localhost:8080` | 业务服务地址     |
+| `PORT`         | `agentic-rag-business-service` | `8080`                  | 业务服务监听端口 |
+| `PORT`         | `mcp-app-collections`          | `8081`                  | MCP 服务监听端口 |
