@@ -1,0 +1,63 @@
+apps/mcp-app-collections/src/app.controller.ts
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-13
+apps/mcp-app-collections/src/app.service.ts
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-9
+apps/mcp-app-collections/src/app.module.ts
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-10
+apps/mcp-app-collections/README.md
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-14
+apps/mcp-app-collections/src/main.ts
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-8
+apps/mcp-app-collections/eslint.config.mjs
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-4
+apps/mcp-app-collections/.env.example
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1
+apps/mcp-app-collections/.prettierrc
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-4
+apps/mcp-app-collections/tsconfig.build.json
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-8
+apps/mcp-app-collections/vitest.config.e2e.ts
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-11
+apps/mcp-app-collections/tsconfig.json
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-13
+apps/mcp-app-collections/src/app.controller.spec.ts
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-24
+apps/mcp-app-collections/vitest.config.ts
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-11
+README.md
+  s_e2e82d8a95861d::t_e72915ffc6b2fd 1-8,15-44,47,49,51-52,54,56-57,60,62,64-65,68,70-74,77,79-80,83,85-88,91,93-97,100
+  s_e2e82d8a95861d::t_fec9643955cf6d 102
+  s_5ac379ebe83c59::t_5faab90d2a1fb8 9-14,104-108
+apps/mcp-app-collections/nest-cli.json
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-8
+apps/docs/README.md
+  s_e2e82d8a95861d::t_e72915ffc6b2fd 17
+apps/mcp-app-collections/package.json
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-52
+apps/mcp-app-collections/test/app.e2e-spec.ts
+  s_e2e82d8a95861d::t_4a9c2d8e55d17c 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "2ef9aca2353bbed4e916d15c8d7735ccb64219bf",
+  "prompts": {},
+  "sessions": {
+    "s_5ac379ebe83c59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a0e1fc-1273-7ae1-897c-0b8f12e782c2",
+        "model": "unknown"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_e2e82d8a95861d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e1fc-1273-7ae1-897c-0b8f12e782c2",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
