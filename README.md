@@ -50,6 +50,10 @@
 
 ## 架构与技术决策
 
+产品定位、目标能力、输入材料与当前实现的差异见
+[`docs/guides/product-overview.md`](docs/guides/product-overview.md)。该文档将 RAG 产品蓝图与
+仓库当前状态分开描述，避免把候选技术或规划能力误写成已完成实现。
+
 当前系统边界、协议分工和技术选型状态见
 [`docs/architecture/README.md`](docs/architecture/README.md)。重要选型使用 ADR 记录，
 OpenSpec 继续负责具体变更的提案、设计和实施任务。
