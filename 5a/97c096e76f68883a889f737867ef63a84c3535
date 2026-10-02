@@ -1,0 +1,30 @@
+README.md
+  s_e710c0b5fff3b5::t_2bf388dd66ceb9 53-56
+docs/guides/product-overview.md
+  s_291835d3f63489::t_59d0ddb79de108 14-22,60-69
+  s_e710c0b5fff3b5::t_2bf388dd66ceb9 1-13,23-59,70-121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "5a97c096e76f68883a889f737867ef63a84c3535",
+  "prompts": {},
+  "sessions": {
+    "s_291835d3f63489": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a0fb99-56db-7853-8718-58c642c3274a",
+        "model": "unknown"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_e710c0b5fff3b5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0fb99-56db-7853-8718-58c642c3274a",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
