@@ -34,53 +34,66 @@ The database and vector-store technologies are intentionally undecided in the fi
 ## Deployment Topology
 
 ```text
-ernestbot.com                          api.ernestbot.com
-Vercel                                 Cloudflare
-+------------------+                   +------------------------+
-| Next.js Web      | -- HTTPS/oRPC --> | Worker public ingress  |
-+------------------+                   | CORS / routing / cron  |
-                                       +-----------+------------+
-                                                   |
-                                                   v
-                                       +------------------------+
-                                       | NestJS API Containers  |
-                                       | oRPC / MCP / producers |
-                                       +------------------------+
-                                                   |
-                                                   v
-                                       +------------------------+
-                                       | Managed RabbitMQ       |
-                                       +------------------------+
-                                                   |
-                                                   v
-                                       +------------------------+
-                                       | NestJS Consumer Runtime|
-                                       | provider pending       |
-                                       +------------------------+
+Cloudflare authoritative DNS
+  |
+  +-- know-research.ernestbot.com
+  |       |
+  |       v
+  |   +------------------+
+  |   | Vercel Next.js   |
+  |   | Web              |
+  |   +--------+---------+
+  |            |
+  |            | HTTPS / oRPC
+  |            v
+  +-- know-research-api.ernestbot.com
+          |
+          v
+      +---------------------------+
+      | Railway NestJS API        |
+      | HTTP / oRPC / publishers  |
+      +-------------+-------------+
+                    |
+             publisher confirm
+                    v
+      +---------------------------+
+      | Managed durable RabbitMQ  |
+      +-------------+-------------+
+                    |
+                manual ack
+                    v
+      +---------------------------+
+      | Railway NestJS Consumer   |
+      | always-on / supervised    |
+      +---------------------------+
 
-API and Consumer Runtime ----------> managed Redis
-API and Consumer Runtime ----------> DB / R2 / Vector DB
+Railway Cron publisher -- versioned idempotent command --> RabbitMQ
+
+Railway API and Consumer ----------> managed Redis
+Railway API and Consumer ----------> DB / Object Storage / Vector DB
 ```
 
-The Worker is the only public ingress for Container services. Browser business API calls go directly to
-`api.ernestbot.com`; they do not use a Vercel same-origin rewrite. The Worker uses an exact CORS allowlist for
-the Vercel Web origin and owns preflight handling. Scheduled triggers and Workflows initiate background
-work by publishing commands to RabbitMQ, while NestJS keeps the underlying business use cases. RabbitMQ is
-hosted on durable managed infrastructure outside Cloudflare Containers; Container-local timers are not the
-scheduler of record and Cloudflare Queues is not the primary message broker. Redis provides cache,
-distributed coordination and short-lived state; it does not replace RabbitMQ or the system-of-record
-database.
+Browser business API calls go directly from `know-research.ernestbot.com` to
+`know-research-api.ernestbot.com`; they do not use a Vercel same-origin rewrite. The Railway NestJS API owns
+an exact production CORS allowlist and preflight handling. Cloudflare remains the authoritative DNS provider
+but is not a required application runtime or proxy in this topology.
 
-The Consumer must be a separate supervised, non-scale-to-zero deployment, but its hosting platform is not
-yet selected. Cloudflare Containers and external always-on container platforms remain candidates; GCP Cloud
-Run Worker Pools is an evaluated option, not an accepted decision.
+The API and Consumer are separate Railway services sourced from the same backend workspace. API replicas can
+scale or deploy without changing Consumer count. The Consumer is supervised, never scales to zero and keeps
+its RabbitMQ subscription available while idle. Railway Cron starts short-lived publisher processes that
+publish versioned, idempotent commands and exit; scheduled processes never perform the long-running business
+operation themselves. Ordinary API instances and Consumer instances are not the scheduler of record.
 
-This is the target topology, not the current provisioning state. Cloudflare already manages the
-`ernestbot.com` DNS zone, but Vercel has not been opened and neither the Vercel project nor the Cloudflare
-Worker/Container deployment exists yet. No Web or API DNS routing record should be inferred from the diagram;
-see the [deployment and infrastructure guide](../guides/deployment-and-infrastructure.md) for the rollout order.
-Cloudflare remains the authoritative DNS provider: `ernestbot.com` can point to the future Vercel Web project
-without transferring the domain, while `api.ernestbot.com` is bound to the Cloudflare Worker.
+RabbitMQ uses durable managed infrastructure and remains the primary command and integration-event transport.
+Redis provides cache, distributed coordination and short-lived state; it does not replace RabbitMQ or the
+system-of-record database. Application containers do not own durable state.
+
+This is the selected target topology, not the current provisioning state. Cloudflare already manages the
+`ernestbot.com` DNS zone, but the Vercel and Railway projects, production services and product-scoped DNS
+records are not yet provisioned. No Web or API routing record should be inferred from the diagram; see the
+[deployment and infrastructure guide](../guides/deployment-and-infrastructure.md) for the rollout order.
+Cloudflare DNS will point `know-research.ernestbot.com` to the future Vercel project and
+`know-research-api.ernestbot.com` to the future Railway API without transferring the domain.
 
 Phase 1 deliberately does not introduce Kubernetes. Local infrastructure will run through Docker Compose;
 production RabbitMQ and Redis will use durable managed services. Kubernetes remains an evolution option
@@ -142,7 +155,7 @@ business services -------> data-access abstractions
 Runtime data is validated once when it crosses an external trust boundary. Validated values may flow
 through internal layers without redundant parsing until they cross another boundary.
 
-## Current Decisions
+## Architecture Decision Records
 
 | ADR                                                            | Decision                                            | Status   |
 | -------------------------------------------------------------- | --------------------------------------------------- | -------- |
@@ -151,11 +164,11 @@ through internal layers without redundant parsing until they cross another bound
 | [ADR-0003](./decisions/0003-separate-ai-stream-rpc-and-mcp.md) | Separate AI stream, business API and MCP boundaries | Accepted |
 | [ADR-0004](./decisions/0004-evaluate-orpc.md)                  | Evaluate oRPC for Web-to-service APIs               | Proposed |
 | [ADR-0005](./decisions/0005-evaluate-mcp-nest.md)              | Evaluate `@rekog/mcp-nest` v2 for the MCP service   | Proposed |
-| [ADR-0006](./decisions/0006-use-vercel-and-cloudflare.md)      | Vercel Web with Cloudflare runtime services         | Accepted |
 | [ADR-0007](./decisions/0007-use-rabbitmq.md)                   | RabbitMQ for asynchronous messaging                 | Accepted |
 | [ADR-0008](./decisions/0008-use-redis.md)                      | Redis for cache and distributed coordination        | Accepted |
 | [ADR-0009](./decisions/0009-defer-kubernetes.md)               | Defer Kubernetes during phase 1                     | Accepted |
 | [ADR-0010](./decisions/0010-use-tanstack-query.md)             | TanStack Query for browser server state             | Accepted |
+| [ADR-0011](./decisions/0011-use-vercel-and-railway.md)         | Use Vercel Web with Railway Backend Workloads       | Accepted |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

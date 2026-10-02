@@ -3,6 +3,7 @@ import {
   HealthProbeResponseSchema,
   ServiceIdentityResponseSchema,
 } from '@repo/contracts';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HealthController } from './health.controller.js';
 import { HealthModule } from './health.module.js';
 
@@ -15,6 +16,10 @@ describe('HealthController', () => {
     }).compile();
 
     controller = module.get(HealthController);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it('reports the process as live', async () => {
@@ -38,5 +43,17 @@ describe('HealthController', () => {
       true,
     );
     expect(response.service).toBe('agentic-rag-business-service');
+  });
+
+  it('reports Railway deployment identity and commit version', () => {
+    vi.stubEnv('RAILWAY_REPLICA_ID', 'replica-123');
+    vi.stubEnv('RAILWAY_DEPLOYMENT_ID', 'deployment-456');
+    vi.stubEnv('RAILWAY_GIT_COMMIT_SHA', 'commit-789');
+
+    const response = controller.getIdentity();
+
+    expect(response.instanceId).toBe('replica-123');
+    expect(response.deploymentId).toBe('deployment-456');
+    expect(response.version).toBe('commit-789');
   });
 });

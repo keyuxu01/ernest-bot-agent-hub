@@ -80,13 +80,14 @@ curl http://localhost:8080/
 
 ```bash
 API_BASE_URL=http://business-service.internal:8080 \
-NEXT_PUBLIC_API_BASE_URL=https://api.ernestbot.com \
+NEXT_PUBLIC_API_BASE_URL=https://know-research-api.ernestbot.com \
 pnpm --filter agentic-rag-client dev
 ```
 
-本地开发时两者均使用 `http://localhost:8080`。生产浏览器直接调用 Cloudflare Worker 暴露的
-`api.ernestbot.com`，不通过 Next.js/Vercel rewrite；Worker 必须精确允许
-`https://ernestbot.com` 的 CORS。Vercel 与 Worker 尚未开通部署时，本地继续使用 localhost 配置。
+本地开发时两者均使用 `http://localhost:8080`。生产浏览器从
+`https://know-research.ernestbot.com` 直接调用 Railway 暴露的
+`https://know-research-api.ernestbot.com`，不通过 Next.js/Vercel rewrite；NestJS API 必须精确允许
+Web Origin 并处理预检。Vercel 与 Railway 尚未开通部署时，本地继续使用 localhost 配置。
 
 ## TanStack Query 使用方式
 

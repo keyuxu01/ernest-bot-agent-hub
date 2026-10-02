@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-09-28
+- Related: ADR-0011 selects Railway for application compute
 
 ## Context
 
@@ -10,17 +11,16 @@ Kubernetes would provide mature rollout, self-healing, service discovery and wor
 also add cluster, ingress, storage, backup, monitoring, security and upgrade responsibilities. Running
 RabbitMQ or Redis on Kubernetes does not make those stateful systems managed services.
 
-Cloudflare Containers currently require explicit instance and routing management rather than providing the
-same mature autoscaling model as Kubernetes. That limitation is acceptable for phase 1, while the workload
-and team are still small.
+Railway provides sufficient deployment, restart, networking and service isolation capabilities for the
+current workload without requiring the team to operate a Kubernetes control plane.
 
 ## Decision
 
 - Do not introduce a production Kubernetes cluster during phase 1.
 - Use Docker Compose for local RabbitMQ and Redis dependencies.
 - Use managed RabbitMQ and managed Redis in production rather than self-hosting stateful clusters.
-- Continue running stateless NestJS API/MCP processes in Cloudflare Containers behind the public Worker.
-- Run RabbitMQ consumers as separate continuously available Container processes; do not mix consumer
+- Run stateless NestJS API/MCP processes as Railway services.
+- Run RabbitMQ consumers as separate continuously available Railway services; do not mix consumer
   lifecycle with request-serving API replicas.
 - Keep deployment manifests, configuration and application boundaries portable so NestJS workloads can move
   to Kubernetes later without moving business logic.
@@ -32,7 +32,7 @@ conditions are true:
 - multiple independently deployed backend services or consumer types exist;
 - queue-depth-driven autoscaling is required;
 - rolling/canary delivery, namespace isolation or private networking is a concrete requirement;
-- managed service or Container limitations create measured cost, reliability or scaling problems.
+- managed-service or Railway limitations create measured cost, reliability or scaling problems.
 
 ## Stateless NestJS Constraint
 
@@ -53,7 +53,7 @@ therefore be replaced and RabbitMQ can redeliver unacknowledged work.
 
 - Phase 1 avoids premature cluster operations and keeps the platform smaller.
 - Managed RabbitMQ and Redis add vendor cost but transfer persistence, failover, backup and upgrade duties.
-- Cloudflare Container consumer scaling is less automatic than Kubernetes and must be monitored explicitly.
+- Railway Consumer scaling and queue backlog must be monitored explicitly.
 - A future Kubernetes migration would place NestJS APIs and workers in Deployments behind an Ingress or
   Gateway; managed RabbitMQ and Redis can remain external during that migration.
 
@@ -61,8 +61,8 @@ therefore be replaced and RabbitMQ can redeliver unacknowledged work.
 
 - Kubernetes for every workload now: powerful, but disproportionate to the current service count and
   operations capacity.
-- Cloudflare compute with RabbitMQ and Redis on a separate Kubernetes cluster: rejected because it combines
-  two compute control planes and adds unnecessary cross-platform networking.
+- Railway compute with RabbitMQ and Redis on a separate Kubernetes cluster: rejected because it combines two
+  compute control planes and adds unnecessary cross-platform networking.
 - Kubernetes for stateless NestJS while retaining managed RabbitMQ and Redis: a valid future migration path
   when workload scaling justifies it.
 
@@ -71,4 +71,3 @@ therefore be replaced and RabbitMQ can redeliver unacknowledged work.
 - [Kubernetes capabilities and boundaries](https://kubernetes.io/docs/concepts/overview/)
 - [Kubernetes Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 - [Kubernetes StatefulSets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)
-- [Cloudflare Containers scaling and routing](https://developers.cloudflare.com/containers/configuration/scaling-and-routing/)

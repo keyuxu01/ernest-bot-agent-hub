@@ -41,13 +41,11 @@ class HealthController {
   @Get('whoami')
   @Header('Cache-Control', 'no-store')
   getIdentity(): ServiceIdentityResponse {
-    const deploymentId = getNonEmptyEnvironmentValue(
-      'CLOUDFLARE_DEPLOYMENT_ID',
-    );
+    const deploymentId = getNonEmptyEnvironmentValue('RAILWAY_DEPLOYMENT_ID');
     const instanceId =
-      getNonEmptyEnvironmentValue('CLOUDFLARE_DURABLE_OBJECT_ID') ??
-      deploymentId ??
+      getNonEmptyEnvironmentValue('RAILWAY_REPLICA_ID') ??
       getNonEmptyEnvironmentValue('CONTAINER_INSTANCE_ID') ??
+      deploymentId ??
       LOCAL_INSTANCE_ID;
 
     return ServiceIdentityResponseSchema.parse({
@@ -57,6 +55,7 @@ class HealthController {
       deploymentId: deploymentId ?? null,
       version:
         getNonEmptyEnvironmentValue('SERVICE_VERSION') ??
+        getNonEmptyEnvironmentValue('RAILWAY_GIT_COMMIT_SHA') ??
         UNKNOWN_SERVICE_VERSION,
       uptimeSeconds: Math.floor(process.uptime()),
     });

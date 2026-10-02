@@ -2,25 +2,24 @@
 
 - Status: Accepted
 - Date: 2026-09-27
-- Supersedes: the Cloudflare Queues portion of ADR-0006
+- Amended by: ADR-0011, which selects Railway for the continuously running Consumer
 
 ## Context
 
 Knowledge ingestion requires durable asynchronous commands, explicit acknowledgement, backpressure,
 dead-letter routing and independently scalable consumers. RabbitMQ is a project requirement and must remain
-the primary message broker rather than being replaced by Cloudflare Queues.
+the primary message broker.
 
-Cloudflare Container disks are ephemeral, while a production RabbitMQ broker requires stable durable
-storage. A sleeping API Container also cannot maintain a long-lived consumer connection. Broker and consumer
-lifecycle therefore need separate deployment responsibilities.
+Stateless application containers are replaceable, while a production RabbitMQ broker requires stable durable
+storage. API replicas also scale and deploy independently from long-lived consumers. Broker, API and Consumer
+lifecycles therefore need separate deployment responsibilities.
 
 ## Decision
 
 - Use RabbitMQ as the primary asynchronous command and event transport.
-- Run production RabbitMQ on external managed, durable infrastructure; do not run the broker in a
-  Cloudflare Container.
-- Run HTTP/oRPC producers in the NestJS API Container and consumers in a separate, continuously running
-  NestJS Consumer deployment. The Consumer hosting platform is pending a later decision.
+- Run production RabbitMQ on managed, durable infrastructure outside application-service filesystems.
+- Run HTTP/oRPC producers in the Railway NestJS API service and consumers in a separate, continuously running
+  Railway NestJS Consumer service.
 - Keep the Consumer runtime supervised and non-scale-to-zero. Its platform health system or an external
   watchdog checks `/health/whoami` for instance identity and uptime plus `/health/ready` for RabbitMQ
   connection and consumer registration; repeated failures trigger an explicit restart and an alert.
@@ -36,42 +35,43 @@ lifecycle therefore need separate deployment responsibilities.
 - Do not introduce BullMQ or Redis-backed jobs alongside RabbitMQ; RabbitMQ remains the single primary task
   and event transport.
 
-Cloudflare Cron Triggers or scheduled Workflows may initiate periodic work, but they publish commands into
-RabbitMQ. Cloudflare Queues is not used as a parallel primary broker.
+ADR-0011 selects short-lived Railway Cron publishers as the default periodic trigger. Any later external
+scheduler still publishes commands into RabbitMQ; the system does not add a parallel primary broker.
 
 ## Runtime Topology
 
 ```text
 Vercel Web
     |
-Cloudflare Worker ingress / scheduled trigger
-    |
-NestJS API Container -- publisher confirm --> Managed RabbitMQ
-                                                 |
-                                                 v
-                                  Always-on NestJS Consumer Runtime
-                                  hosting provider: pending
-                                                 |
-                                      manual ack after durable result
+Railway NestJS API -- publisher confirm --+
+                                           |
+Railway Cron publisher -- publisher confirm+--> Managed RabbitMQ
+                                                     |
+                                                     v
+                                          Railway NestJS Consumer
+                                          always-on / supervised
+                                                     |
+                                          manual ack after durable result
 ```
 
 ## Consequences
 
 - Production gains RabbitMQ routing, acknowledgements, prefetch, retry and dead-letter capabilities.
-- The deployment adds a stateful managed service outside Vercel and Cloudflare.
+- The deployment adds a stateful managed service outside the stateless application-process lifecycle.
 - Consumer instances cannot scale to zero while they are responsible for active RabbitMQ subscriptions.
 - Health probes detect failure but do not provide recovery by themselves; the watchdog owns recovery, while
   RabbitMQ retains unacknowledged or queued work during Consumer downtime.
 - AMQP connections must reconnect after Consumer restarts and deployments.
 - Broker region selection must minimize latency to the NestJS Consumer runtime.
-- Cloudflare Workflows are optional orchestration infrastructure, not a replacement message broker.
+- Workflow orchestration, if introduced later, is not a replacement message broker.
 
 ## Alternatives
 
-- Cloudflare Queues: operationally simpler inside Cloudflare, but does not meet the RabbitMQ requirement.
-- RabbitMQ inside Cloudflare Containers: rejected because broker storage would be ephemeral and Container
-  lifecycle is unsuitable for durable stateful infrastructure.
-- RabbitMQ consumers inside API Containers: rejected because API replicas can sleep or scale independently,
+- Another queue product: rejected because RabbitMQ is the selected primary broker and two brokers would split
+  delivery, retry and operational semantics.
+- RabbitMQ inside an application service: rejected because application filesystems and service lifecycles are
+  unsuitable for durable stateful infrastructure.
+- RabbitMQ consumers inside API services: rejected because API replicas can restart or scale independently,
   causing unpredictable consumer count and duplicate workload pressure.
 
 ## References
