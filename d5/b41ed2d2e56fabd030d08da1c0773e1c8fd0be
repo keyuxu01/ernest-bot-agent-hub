@@ -1,0 +1,64 @@
+docs/guides/deployment-and-infrastructure.md
+  s_6be61e00c01b4e::t_7a304b869bf855 114-115
+  s_f8b4276fc13a81::t_31585ee6ea660c 9-23,41-44,88-92,121-127,197-201
+  s_6be61e00c01b4e::t_2914dfae4e0408 3-5,30-34,38-39,46-50,55-81,84-86,94-100,104-105,107-110,132-138,140,143-145,147,149,151-155,157-158,162,174-177,190-191,193,195,203-204,206-208,210,212,214-220,223,225,227-234,237-243,245,247-274,276-279,283-300,307
+openspec/specs/frontend-server-state/spec.md
+  s_6be61e00c01b4e::t_c9edc19b46983e 1-2,5,7,11,16,25,39,53,58
+docs/architecture/decisions/0011-use-vercel-and-railway.md
+  s_6be61e00c01b4e::t_2fada585d30202 10-11
+  s_6be61e00c01b4e::t_7a304b869bf855 93
+  s_6be61e00c01b4e::t_5515fe68e39d84 1,4-5,9,13-15,17,19-86,90-92,94-102,106-117
+.rulesync/rules/backend.md
+  s_6be61e00c01b4e::t_ad4931b713bda9 47-50,54-56
+docs/architecture/decisions/0009-defer-kubernetes.md
+  s_6be61e00c01b4e::t_2fada585d30202 5,14-15,22-23,35,56,64-65
+docs/guides/orpc.md
+  s_6be61e00c01b4e::t_e54045e02783cf 83,87-90
+apps/agentic-rag-business-service/src/health/health.controller.ts
+  s_6be61e00c01b4e::t_cbbbd906910e07 44,46,48,58
+apps/agentic-rag-business-service/src/health/health.controller.spec.ts
+  s_6be61e00c01b4e::t_79d61be6ca91fc 6,21-24,47-57
+openspec/specs/railway-deployment/spec.md
+  s_6be61e00c01b4e::t_c9edc19b46983e 1-120
+openspec/specs/shared-runtime-contracts/spec.md
+  s_6be61e00c01b4e::t_c9edc19b46983e 1-2,7
+openspec/changes/archive/2026-10-02-adopt-railway-deployment-topology/design.md
+  s_6be61e00c01b4e::t_2fada585d30202 3,5-7,13-18,22-26,30-42,44,46-50,52,54,56,58-60,62,64,66,68,70-72,74,76,78,80,82-96,100-105,109-114
+openspec/changes/archive/2026-10-02-adopt-railway-deployment-topology/proposal.md
+  s_6be61e00c01b4e::t_2fada585d30202 3,7-13,19,23,27-33
+docs/architecture/README.md
+  s_6be61e00c01b4e::t_296c5a67613b83 158
+  s_f8b4276fc13a81::t_dfda16ae724a5d 171
+  s_6be61e00c01b4e::t_7c416a0e4c7453 37-73,76-96
+docs/architecture/decisions/0007-use-rabbitmq.md
+  s_6be61e00c01b4e::t_5515fe68e39d84 5
+  s_6be61e00c01b4e::t_2ee5bcb3485305 46-54
+  s_6be61e00c01b4e::t_9be4efbd2bdfa4 38,60
+  s_6be61e00c01b4e::t_2fada585d30202 11,13-15,20-22,39,66,70-74
+openspec/specs/typed-business-api/spec.md
+  s_6be61e00c01b4e::t_c9edc19b46983e 1-2,7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "d5b41ed2d2e56fabd030d08da1c0773e1c8fd0be",
+  "prompts": {},
+  "sessions": {
+    "s_6be61e00c01b4e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0faa6-25c8-74a1-ad8e-915cad786848",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_f8b4276fc13a81": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a0faa6-25c8-74a1-ad8e-915cad786848",
+        "model": "unknown"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
