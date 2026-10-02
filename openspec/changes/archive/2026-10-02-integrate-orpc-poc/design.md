@@ -1,8 +1,10 @@
 ## Context
 
+> Archive correction (2026-10-02): Subsequent module-boundary verification established that the NestJS deployment units use CommonJS package boundaries with NodeNext resolution. This correction updates only that architectural premise; the archived change scope and completion record are unchanged.
+
 See `proposal.md` for motivation and `specs/typed-business-api/spec.md` for observable requirements. Today the Next.js server component calls a hand-written `fetch` wrapper, the NestJS service exposes `GET /`, and both sides share only `GreetingResponseSchema` from `@repo/contracts`.
 
-The repository already uses ESM, NodeNext-compatible NestJS output, Node.js 24+, Zod 4 and explicit package exports. Those constraints match the stable oRPC v1 NestJS integration requirements. This PoC evaluates only npm `latest` releases and excludes `beta`, `next` and other prerelease tags.
+The repository uses CommonJS NestJS deployment units with NodeNext module resolution, Node.js 24+, Zod 4 and explicit compiled package exports. NodeNext type-checks the ESM-only oRPC packages correctly, while Node.js 24 allows the emitted CommonJS code to load them through synchronous `require(ESM)`. Those constraints match the stable oRPC v1 NestJS integration requirements. This PoC evaluates only npm `latest` releases and excludes `beta`, `next` and other prerelease tags.
 
 ## Goals / Non-Goals
 
@@ -37,9 +39,12 @@ This prevents MCP and ordinary schema consumers from loading oRPC transitively. 
 
 ### Implement the contract through `@orpc/nest` and existing services
 
-The NestJS controller will use the official contract implementation decorator and delegate to `AppService`; it will not duplicate the greeting business behavior. The application module will configure the oRPC Nest integration and centralized error logging without exposing internal errors.
+The NestJS `GreetingRpcController` uses the official contract implementation decorator and delegates to
+`GreetingService`; it does not duplicate the greeting business behavior. `GreetingModule` owns the controller
+and service, while the root application module configures the oRPC Nest integration and centralized error
+logging without exposing internal errors.
 
-The existing `AppController.getHello()` and `GET /` remain unchanged during the PoC. This gives a direct compatibility test and rollback path.
+The existing `GreetingController.getHello()` and `GET /` remain unchanged during the PoC. This gives a direct compatibility test and rollback path.
 
 ### Use an OpenAPI link with client-side response validation
 

@@ -1,16 +1,16 @@
 import { Controller } from '@nestjs/common';
 import { Implement, implement } from '@orpc/nest';
 import { BusinessApiContract } from '@repo/contracts/orpc';
-import { AppService } from './app.service.js';
+import { GreetingService } from './greeting.service';
 
 @Controller()
-export class BusinessApiController {
-  constructor(private readonly appService: AppService) {}
+export class GreetingRpcController {
+  constructor(private readonly greetingService: GreetingService) {}
 
   @Implement(BusinessApiContract.greeting)
   greeting() {
     return implement(BusinessApiContract.greeting).handler(() =>
-      this.appService.getHello(),
+      this.greetingService.getHello(),
     );
   }
 }

@@ -1,4 +1,4 @@
-export type { GreetingResponse } from './greeting.js';
-export { GreetingResponseSchema } from './greeting.js';
-export type { HealthProbeResponse, ServiceIdentityResponse } from './health.js';
-export { HealthProbeResponseSchema, ServiceIdentityResponseSchema } from './health.js';
+export type { GreetingResponse } from './greeting';
+export { GreetingResponseSchema } from './greeting';
+export type { HealthProbeResponse, ServiceIdentityResponse } from './health';
+export { HealthProbeResponseSchema, ServiceIdentityResponseSchema } from './health';

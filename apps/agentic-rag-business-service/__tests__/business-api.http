@@ -1,0 +1,57 @@
+# 本地业务 API（REST Client / httpYac）
+# 先启动：pnpm --filter agentic-rag-business-service dev
+# 默认端口见 apps/agentic-rag-business-service/.env.dev（9020；9000/9001 为 Compose RustFS）
+
+@host = http://127.0.0.1
+@port = 9020
+@baseUrl = {{host}}:{{port}}
+
+### Root greeting
+GET {{baseUrl}}/
+
+### Typed greeting (oRPC contract route)
+GET {{baseUrl}}/api/greeting
+
+### Health whoami
+GET {{baseUrl}}/health/whoami
+
+### OpenAPI JSON
+GET {{baseUrl}}/openapi.json
+
+### List documents
+GET {{baseUrl}}/documents?page=1&pageSize=20
+
+### Create document
+# @name createDocument
+POST {{baseUrl}}/documents
+Content-Type: application/json
+
+{
+  "title": "http client smoke test",
+  "content": "## smoke\n\nfrom __tests__/business-api.http"
+}
+
+### Get document (uses id from create)
+GET {{baseUrl}}/documents/{{createDocument.response.body.id}}
+
+### Update document
+PATCH {{baseUrl}}/documents/{{createDocument.response.body.id}}
+Content-Type: application/json
+
+{
+  "title": "http client smoke test (updated)"
+}
+
+### Soft delete document
+DELETE {{baseUrl}}/documents/{{createDocument.response.body.id}}
+
+### Get after delete (expect 404)
+GET {{baseUrl}}/documents/{{createDocument.response.body.id}}
+
+### Validation error (expect 400 — missing content)
+POST {{baseUrl}}/documents
+Content-Type: application/json
+
+{
+  "title": "bad request"
+}

@@ -5,7 +5,9 @@
 
 ## 2. NestJS Contract Implementation
 
-- [x] 2.1 Configure the official oRPC NestJS module and implement the greeting contract by delegating to `AppService`, then verify focused controller tests cover a contract-valid result.
+- [x] 2.1 Configure the official oRPC NestJS module and implement the greeting contract in `GreetingModule` by
+      delegating from `GreetingRpcController` to `GreetingService`, then verify focused controller tests cover a
+      contract-valid result.
 - [x] 2.2 Generate OpenAPI from the shared contract and expose it at `GET /openapi.json`, then verify e2e tests assert the greeting path, method and response schema are present.
 - [x] 2.3 Extend e2e coverage for `GET /api/greeting` while retaining the existing `GET /` assertions, and verify both routes return the same contract-valid greeting.
 

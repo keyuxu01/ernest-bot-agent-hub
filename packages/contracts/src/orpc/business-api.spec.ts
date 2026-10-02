@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { GreetingResponseSchema } from '../greeting.js';
-import { BusinessApiContract, GreetingContract } from './business-api.js';
+import { GreetingResponseSchema } from '../greeting';
+import { BusinessApiContract, GreetingContract } from './business-api';
 
 describe('BusinessApiContract', () => {
   it('defines the greeting OpenAPI route', () => {

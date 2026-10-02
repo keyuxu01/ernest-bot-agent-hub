@@ -1,0 +1,10 @@
+# MCP 服务（REST Client / httpYac）
+# 先启动：pnpm --filter mcp-app-collections dev
+# 默认端口见 apps/mcp-app-collections/.env.dev（9021）
+
+@host = http://127.0.0.1
+@port = 9021
+@baseUrl = {{host}}:{{port}}
+
+### Root
+GET {{baseUrl}}/

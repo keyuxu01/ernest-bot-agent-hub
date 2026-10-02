@@ -7,7 +7,7 @@ describe('resolveApiBaseUrl', () => {
     const apiBaseUrl = resolveApiBaseUrl({
       isBrowser: true,
       publicBaseUrl: 'https://api.example.com/',
-      serverBaseUrl: 'http://business-service.internal:8080',
+      serverBaseUrl: 'http://business-service.internal:9020',
     });
 
     expect(apiBaseUrl).toBe('https://api.example.com');
@@ -17,10 +17,10 @@ describe('resolveApiBaseUrl', () => {
     const apiBaseUrl = resolveApiBaseUrl({
       isBrowser: false,
       publicBaseUrl: 'https://api.example.com',
-      serverBaseUrl: 'http://business-service.internal:8080/',
+      serverBaseUrl: 'http://business-service.internal:9020/',
     });
 
-    expect(apiBaseUrl).toBe('http://business-service.internal:8080');
+    expect(apiBaseUrl).toBe('http://business-service.internal:9020');
   });
 
   it('uses the direct local business-service origin by default', () => {

@@ -10,7 +10,7 @@ import {
   BUSINESS_SERVICE_NAME,
   LOCAL_INSTANCE_ID,
   UNKNOWN_SERVICE_VERSION,
-} from './health.constants.js';
+} from './health.constants';
 
 const getNonEmptyEnvironmentValue = (name: string): string | undefined => {
   const value = process.env[name]?.trim();

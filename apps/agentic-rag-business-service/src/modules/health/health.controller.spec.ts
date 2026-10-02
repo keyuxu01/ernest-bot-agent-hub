@@ -4,8 +4,8 @@ import {
   ServiceIdentityResponseSchema,
 } from '@repo/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { HealthController } from './health.controller.js';
-import { HealthModule } from './health.module.js';
+import { HealthController } from './health.controller';
+import { HealthModule } from './health.module';
 
 describe('HealthController', () => {
   let controller: HealthController;

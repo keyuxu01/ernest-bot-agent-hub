@@ -27,6 +27,9 @@ cursor:
 ## Architecture
 
 - 按业务 feature module 组织代码，禁止新增按 controller/service/repository 横向聚合的全局目录。
+- 业务服务的 feature module 统一位于 `src/modules/<feature>`；数据库连接等技术设施位于
+  `src/infrastructure/<capability>`。根 `AppModule` 只负责组合模块，不直接注册业务 Controller 或 Service。
+- 模块间使用指向具体文件的相对导入；不要新增 `modules/index.ts` 等 barrel 入口来隐藏依赖关系。
 - Controller 与协议 handler 只负责输入输出适配、鉴权上下文接入和调用业务服务。
 - 业务规则放在 service 或 use case；禁止在 Controller、MCP Tool 或 DTO 中实现业务规则。
 - 数据访问必须经过明确的数据访问抽象；Controller 不得直接操作数据库或向量数据库。
@@ -34,7 +37,10 @@ cursor:
 
 ## Runtime and Errors
 
-- 保持 ESM 与 NodeNext 兼容，内部相对导入使用能够在编译后 Node.js 中解析的 `.js` specifier。
+- NestJS 应用保持 CommonJS package boundary，并使用 TypeScript `NodeNext` 模块解析；源码中的内部相对
+  导入省略文件扩展名。运行时最低 Node.js 版本为 24，以支持从 CommonJS 同步加载所需的 ESM-only 依赖。
+- 共享运行时包必须通过 `dist` 暴露编译产物和声明文件；不得让生产 Node.js 进程依赖工作区 TypeScript
+  源码或仅靠消费者 bundler 才能解析的入口。
 - 外部输入和输出必须在边界进行运行时校验。
 - 业务错误必须映射为稳定错误码；不要把内部异常、堆栈或敏感信息直接返回给客户端。
 - catch 异常时记录必要上下文，但不得记录凭据、完整文档内容或其他敏感数据。

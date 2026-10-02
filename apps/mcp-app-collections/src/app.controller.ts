@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import type { GreetingResponse } from '@repo/contracts';
-import { AppService } from './app.service.js';
+import { AppService } from './app.service';
 
 @Controller()
 export class AppController {

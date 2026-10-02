@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GreetingResponseSchema } from './greeting.js';
+import { GreetingResponseSchema } from './greeting';
 
 describe('GreetingResponseSchema', () => {
   it('accepts a valid greeting response', () => {

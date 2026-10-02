@@ -25,8 +25,8 @@ Next.js Server Component or browser query hook
   -> apps/agentic-rag-client/lib/business-api-query.ts (browser query only)
   -> oRPC OpenAPILink + ResponseValidationPlugin
   -> GET /api/greeting
-  -> NestJS BusinessApiController
-  -> AppService
+  -> NestJS GreetingRpcController
+  -> GreetingService
   -> GreetingResponseSchema validates the output
 ```
 
@@ -34,8 +34,8 @@ Next.js Server Component or browser query hook
 
 - 基础 Zod schema：`packages/contracts/src/greeting.ts`
 - oRPC contract：`packages/contracts/src/orpc/business-api.ts`
-- NestJS 实现：`apps/agentic-rag-business-service/src/business-api.controller.ts`
-- OpenAPI 输出：`apps/agentic-rag-business-service/src/openapi.controller.ts`
+- NestJS 实现：`apps/agentic-rag-business-service/src/modules/greeting/greeting-rpc.controller.ts`
+- OpenAPI 输出：`apps/agentic-rag-business-service/src/modules/api-docs/openapi.controller.ts`
 - Next.js client：`apps/agentic-rag-client/lib/api.ts`
 - TanStack Query utilities：`apps/agentic-rag-client/lib/business-api-query.ts`
 - Browser QueryClient：`apps/agentic-rag-client/lib/query-client.ts`
@@ -62,9 +62,9 @@ pnpm --filter agentic-rag-client dev
 验证接口：
 
 ```bash
-curl http://localhost:8080/api/greeting
-curl http://localhost:8080/openapi.json
-curl http://localhost:8080/
+curl http://localhost:9020/api/greeting
+curl http://localhost:9020/openapi.json
+curl http://localhost:9020/
 ```
 
 预期 greeting 响应：
@@ -76,15 +76,15 @@ curl http://localhost:8080/
 ```
 
 打开 `http://localhost:3000` 可以验证 Next.js 通过 typed query client 读取结果。业务服务地址默认是
-`http://localhost:8080`。Server Component 与浏览器地址可以分别覆盖：
+`http://localhost:9020`。Server Component 与浏览器地址可以分别覆盖：
 
 ```bash
-API_BASE_URL=http://business-service.internal:8080 \
+API_BASE_URL=http://business-service.internal:9020 \
 NEXT_PUBLIC_API_BASE_URL=https://know-research-api.ernestbot.com \
 pnpm --filter agentic-rag-client dev
 ```
 
-本地开发时两者均使用 `http://localhost:8080`。生产浏览器从
+本地开发时两者均使用 `http://localhost:9020`。生产浏览器从
 `https://know-research.ernestbot.com` 直接调用 Railway 暴露的
 `https://know-research-api.ernestbot.com`，不通过 Next.js/Vercel rewrite；NestJS API 必须精确允许
 Web Origin 并处理预检。Vercel 与 Railway 尚未开通部署时，本地继续使用 localhost 配置。

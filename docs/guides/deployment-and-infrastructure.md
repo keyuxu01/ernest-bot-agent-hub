@@ -19,7 +19,7 @@ OpenSpec 变更完成。
 | 消息系统           | RabbitMQ                          | 已选型，待接入                |
 | 缓存与协调         | Redis                             | 已选型，待接入                |
 | 数据库 / Vector DB | 尚未选择                          | 待决策                        |
-| 本地基础设施       | Docker Compose                    | 已选型，待实现                |
+| 本地基础设施       | Compose（本地使用 Podman）        | 配置已实现，待运行验收        |
 | 生产 Kubernetes    | 第一阶段暂不引入                  | 已选型                        |
 
 “已选型”只表示架构决策已经接受，不表示供应商资源已经购买、项目已经创建或生产环境已经部署。
@@ -246,6 +246,11 @@ Railpack 默认提供构建层缓存，但缓存命中不保证。可选地给 R
 
 - `NEXT_PUBLIC_API_BASE_URL` 会进入浏览器构建，必须参与 `build` task hash；
 - Railway `PORT` 仅在运行时读取，可以 pass-through 而不影响 hash；
+- `POSTGRES_HOST`、`POSTGRES_PORT`、`POSTGRES_USER`、`POSTGRES_PASSWORD`、`POSTGRES_DB` 和 `MONGO_URI`
+  仅在业务服务运行时读取，可以 pass-through；生产凭据必须由 Railway variables 或 secret manager
+  注入，不能使用仓库中的本地示例值；
+- `SNOWFLAKE_WORKER_ID` 与 `SNOWFLAKE_OFFSET` 仅在业务服务运行时读取，可以 pass-through；每个并发
+  ID 生成实例必须使用唯一的 worker ID，已产生持久化 ID 后不得修改 offset；
 - `API_BASE_URL` 是否参与 hash 取决于最终 Next.js 构建/运行时读取方式，验证前不能跨不同值承诺复用。
 
 当前 `turbo.json` 把这些变量放在 `globalPassThroughEnv`，后续启用 Remote Cache 的实施变更必须先把
@@ -254,13 +259,17 @@ Railpack 默认提供构建层缓存，但缓存命中不保证。可选地给 R
 
 ## 本地开发
 
-目标是用 Docker Compose 提供 RabbitMQ、Redis 和后续数据库，应用代码仍通过 pnpm 启动以保留热更新：
+本地使用 Podman Compose 提供共享基础设施，应用代码仍通过 pnpm 启动以保留热更新。`docker-compose.yml` 保持 Compose 规范兼容，不依赖 Podman 专属语法：
 
 ```text
-Docker Compose
-  +-- RabbitMQ + management UI
-  +-- Redis
-  `-- Database（选型后加入）
+Podman Compose
+  +-- PostgreSQL + pgAdmin
+  +-- MongoDB + mongo-express
+  +-- Redis + RedisInsight
+  +-- RabbitMQ
+  +-- Elasticsearch + Kibana
+  +-- RustFS
+  `-- Neo4j
 
 Host
   +-- pnpm --filter agentic-rag-business-service dev
@@ -268,8 +277,7 @@ Host
   `-- pnpm --filter agentic-rag-client dev
 ```
 
-Compose 与环境变量尚未创建。接入时至少规划 `RABBITMQ_URL`、`REDIS_URL`、数据库 URL、独立凭证和
-健康检查。
+仓库已提供 `.env.dev`、`.env.example`、`.env.prod.example`、健康检查和持久化目录。`podman compose config` 的静态解析已通过；尚未完成全部容器启动、健康状态、端口和数据读写验收。应用侧的 `RABBITMQ_URL`、`REDIS_URL`、数据库 URL 与独立凭证仍需在具体功能接入时配置。
 
 ## 为什么第一阶段不上 Kubernetes
 

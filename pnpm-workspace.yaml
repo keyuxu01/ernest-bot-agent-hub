@@ -1,5 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+# pnpm 11：未列出的依赖默认不跑 install/postinstall 脚本；跑脚本前需批准（pnpm approve-builds）
 allowBuilds:
-  tldjs: set this to true or false
+  core-js: true
+  tldjs: false

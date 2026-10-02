@@ -1,1 +1,1 @@
-export { BusinessApiContract, GreetingContract } from './business-api.js';
+export { BusinessApiContract, GreetingContract } from './business-api';

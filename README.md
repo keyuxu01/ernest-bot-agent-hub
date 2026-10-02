@@ -10,12 +10,16 @@
 | ------------------------------ | ------- | ---------------: | ------------------------ |
 | `agentic-rag-client`           | Next.js |           `3000` | Agentic RAG 前端         |
 | `docs`                         | Next.js |           `3001` | 项目文档站点             |
-| `agentic-rag-business-service` | NestJS  |           `8080` | Agentic RAG 业务服务     |
-| `mcp-app-collections`          | NestJS  |           `8081` | MCP App Collections 服务 |
+| `agentic-rag-business-service` | NestJS  |           `9020` | Agentic RAG 业务服务     |
+| `mcp-app-collections`          | NestJS  |           `9021` | MCP App Collections 服务 |
 
 两个 NestJS 服务支持通过 `PORT` 环境变量覆盖默认端口。前端默认通过
-`http://localhost:8080` 访问业务服务；Server Component 可使用 `API_BASE_URL`，浏览器 query
+`http://localhost:9020` 访问业务服务；Server Component 可使用 `API_BASE_URL`，浏览器 query
 使用 `NEXT_PUBLIC_API_BASE_URL`。浏览器直接请求业务 API Origin，不经过 Vercel 同源代理。
+
+两个 NestJS 服务以 CommonJS 产物运行，但使用 TypeScript `NodeNext` 解析，并要求 Node.js 24 或
+更高版本，以同步加载 oRPC 等 ESM-only 依赖。共享 `@repo/contracts` 由 Turbo 先行构建，所有运行时
+入口都指向 `dist`；详见 [ADR-0012](docs/architecture/decisions/0012-use-commonjs-nestjs.md)。
 
 ## 项目结构
 
@@ -29,10 +33,10 @@
 │   ├── docs/                            # Next.js 文档站点，端口 3001
 │   │   ├── app/
 │   │   └── public/
-│   ├── agentic-rag-business-service/   # NestJS 业务服务，端口 8080
+│   ├── agentic-rag-business-service/   # NestJS 业务服务，端口 9020
 │   │   ├── src/                         # 模块、控制器和服务
 │   │   └── test/                        # e2e 测试
-│   └── mcp-app-collections/             # NestJS MCP 服务，端口 8081
+│   └── mcp-app-collections/             # NestJS MCP 服务，端口 9021
 │       ├── src/                         # 模块、控制器和服务
 │       └── test/                        # e2e 测试
 ├── packages/
@@ -66,6 +70,7 @@ oRPC 的启动、调用和新增接口流程见 [`docs/guides/orpc.md`](docs/gui
 
 - Node.js `>= 24`
 - pnpm `11.23.0`
+- Podman `6.x` 与可用的 `podman compose` provider
 
 ## 安装依赖
 
@@ -89,6 +94,40 @@ pnpm install
 
 ## 本地开发
 
+首次在 macOS 上使用 Podman 时，先确保 Podman machine 已启动：
+
+```bash
+podman machine start
+```
+
+启动本地基础设施：
+
+```bash
+pnpm docker:up
+pnpm docker:ps
+```
+
+`docker:*` 是为了保留已有脚本名称；本地脚本调用 `podman compose`，prod 脚本保留 `docker compose`。完整服务、端口、环境文件和持久化说明见 [`docker-compose.yml`](docker-compose.yml) 与 [`.env.example`](.env.example)。
+
+Compose **只起基础设施**，不占用应用默认端口；与 `pnpm dev` 同机并存时，注意下表（宿主机端口）：
+
+| 用途                          | 端口                                                        |
+| ----------------------------- | ----------------------------------------------------------- |
+| Next.js 前端                  | `3000`                                                      |
+| 业务 Nest                     | `9020`（9xxx，避开下方 RustFS）                             |
+| MCP Nest                      | `9021`                                                      |
+| RustFS（Compose，API/控制台） | `9000` / `9001`                                             |
+| mongo-express（Compose）      | `8081`                                                      |
+| pgAdmin                       | `8088`                                                      |
+| Postgres / Mongo / Redis / …  | `5432` / `27017` / `6379` 等（见 `.env.example`）           |
+
+常用运维命令：
+
+```bash
+pnpm docker:logs
+pnpm docker:down
+```
+
 同时启动所有应用：
 
 ```bash
@@ -104,10 +143,10 @@ pnpm --filter agentic-rag-business-service dev
 pnpm --filter mcp-app-collections dev
 ```
 
-覆盖 NestJS 服务端口时，建议只启动目标服务：
+若本机某端口已被占用，可单独改 `PORT` 再启动对应 Nest 应用，例如：
 
 ```bash
-PORT=9081 pnpm --filter mcp-app-collections dev
+PORT=9011 pnpm --filter mcp-app-collections dev
 ```
 
 ## oRPC 快速验证
@@ -122,9 +161,9 @@ pnpm --filter agentic-rag-client dev
 可访问：
 
 - 前端：`http://localhost:3000`
-- Typed greeting：`http://localhost:8080/api/greeting`
-- OpenAPI JSON：`http://localhost:8080/openapi.json`
-- 兼容旧接口：`http://localhost:8080/`
+- Typed greeting：`http://localhost:9020/api/greeting`
+- OpenAPI JSON：`http://localhost:9020/openapi.json`
+- 兼容旧接口：`http://localhost:9020/`
 
 本项目使用稳定 oRPC v1；不要复制 v2 beta 的 `.meta(openapi(...))` 等 API。完整开发流程见
 [`docs/guides/orpc.md`](docs/guides/orpc.md)。
@@ -154,9 +193,17 @@ pnpm --filter mcp-app-collections test:e2e
 
 需要环境变量的应用在对应目录中提供 `.env.example`。常用变量如下：
 
-| 变量                       | 使用方                         | 默认值                  | 说明                        |
-| -------------------------- | ------------------------------ | ----------------------- | --------------------------- |
-| `API_BASE_URL`             | `agentic-rag-client` server    | `http://localhost:8080` | Server Component 业务地址   |
-| `NEXT_PUBLIC_API_BASE_URL` | `agentic-rag-client` browser   | `http://localhost:8080` | 浏览器可见的公开 API Origin |
-| `PORT`                     | `agentic-rag-business-service` | `8080`                  | 业务服务监听端口            |
-| `PORT`                     | `mcp-app-collections`          | `8081`                  | MCP 服务监听端口            |
+| 变量                       | 使用方                         | 默认值                  | 说明                          |
+| -------------------------- | ------------------------------ | ----------------------- | ----------------------------- |
+| `API_BASE_URL`             | `agentic-rag-client` server    | `http://localhost:9020` | Server Component 业务地址     |
+| `NEXT_PUBLIC_API_BASE_URL` | `agentic-rag-client` browser   | `http://localhost:9020` | 浏览器可见的公开 API Origin   |
+| `PORT`                     | `agentic-rag-business-service` | `9020`                  | 业务服务监听端口              |
+| `PORT`                     | `mcp-app-collections`          | `9021`                  | MCP 服务监听端口              |
+| `POSTGRES_HOST`            | `agentic-rag-business-service` | `localhost`             | PostgreSQL 主机               |
+| `POSTGRES_PORT`            | `agentic-rag-business-service` | `5432`                  | PostgreSQL 端口               |
+| `POSTGRES_USER`            | `agentic-rag-business-service` | `user`                  | PostgreSQL 应用账号           |
+| `POSTGRES_PASSWORD`        | `agentic-rag-business-service` | `123456`                | PostgreSQL 密码（仅本地示例） |
+| `POSTGRES_DB`              | `agentic-rag-business-service` | `agent_hub`             | PostgreSQL 数据库             |
+| `MONGO_URI`                | `agentic-rag-business-service` | 见应用 `.env.example`   | MongoDB 应用连接 URI          |
+| `SNOWFLAKE_WORKER_ID`      | `agentic-rag-business-service` | `1`                     | 并发实例唯一，范围 `1–1022`   |
+| `SNOWFLAKE_OFFSET`         | `agentic-rag-business-service` | `1704067200000`         | 固定的自定义纪元毫秒值        |

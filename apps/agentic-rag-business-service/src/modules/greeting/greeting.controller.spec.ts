@@ -1,23 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GreetingResponseSchema } from '@repo/contracts';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
+import { GreetingController } from './greeting.controller';
+import { GreetingService } from './greeting.service';
 
-describe('AppController', () => {
-  let appController: AppController;
+describe('GreetingController', () => {
+  let greetingController: GreetingController;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
+      controllers: [GreetingController],
+      providers: [GreetingService],
     }).compile();
 
-    appController = app.get<AppController>(AppController);
+    greetingController = app.get<GreetingController>(GreetingController);
   });
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
-      const response = appController.getHello();
+      const response = greetingController.getHello();
 
       expect(GreetingResponseSchema.safeParse(response).success).toBe(true);
       expect(response).toEqual({ message: 'Hello World!' });

@@ -11,15 +11,15 @@ Ernest Bot Agent 面向企业内部知识分散、跨部门资料缺少统一入
 
 ## 当前仓库状态
 
-| 范围                      | 当前状态                                                                             | 证据入口                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| pnpm + Turborepo monorepo | 已建立 2 个 Next.js 应用、2 个 NestJS 服务和共享包                                   | [仓库 README](../../README.md)                                 |
-| Web 与业务 API 边界       | 已完成稳定 oRPC v1 greeting PoC，并接入 TanStack Query                               | [oRPC 指南](./orpc.md)                                         |
-| 运行时契约                | 已使用 Zod 契约在前后端共享运行时校验与类型                                          | [`packages/contracts`](../../packages/contracts)               |
-| MCP 服务                  | 已建立独立 NestJS 应用；业务 Tools、Resources 和 Widget 仍待实现                     | [`apps/mcp-app-collections`](../../apps/mcp-app-collections)   |
-| 健康检查                  | 业务服务已有 `live`、`ready`、`whoami` 边界                                          | [`health`](../../apps/agentic-rag-business-service/src/health) |
-| 部署拓扑                  | 已选定 Vercel Web + Railway API/Consumer/Cron 的目标拓扑，尚未完成资源创建和部署验证 | [部署指南](./deployment-and-infrastructure.md)                 |
-| RAG 业务能力              | 文档入库、检索、问答、权限和图谱等仍是待实施蓝图                                     | 本文“产品能力蓝图”                                             |
+| 范围                      | 当前状态                                                                             | 证据入口                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| pnpm + Turborepo monorepo | 已建立 2 个 Next.js 应用、2 个 NestJS 服务和共享包                                   | [仓库 README](../../README.md)                                         |
+| Web 与业务 API 边界       | 已完成稳定 oRPC v1 greeting PoC，并接入 TanStack Query                               | [oRPC 指南](./orpc.md)                                                 |
+| 运行时契约                | 已使用 Zod 契约在前后端共享运行时校验与类型                                          | [`packages/contracts`](../../packages/contracts)                       |
+| MCP 服务                  | 已建立独立 NestJS 应用；业务 Tools、Resources 和 Widget 仍待实现                     | [`apps/mcp-app-collections`](../../apps/mcp-app-collections)           |
+| 健康检查                  | 业务服务已有 `live`、`ready`、`whoami` 边界                                          | [`health`](../../apps/agentic-rag-business-service/src/modules/health) |
+| 部署拓扑                  | 已选定 Vercel Web + Railway API/Consumer/Cron 的目标拓扑，尚未完成资源创建和部署验证 | [部署指南](./deployment-and-infrastructure.md)                         |
+| RAG 业务能力              | 文档入库、检索、问答、权限和图谱等仍是待实施蓝图                                     | 本文“产品能力蓝图”                                                     |
 
 ## 产品能力蓝图
 

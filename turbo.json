@@ -1,7 +1,19 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
-  "globalPassThroughEnv": ["API_BASE_URL", "NEXT_PUBLIC_API_BASE_URL", "PORT"],
+  "globalPassThroughEnv": [
+    "API_BASE_URL",
+    "NEXT_PUBLIC_API_BASE_URL",
+    "PORT",
+    "POSTGRES_HOST",
+    "POSTGRES_PORT",
+    "POSTGRES_USER",
+    "POSTGRES_PASSWORD",
+    "POSTGRES_DB",
+    "MONGO_URI",
+    "SNOWFLAKE_OFFSET",
+    "SNOWFLAKE_WORKER_ID"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

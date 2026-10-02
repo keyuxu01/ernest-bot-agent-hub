@@ -1,5 +1,5 @@
 import { oc } from '@orpc/contract';
-import { GreetingResponseSchema } from '../greeting.js';
+import { GreetingResponseSchema } from '../greeting';
 
 /**
  * @description Contract for retrieving the business-service greeting through the typed API.

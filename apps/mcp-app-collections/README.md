@@ -10,5 +10,5 @@ From the repository root:
 pnpm --filter mcp-app-collections dev
 ```
 
-The service listens on port `8081` by default. Override it with the `PORT`
+The service listens on port `9021` by default. Override it with the `PORT`
 environment variable.

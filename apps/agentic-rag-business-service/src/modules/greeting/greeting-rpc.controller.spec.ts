@@ -1,19 +1,19 @@
 import { Test, type TestingModule } from '@nestjs/testing';
 import { call } from '@orpc/server';
 import { GreetingResponseSchema } from '@repo/contracts';
-import { AppService } from './app.service.js';
-import { BusinessApiController } from './business-api.controller.js';
+import { GreetingRpcController } from './greeting-rpc.controller';
+import { GreetingService } from './greeting.service';
 
-describe('BusinessApiController', () => {
-  let controller: BusinessApiController;
+describe('GreetingRpcController', () => {
+  let controller: GreetingRpcController;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [BusinessApiController],
-      providers: [AppService],
+      controllers: [GreetingRpcController],
+      providers: [GreetingService],
     }).compile();
 
-    controller = app.get<BusinessApiController>(BusinessApiController);
+    controller = app.get<GreetingRpcController>(GreetingRpcController);
   });
 
   it('returns a contract-valid greeting', async () => {

@@ -5,10 +5,14 @@ import {
   ServiceIdentityResponseSchema,
 } from '@repo/contracts';
 import { INestApplication } from '@nestjs/common';
+import { getModelToken } from '@nestjs/mongoose';
+import { DataSource } from 'typeorm';
 import request from 'supertest';
-import { AppModule } from './../src/app.module.js';
+import { AppModule } from './../src/app.module';
+import { DocumentEntity } from './../src/modules/document/entities/document.entity';
+import { DocumentContent } from './../src/modules/document/schemas/document-content.schema';
 
-describe('AppController (e2e)', () => {
+describe('Business service (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -94,6 +98,13 @@ describe('AppController (e2e)', () => {
           ServiceIdentityResponseSchema.safeParse(response.body).success,
         ).toBe(true);
       });
+  });
+
+  it('registers the document persistence models', () => {
+    const dataSource = app.get(DataSource);
+
+    expect(dataSource.hasMetadata(DocumentEntity)).toBe(true);
+    expect(app.get(getModelToken(DocumentContent.name))).toBeDefined();
   });
 
   afterEach(async () => {

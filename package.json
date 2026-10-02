@@ -10,7 +10,15 @@
     "cz": "git-cz",
     "agent:sync": "rulesync install --frozen && rulesync generate",
     "agent:update": "rulesync install --update && rulesync generate",
-    "agent:check": "rulesync generate --check"
+    "agent:check": "rulesync generate --check",
+    "docker:setup:prod": "test -f .env.prod.local || cp .env.prod.example .env.prod.local",
+    "docker:up": "podman compose --env-file .env.dev up -d --build",
+    "docker:up:prod": "pnpm docker:setup:prod && docker compose --env-file .env.prod.example --env-file .env.prod.local up -d --build",
+    "docker:down": "podman compose --env-file .env.dev down",
+    "docker:down:prod": "docker compose --env-file .env.prod.example --env-file .env.prod.local down",
+    "docker:logs": "podman compose --env-file .env.dev logs -f",
+    "docker:ps": "podman compose --env-file .env.dev ps",
+    "docker:clean": "podman compose --env-file .env.dev down -v && rm -rf ./volumes"
   },
   "devDependencies": {
     "commitizen": "^4.3.1",

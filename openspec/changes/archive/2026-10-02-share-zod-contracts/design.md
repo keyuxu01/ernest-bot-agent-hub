@@ -1,6 +1,8 @@
 ## Context
 
-See `proposal.md` for motivation. The repository currently has a just-in-time `@repo/types` workspace package containing one `GreetingResponse` interface. The Next.js client and both NestJS services import that compile-time type, but no runtime validator exists. Once schemas become runtime values, source exports with NodeNext `.js` specifiers cannot be resolved reliably by every consumer bundler, so the contract package must provide compiled JavaScript.
+> Archive correction (2026-10-02): Subsequent module-boundary verification established CommonJS package boundaries for the NestJS deployment units and compiled CommonJS output for `@repo/contracts`. This correction updates only that architectural premise; the archived change scope and completion record are unchanged.
+
+See `proposal.md` for motivation. The repository currently has a just-in-time `@repo/types` workspace package containing one `GreetingResponse` interface. The Next.js client and both NestJS services import that compile-time type, but no runtime validator exists. Once schemas become runtime values, CommonJS NestJS services and ESM-aware frontend tooling need one stable package boundary, so the contract package must provide compiled JavaScript and declarations instead of a TypeScript source fallback.
 
 The change crosses three applications, a shared package, the pnpm workspace lockfile, RuleSync-generated instructions, and repository documentation. The initial greeting contract is the migration proof; future knowledge-base API and MCP contracts will follow the same structure.
 
@@ -57,9 +59,9 @@ This avoids unnecessary runtime schemas for presentation details while preventin
 
 ### Compile contracts before application consumers
 
-`@repo/contracts` compiles ESM JavaScript and declarations into `dist` and exposes only those artifacts through package exports. Turbo builds dependency packages before application builds and type-checks, so clean workspace commands do not depend on stale local artifacts. The package does not provide a source fallback: a missing build should fail explicitly instead of changing runtime resolution between tools.
+`@repo/contracts` compiles CommonJS JavaScript and declarations into `dist` and exposes only those artifacts through package exports. Its `require`, `import`, and `default` runtime conditions resolve to the same compiled `.js` files. Turbo builds dependency packages before application builds and type-checks, so clean workspace commands do not depend on stale local artifacts. The package does not provide a source fallback: a missing build should fail explicitly instead of changing runtime resolution between tools.
 
-This follows the proven compiled-schema-package shape used by `ai-engine-alpha`, while retaining explicit exports and removing its source fallback. A separate `tsconfig.build.json` excludes tests from distributable artifacts while the regular TypeScript configuration continues checking them.
+This follows the proven compiled CommonJS schema-package shape used by `ai-engine-alpha`, while retaining explicit exports and removing its source fallback. A separate `tsconfig.build.json` excludes tests from distributable artifacts while the regular TypeScript configuration continues checking them.
 
 ## Risks / Trade-offs
 

@@ -1,0 +1,252 @@
+# Agent Hub shared infrastructure.
+# Local: pnpm docker:up (Podman Compose); prod: pnpm docker:up:prod (Docker Compose).
+# Env: .env.dev for local defaults; .env.prod.example + ignored .env.prod.local for prod.
+# Persistent data: ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/.
+# Knowledge note:
+# obsidian://open?vault=study-notes&file=wiki%2F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5%2FAgent%20Hub%2Fdocker-compose.yml.md
+name: agent-hub
+
+services:
+  # PostgreSQL 16 + pgvector（AI 向量检索）
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: agent_hub_postgres
+    # 见文件头「restart」说明
+    restart: unless-stopped
+    # 与 .env.dev / .env.prod.local 同名变量；Nest 连 localhost:5432 时用同一套账号库名
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
+      POSTGRES_DB: ${POSTGRES_DB:-agent_hub}
+    ports:
+      - '5432:5432'
+    volumes:
+      # 数据持久化；init-scripts 只在「首次建空数据目录」时执行（如启用 pgvector）
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/postgres:/var/lib/postgresql/data
+      - ./init-scripts/postgresql:/docker-entrypoint-initdb.d
+    healthcheck:
+      # -d 必须是真实库名（勿写 hello_pg 等与 POSTGRES_DB 不一致的名字）
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-user} -d ${POSTGRES_DB:-agent_hub}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      #  Postgres 冷启动几秒内可能连不上，宽限期内失败不计入 retries
+      start_period: 10s
+
+  # PostgreSQL 管理界面
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: agent_hub_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    ports:
+      - '8088:80'
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/pgadmin:/var/lib/pgadmin
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:80/login']
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    # 等 postgres healthcheck 通过后再启，否则 Web 界面打开即报错
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # MongoDB 主库
+  mongodb:
+    image: mongo:7-jammy
+    container_name: agent_hub_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-mongo_user}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongo_pass123}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-knowledge_hub}
+      MONGO_APP_USERNAME: ${MONGO_APP_USERNAME:-agent_hub}
+      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD:-agent_hub_password}
+    ports:
+      - '27017:27017'
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/mongo:/data/db
+      - ./init-scripts/mongodb:/docker-entrypoint-initdb.d
+    healthcheck:
+      # $$ → 容器内 $：用环境变量账号探测，改 .env.dev 后 healthcheck 仍正确（勿写死 mongo_pass123）
+      test:
+        [
+          'CMD-SHELL',
+          'mongosh -u "$$MONGO_INITDB_ROOT_USERNAME" -p "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --eval "db.adminCommand({ ping: 1 })" --quiet',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # MongoDB Web GUI
+  mongo-express:
+    image: mongo-express:1.0.2-20-alpine3.19
+    container_name: agent_hub_mongo_express
+    restart: unless-stopped
+    ports:
+      - '8081:8081'
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      # 下面两行：连 Mongo 的账号（与 mongodb 服务一致，来自 env 文件）
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME:-mongo_user}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongo_pass123}
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
+      # me_admin / me_123456：打开 http://localhost:8081 时浏览器要的登录，与 Mongo 账号不是一回事
+      ME_CONFIG_BASICAUTH_ENABLED: 'true'
+      ME_CONFIG_BASICAUTH_USERNAME: me_admin
+      ME_CONFIG_BASICAUTH_PASSWORD: me_123456
+      ME_CONFIG_OPTIONS_EDITORTHEME: '3024-night'
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # Redis（缓存、验证码等）
+  redis:
+    image: redis:7-alpine
+    container_name: agent_hub_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/redis:/data
+    # AOF：关键写入追加到磁盘，容器重启后验证码/会话仍在（见文件头说明）
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 官方 Web 管理界面
+  redisinsight:
+    image: redis/redisinsight:2.50
+    container_name: agent_hub_redisinsight
+    restart: unless-stopped
+    ports:
+      - '5540:5540'
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/redisinsight:/data
+    environment:
+      RI_HOST: 0.0.0.0
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # RabbitMQ（文档发布后异步管线：RAG / KG / ES）
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: agent_hub_rabbitmq
+    restart: unless-stopped
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    # guest 仅适合本地；上机在 .env.prod.local 改为独立账号（异步任务：文档→RAG/KG/ES）
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      # 管理插件就绪较慢，给 30s 宽限期
+      start_period: 30s
+
+  # Elasticsearch 8.17.0 + IK 中文分词（内置到镜像）
+  es:
+    # 非官方镜像：Dockerfile 内安装 IK 中文分词；首次 up 会 build，较慢属正常
+    build: ./infra/elasticsearch
+    container_name: agent_hub_elasticsearch
+    ports:
+      - '9200:9200'
+    environment:
+      - discovery.type=single-node
+      # 以下关闭认证/TLS：本地/内网省事；对公网必须改方案（开 xpack 或托管 ES）
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/es/data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+
+  # Kibana 8.17.0（必须与 ES 版本完全一致）
+  kibana:
+    image: kibana:8.17.0
+    container_name: agent_hub_kibana
+    ports:
+      - '5601:5601'
+    environment:
+      # 容器内用服务名 es，不是 localhost（localhost 在 kibana 容器里指向自身）
+      - ELASTICSEARCH_HOSTS=http://es:9200
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/kibana:/usr/share/kibana/data
+    restart: unless-stopped
+    depends_on:
+      - es
+
+  # RustFS（S3 兼容对象存储）— PDF 抽图 / 原文件上传
+  # 文档：https://docs.rustfs.com/installation/docker/
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: agent_hub_rustfs
+    restart: unless-stopped
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      RUSTFS_VOLUMES: /data/rustfs0
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_CONSOLE_ENABLE: 'true'
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:-rustfsadmin}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:-rustfsadmin}
+      RUSTFS_CORS_ALLOWED_ORIGINS: '*'
+      RUSTFS_UNSAFE_BYPASS_DISK_CHECK: 'true'
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/rustfs0:/data/rustfs0
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://127.0.0.1:9000/health || exit 1']
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      # RustFS 启动与磁盘检查较慢
+      start_period: 40s
+
+  # Neo4j — KG 知识图谱
+  neo4j:
+    image: neo4j:2026.04.0
+    container_name: agent_hub_neo4j
+    restart: unless-stopped
+    ports:
+      - '7474:7474'
+      - '7687:7687'
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:-12345678}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/neo4j/data:/data
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/neo4j/logs:/logs
+      # conf：以后改 neo4j.conf（内存、备份）可持久化，不挂则配置随容器重建丢失
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/neo4j/conf:/conf
+
+# ---------------------------------------------------------------------------
+# 网络：所有上面的服务在同一 bridge 网里，DNS 互认服务名（postgres、redis…）
+# name 固定为 common-network，便于以后第二个 compose 文件 join 同一网络
+# ---------------------------------------------------------------------------
+networks:
+  default:
+    name: common-network
+    driver: bridge

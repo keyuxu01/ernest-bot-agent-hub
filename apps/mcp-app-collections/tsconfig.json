@@ -1,6 +1,8 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
     "resolvePackageJsonExports": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
