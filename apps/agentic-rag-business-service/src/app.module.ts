@@ -18,8 +18,8 @@ import { PipelineModule } from './modules/pipeline/pipeline.module';
     // 配置
     ConfigModule.forRoot({
       isGlobal: true,
-      // 后列覆盖前列；与仓库根 compose 用的 .env.dev 分离
-      envFilePath: ['.env.local', '.env.dev', '.env'],
+      // 后列覆盖前列；缺文件会跳过。生产放 .env.prod 覆盖 .env.dev
+      envFilePath: ['.env.dev', '.env.prod'],
       validate: validateEnvironment,
     }),
 

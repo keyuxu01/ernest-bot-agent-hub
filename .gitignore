@@ -6,11 +6,13 @@ node_modules
 .pnp.js
 
 # Local env files
-# 可提交：.env.example · .env.dev · .env.prod.example
+# 可提交：.env.example · .env.prod.example
+# 业务服务本地/生产密钥不入库
 .env
 .env.local
 .env.prod
-.env.*.local
+apps/agentic-rag-business-service/.env.dev
+apps/agentic-rag-business-service/.env.prod
 .env.development.local
 .env.test.local
 .env.production.local
