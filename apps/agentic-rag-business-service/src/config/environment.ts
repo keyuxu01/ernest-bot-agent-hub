@@ -42,5 +42,11 @@ export function validateEnvironment(config: Environment): Environment {
     POSTGRES_PASSWORD: requireString(config, 'POSTGRES_PASSWORD'),
     POSTGRES_DB: requireString(config, 'POSTGRES_DB'),
     MONGO_URI: mongoUri,
+    RUSTFS_ENDPOINT: requireString(config, 'RUSTFS_ENDPOINT'),
+    RUSTFS_REGION: requireString(config, 'RUSTFS_REGION'),
+    RUSTFS_ACCESS_KEY: requireString(config, 'RUSTFS_ACCESS_KEY'),
+    RUSTFS_SECRET_KEY: requireString(config, 'RUSTFS_SECRET_KEY'),
+    RUSTFS_BUCKET: requireString(config, 'RUSTFS_BUCKET'),
+    RUSTFS_PUBLIC_URL: requireString(config, 'RUSTFS_PUBLIC_URL'),
   };
 }

@@ -9,6 +9,12 @@ const validEnvironment = {
   POSTGRES_DB: 'agent_hub',
   MONGO_URI:
     'mongodb://agent_hub:password@localhost:27017/knowledge_hub?authSource=knowledge_hub',
+  RUSTFS_ENDPOINT: 'http://localhost:9000',
+  RUSTFS_REGION: 'us-east-1',
+  RUSTFS_ACCESS_KEY: 'rustfsadmin',
+  RUSTFS_SECRET_KEY: 'rustfsadmin',
+  RUSTFS_BUCKET: 'knowledge-hub',
+  RUSTFS_PUBLIC_URL: 'http://localhost:9000',
 };
 
 describe('validateEnvironment', () => {
@@ -47,6 +53,15 @@ describe('validateEnvironment', () => {
       }),
     ).toThrow(
       'Environment variable MONGO_URI must use mongodb:// or mongodb+srv://',
+    );
+  });
+
+  it('rejects a missing RustFS variable', () => {
+    const missingBucket: Record<string, unknown> = { ...validEnvironment };
+    delete missingBucket.RUSTFS_BUCKET;
+
+    expect(() => validateEnvironment(missingBucket)).toThrow(
+      'Environment variable RUSTFS_BUCKET is required',
     );
   });
 });
