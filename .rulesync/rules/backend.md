@@ -51,9 +51,10 @@ src/modules/<feature>/
   *.service.ts
   repository/     # 自定义数据访问（*Repository）
   entities/       # TypeORM Entity
-  schemas/        # Mongoose Schema
+  schemas/        # Mongoose Schema（*.schema.ts）与 Zod schema（*.zod.ts）
   dto/            # 入参校验 DTO
-  type/           # 独立 type / interface
+  type/           # 独立 type / interface，含从 Zod 推断的类型（*.types.ts）
+  constants/      # 模块内业务常量（*.constants.ts）
   helpers/        # 模块内纯函数
 ```
 
@@ -68,6 +69,31 @@ src/modules/<feature>/
 - Entity / Schema 类本身留在 `entities/`、`schemas/`；与 ORM 类紧耦合的别名（如
   `HydratedDocument<T>`）可留在 schema 旁，其余独立类型仍进 `type/`。
 - 跨应用共享类型继续走 `@repo/contracts`，不要复制进模块 `type/`。
+
+### Zod Schema 与推断类型
+
+- 有运行时校验需求的结构（外部输入、第三方响应、环境变量、出参）先写 Zod schema，类型用
+  `z.infer` / `z.output` 推断，不要再手写一份平行的 type / interface。
+- Zod schema 放 `schemas/<name>.zod.ts`，文件内只放 schema；推断类型放 `type/<name>.types.ts`，
+  用 `import type` 引用 schema。`src/infrastructure/<capability>/` 同样遵循 `schemas/` + `type/`。
+- Mongoose 等 ORM 的枚举字段复用 Zod schema 的 `.options`，不要再维护一份字面量列表。
+
+### Constants
+
+- 先判断作用域再落位，规则同 Helpers：
+  - **仅当前 feature 使用**：放 `src/modules/<feature>/constants/<name>.constants.ts`
+    （如上传大小上限、对象存储前缀、默认标题）。
+  - **跨 feature / 应用级复用**：放 `src/common/constants/`；已有则复用，不要提前上提。
+  - **`src/infrastructure/<capability>/`** 的常量放该目录下的 `constants/`。
+- 有业务含义或被多个文件引用的常量必须进 `constants/`，不要散落在 service / controller 顶部。
+- 只在单个文件内部使用、不导出的实现细节（正则、请求超时、解包上限等）可留在该文件顶部。
+- 存量 `<feature>.constants.ts` 位于 feature 根目录的，改动时迁入 `constants/`。
+
+### Exports
+
+- 新增或重写的文件在文件末尾统一导出：值用 `export { ... }`，类型用 `export type { ... }`；
+  声明处不写 `export`。
+- 存量文件不为此单独改动；整体重写或新增导出时再迁移。
 
 ### Repository
 

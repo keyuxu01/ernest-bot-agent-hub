@@ -48,6 +48,50 @@ DELETE {{baseUrl}}/documents/{{createDocument.response.body.id}}
 ### Get after delete (expect 404)
 GET {{baseUrl}}/documents/{{createDocument.response.body.id}}
 
+### Upload and parse Markdown (no MinerU token required)
+# @name uploadMarkdown
+POST {{baseUrl}}/documents/upload/parse
+Content-Type: multipart/form-data; boundary=----AgentHubBoundary
+
+------AgentHubBoundary
+Content-Disposition: form-data; name="title"
+
+http client upload smoke test
+------AgentHubBoundary
+Content-Disposition: form-data; name="file"; filename="smoke.md"
+Content-Type: text/markdown
+
+## upload smoke
+
+from __tests__/business-api.http
+------AgentHubBoundary--
+
+### Get uploaded document
+GET {{baseUrl}}/documents/{{uploadMarkdown.response.body.id}}
+
+### Upload and parse PDF (in-process pdf-parse)
+# 把 ./sample.pdf 换成本地文件路径（相对本 .http 文件）
+POST {{baseUrl}}/documents/upload/parse
+Content-Type: multipart/form-data; boundary=----AgentHubBoundary
+
+------AgentHubBoundary
+Content-Disposition: form-data; name="file"; filename="sample.pdf"
+Content-Type: application/pdf
+
+< ./sample.pdf
+------AgentHubBoundary--
+
+### Upload unsupported type (expect 415 DOCUMENT_FILE_TYPE_UNSUPPORTED)
+POST {{baseUrl}}/documents/upload/parse
+Content-Type: multipart/form-data; boundary=----AgentHubBoundary
+
+------AgentHubBoundary
+Content-Disposition: form-data; name="file"; filename="tool.exe"
+Content-Type: application/octet-stream
+
+MZ
+------AgentHubBoundary--
+
 ### Validation error (expect 400 — missing content)
 POST {{baseUrl}}/documents
 Content-Type: application/json

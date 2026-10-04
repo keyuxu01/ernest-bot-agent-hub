@@ -23,6 +23,7 @@
       | Knowledge Stores |
       | PostgreSQL       |
       | MongoDB / Vector |
+      | RustFS objects   |
       +------------------+
 
 Shared foundations:
@@ -199,6 +200,19 @@ application-enforced relationship rather than a cross-database foreign key or AC
 must define compensation or retry behavior for partial failure. See
 [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md).
 
+## Document Parsing Boundary
+
+`POST /documents/upload/parse` accepts one PDF, DOCX, XLSX, PPTX, TXT or Markdown file up to 50 MB.
+TXT and Markdown are read as UTF-8; the other formats are converted in-process (`pdf-parse`, `mammoth`
++ `turndown`, `exceljs`, OOXML for PPTX, `officeparser` as fallback). Extracted images are stored in
+RustFS and their Markdown links rewritten, then the draft is persisted through the existing MongoDB
+content and PostgreSQL metadata flow without changing either record shape. The link between a document
+and its RustFS source file is returned to the client but not yet persisted.
+
+Conversion stays inside `DocumentModule`. The MVP waits inside the request and keeps no parse-task
+state, so an interrupted request must be re-uploaded. See
+[ADR-0015](./decisions/0015-use-in-process-document-parsers.md).
+
 ## Architecture Decision Records
 
 | ADR                                                                      | Decision                                            | Status   |
@@ -215,6 +229,8 @@ must define compensation or retry behavior for partial failure. See
 | [ADR-0011](./decisions/0011-use-vercel-and-railway.md)                   | Use Vercel Web with Railway Backend Workloads       | Accepted |
 | [ADR-0012](./decisions/0012-use-commonjs-nestjs.md)                      | CommonJS NestJS applications with NodeNext          | Accepted |
 | [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md) | PostgreSQL metadata with MongoDB document content   | Accepted |
+| [ADR-0014](./decisions/0014-use-mineru-cloud-for-document-parsing.md)    | MinerU cloud API for upload document parsing        | Superseded |
+| [ADR-0015](./decisions/0015-use-in-process-document-parsers.md)          | In-process parsers for upload document parsing      | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

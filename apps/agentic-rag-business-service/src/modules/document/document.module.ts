@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RustfsModule } from '../../infrastructure/rustfs/rustfs.module';
+import { DocumentParseService } from './document-parse.service';
 import { DocumentController } from './document.controller';
 import { DocumentService } from './document.service';
 import { DocumentContentRepository } from './repository/document-content.repository';
@@ -17,12 +19,14 @@ import {
     MongooseModule.forFeature([
       { name: DocumentContent.name, schema: DocumentContentSchema },
     ]),
+    RustfsModule,
   ],
   controllers: [DocumentController],
   providers: [
     DocumentRepository,
     DocumentContentRepository,
     DocumentService,
+    DocumentParseService,
   ],
   exports: [DocumentService],
 })

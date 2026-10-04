@@ -29,6 +29,7 @@ import type { UploadBytesOptions } from './type/upload-bytes.options';
  * - 启动时异步 ensure bucket，失败只打 warn，不阻断 Nest 启动（Compose 冷启动常见）。
  * - 实际上传前会再 ensure；业务侧应处理上传失败，勿假设启动即等于存储已就绪。
  * - 对外 URL：`{publicBase}/{bucket}/{key}`（path-style 公开访问形态）。
+ *   桶默认私有，匿名 GET 会 403；URL 只作对象定位，不代表可匿名下载。
  *
  * 本服务只负责字节上传与 URL 拼装；文档元数据落库由 Document 等 feature 负责。
  */

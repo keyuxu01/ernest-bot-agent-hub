@@ -4,11 +4,12 @@ import {
   HealthProbeResponseSchema,
   ServiceIdentityResponseSchema,
 } from '@repo/contracts';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { DataSource } from 'typeorm';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
+import { MAX_UPLOAD_FILE_BYTES } from './../src/modules/document/constants/document-upload.constants';
 import { DocumentEntity } from './../src/modules/document/entities/document.entity';
 import { DocumentContent } from './../src/modules/document/schemas/document-content.schema';
 
@@ -21,6 +22,13 @@ describe('Business service (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
     await app.init();
   });
 
@@ -105,6 +113,36 @@ describe('Business service (e2e)', () => {
 
     expect(dataSource.hasMetadata(DocumentEntity)).toBe(true);
     expect(app.get(getModelToken(DocumentContent.name))).toBeDefined();
+  });
+
+  it('/documents/upload/parse (POST) requires a file', () => {
+    return request(app.getHttpServer())
+      .post('/documents/upload/parse')
+      .field('title', 'no file')
+      .expect(400)
+      .expect((response) => {
+        expect(response.body.code).toBe('DOCUMENT_FILE_REQUIRED');
+      });
+  });
+
+  it('/documents/upload/parse (POST) rejects unsupported file types', () => {
+    return request(app.getHttpServer())
+      .post('/documents/upload/parse')
+      .attach('file', Buffer.from('MZ'), 'tool.exe')
+      .expect(415)
+      .expect((response) => {
+        expect(response.body.code).toBe('DOCUMENT_FILE_TYPE_UNSUPPORTED');
+      });
+  });
+
+  it('/documents/upload/parse (POST) rejects files over 50 MB', () => {
+    return request(app.getHttpServer())
+      .post('/documents/upload/parse')
+      .attach('file', Buffer.alloc(MAX_UPLOAD_FILE_BYTES + 1), 'big.txt')
+      .expect(413)
+      .expect((response) => {
+        expect(response.body.code).toBe('DOCUMENT_FILE_TOO_LARGE');
+      });
   });
 
   afterEach(async () => {
