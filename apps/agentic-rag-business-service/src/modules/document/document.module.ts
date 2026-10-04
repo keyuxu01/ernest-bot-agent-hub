@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DocumentService } from './document.service';
 import { DocumentController } from './document.controller';
+import { DocumentService } from './document.service';
+import { DocumentContentRepository } from './repository/document-content.repository';
+import { DocumentRepository } from './repository/document.repository';
 import { DocumentEntity } from './entities/document.entity';
 import {
   DocumentContent,
@@ -17,7 +19,11 @@ import {
     ]),
   ],
   controllers: [DocumentController],
-  providers: [DocumentService],
+  providers: [
+    DocumentRepository,
+    DocumentContentRepository,
+    DocumentService,
+  ],
   exports: [DocumentService],
 })
 export class DocumentModule {}

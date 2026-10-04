@@ -32,8 +32,63 @@ cursor:
 - 模块间使用指向具体文件的相对导入；不要新增 `modules/index.ts` 等 barrel 入口来隐藏依赖关系。
 - Controller 与协议 handler 只负责输入输出适配、鉴权上下文接入和调用业务服务。
 - 业务规则放在 service 或 use case；禁止在 Controller、MCP Tool 或 DTO 中实现业务规则。
-- 数据访问必须经过明确的数据访问抽象；Controller 不得直接操作数据库或向量数据库。
+- 数据访问必须经过明确的数据访问抽象：Service / use case 通过 feature 内 Repository（或等价
+  数据访问层）访问数据库；禁止在 Controller、Service 中直接注入 `EntityManager`、TypeORM
+  `Repository` 或 Mongoose `Model`。
 - 跨应用数据模型从 `@repo/contracts` 获取，不在应用内复制 Schema 或类型。
+
+## Code Style
+
+### Feature 内目录
+
+feature 根目录只放 `*.module.ts`、`*.controller.ts`、`*.service.ts`（及协议 handler 等入口）。
+其余按职责进子目录，例如：
+
+```text
+src/modules/<feature>/
+  *.module.ts
+  *.controller.ts
+  *.service.ts
+  repository/     # 自定义数据访问（*Repository）
+  entities/       # TypeORM Entity
+  schemas/        # Mongoose Schema
+  dto/            # 入参校验 DTO
+  type/           # 独立 type / interface
+  helpers/        # 模块内纯函数
+```
+
+禁止新建全局 `src/repositories/`、`src/services/` 等按技术层横切的目录。
+
+### Types
+
+- feature 内的独立 `type` / `interface`（入参、查询结果、Repository 输入等）统一放在
+  `src/modules/<feature>/type/`，按用途分文件，例如 `create-document-meta.input.ts`。
+- 禁止把可复用的 type 长期堆在 `*.service.ts` / `*.repository.ts` 顶部；需要导出的类型从
+  `type/` 导入。
+- Entity / Schema 类本身留在 `entities/`、`schemas/`；与 ORM 类紧耦合的别名（如
+  `HydratedDocument<T>`）可留在 schema 旁，其余独立类型仍进 `type/`。
+- 跨应用共享类型继续走 `@repo/contracts`，不要复制进模块 `type/`。
+
+### Repository
+
+- 自定义数据访问类（`*Repository`）放在 `src/modules/<feature>/repository/`，不要长期堆在
+  feature 根目录。
+- Service / use case 通过这些 Repository 访问数据库；禁止在 Controller、Service 中直接注入
+  `EntityManager`、TypeORM `Repository` 或 Mongoose `Model`（与 Architecture 节一致）。
+
+### Helpers vs Utils
+
+- 不必要写成 class / `@Injectable()` 的纯函数，先判断作用域再落位：
+  - **仅当前 feature 使用**：放 `src/modules/<feature>/helpers/`（如文档字数、正文摘要截取）。
+  - **跨 feature / 应用级复用**：先查 `src/common/helpers/`（或已有 `utils/`）；已有则复用，
+    没有且确实通用再新增到公共目录，不要为了「看起来公共」提前上提。
+- Service 只编排业务流程；可单测、无 DI 依赖的算法与格式化逻辑优先抽成 helper 函数。
+
+### Comments
+
+- 模块、Repository、关键业务流程使用中文 JSDoc：写清职责、关联键、边界（软删 / 回滚 /
+  双写顺序等），而不是复述代码字面含义。
+- 行内注释只补充非显而易见的约束（例如 `status === 0` 也要用 `!== undefined` 判断）。
 
 ## Runtime and Errors
 

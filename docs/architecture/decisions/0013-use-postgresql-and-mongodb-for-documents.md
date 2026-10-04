@@ -45,6 +45,19 @@ individual business features.
 - E2E tests that import `AppModule` are integration tests and require isolated PostgreSQL and MongoDB test
   instances or explicit test-module replacements.
 
+## Deferred work
+
+Document dual-write consistency is accepted as follow-up tech debt (not a current merge blocker):
+
+- `DocumentService.update` / `remove` lack cross-store compensation, idempotency and retry; partial failure
+  can leave PostgreSQL and MongoDB out of sync.
+- Target approach (aligned with ADR-0007): PostgreSQL as system of record, transactional outbox, RabbitMQ
+  consumer for idempotent Mongo projection updates, Railway Cron reconciliation for orphans / one-sided
+  soft deletes. Prefer PG-first for update/remove; keep Mongo-first create with async recovery when
+  compensate-delete fails.
+- Acceptance sketch: idempotent `remove`; update/create partial failures recoverable via outbox or
+  reconcile scan; durable job records, retries and DLQ; tests for the failure paths.
+
 ## Alternatives
 
 - Store complete documents in PostgreSQL: simpler transactional semantics, but rejected for the current
