@@ -1,0 +1,21 @@
+apps/agentic-rag-business-service/src/app.module.ts
+  s_2fdb096a442ead::t_aab19dd9f4abe1 21-22
+apps/agentic-rag-business-service/.env.example
+  s_2fdb096a442ead::t_f61f8354770416 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "6f002a87e94b7a19eea2d63690a9f7c91f5e5d47",
+  "prompts": {},
+  "sessions": {
+    "s_2fdb096a442ead": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "f75779b0-03a0-4386-9799-206d66cddc75",
+        "model": "default"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
