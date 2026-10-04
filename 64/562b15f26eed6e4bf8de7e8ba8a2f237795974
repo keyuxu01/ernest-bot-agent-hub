@@ -1,0 +1,25 @@
+apps/agentic-rag-business-service/__tests__/business-api.http
+  s_5843fc82a978b5::t_4fb6f79439a28a 90,92-95,97,105,107-108,112,120-124
+  s_5843fc82a978b5::t_be51517374faa7 72-73,78-89,91,96,98-104,106,111,113-119,125-126,129-130
+apps/agentic-rag-business-service/__tests__/document-api.curl.md
+  s_5843fc82a978b5::t_5325c63d9c795c 1-80
+apps/agentic-rag-business-service/__tests__/document-api.sh
+  s_5843fc82a978b5::t_82006c261b132d 1-125,130-133,138-216
+  s_5843fc82a978b5::t_924b2aa5f7e155 126-129,134-137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "64562b15f26eed6e4bf8de7e8ba8a2f237795974",
+  "prompts": {},
+  "sessions": {
+    "s_5843fc82a978b5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "597ff8a3-a704-43fd-8358-c77101eaca6d",
+        "model": "grok-4.6"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
