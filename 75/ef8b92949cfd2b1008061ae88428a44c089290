@@ -1,0 +1,77 @@
+apps/agentic-rag-business-service/src/config/environment.ts
+  s_c74f88edf4fc40::t_bf08e6732eb300 45,47-49
+  s_c74f88edf4fc40::t_d4ca431fdae0da 46
+  s_c74f88edf4fc40::t_727a2ff2210a46 50
+pnpm-lock.yaml
+  s_5843fc82a978b5::t_ec24dc43158c32 32-34,439-510,1616-1639,2145-2147,4726-4890,6010-6042,6545
+apps/agentic-rag-business-service/src/infrastructure/rustfs/type/upload-bytes.options.ts
+  s_c74f88edf4fc40::t_b4e6632a2cda26 1-7
+apps/agentic-rag-business-service/src/infrastructure/rustfs/rustfs.service.ts
+  s_c74f88edf4fc40::t_07fb372ff7e526 58-60
+  s_c74f88edf4fc40::t_f44086f24e256d 22-24,26-33,38,40,42,47-50,55,69,84,90-97,128-134,140
+  s_c74f88edf4fc40::t_acad359f5ff022 25
+  s_c74f88edf4fc40::t_d66fc2ccab0dbd 7-12
+  s_c74f88edf4fc40::t_4e906aa0f1702e 1-6,13-21,34-37,39,41,43-46,51-54,57,61-68,70-83,85-89,98-127,135-139,141-157
+  s_c74f88edf4fc40::t_74039b41d38c38 56
+apps/agentic-rag-business-service/src/config/environment.spec.ts
+  s_c74f88edf4fc40::t_3b0c8188195b6f 13
+  s_c74f88edf4fc40::t_c3c6c09c56c8c4 17
+  s_c74f88edf4fc40::t_08e1fe790976fc 58-66
+  s_c74f88edf4fc40::t_6b7e92d346aafe 12,14-16
+apps/agentic-rag-business-service/src/app.module.ts
+  s_c74f88edf4fc40::t_8c0374df76dd5a 6,24
+  s_c74f88edf4fc40::t_e4feb82ca19bec 14,21-22,25-26,29-30
+apps/agentic-rag-business-service/.env.example
+  s_c74f88edf4fc40::t_3f30bca0efd5eb 19-21,23-26
+  s_c74f88edf4fc40::t_6a23ef624d12a5 22
+apps/agentic-rag-business-service/src/infrastructure/rustfs/helpers/sanitize-base-name.spec.ts
+  s_c74f88edf4fc40::t_3c516538e69624 1-12
+.vscode/settings.json
+  s_5843fc82a978b5::t_ec24dc43158c32 34-35
+apps/agentic-rag-business-service/src/infrastructure/rustfs/helpers/guess-ext.ts
+  s_c74f88edf4fc40::t_70d929831b8894 1-15
+.env.example
+  s_c74f88edf4fc40::t_0a78a0df32b39f 69
+apps/agentic-rag-business-service/src/infrastructure/rustfs/rustfs.module.ts
+  s_c74f88edf4fc40::t_1eeae3e1978511 1-9
+apps/agentic-rag-business-service/src/infrastructure/rustfs/helpers/guess-ext.spec.ts
+  s_c74f88edf4fc40::t_df6489a386772d 1-13
+.env.prod.example
+  s_c74f88edf4fc40::t_3d73b8cf82dd0b 55
+apps/agentic-rag-business-service/package.json
+  s_5843fc82a978b5::t_ec24dc43158c32 26
+apps/agentic-rag-business-service/.env.dev
+  s_c74f88edf4fc40::t_2c83c097a66c89 28
+  s_c74f88edf4fc40::t_f57de67e579c5b 24
+  s_c74f88edf4fc40::t_8efd457b3b3fb3 21-23,25-27,29
+apps/agentic-rag-business-service/src/infrastructure/rustfs/helpers/format-date-path.ts
+  s_c74f88edf4fc40::t_e74b06bb367dd1 1-7
+.env.dev
+  s_c74f88edf4fc40::t_454251dd48d803 54
+apps/agentic-rag-business-service/src/infrastructure/rustfs/helpers/sanitize-base-name.ts
+  s_c74f88edf4fc40::t_38bfb534733783 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "75ef8b92949cfd2b1008061ae88428a44c089290",
+  "prompts": {},
+  "sessions": {
+    "s_5843fc82a978b5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "597ff8a3-a704-43fd-8358-c77101eaca6d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_c74f88edf4fc40": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9290c4f2-ba68-4d8d-a134-1407d009f491",
+        "model": "default"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
