@@ -1,0 +1,51 @@
+apps/agentic-rag-business-service/src/modules/document/document.service.ts
+  s_a619cfd4e5ae00::t_3380d62d1371ff 12,32,37-38,55,68,91,101,109,119-121,136,145-149,158,184,191-193,202,208,210
+  s_a619cfd4e5ae00::t_7b1c3fabfe5bbe 7-8
+  s_a619cfd4e5ae00::t_d8fe79fa6a789c 13-14,49,52,144,155
+apps/agentic-rag-business-service/src/modules/document/type/create-document-content.input.ts
+  s_a619cfd4e5ae00::t_e68ea647a7b187 1-15
+apps/agentic-rag-business-service/src/modules/document/helpers/count-words.ts
+  s_a619cfd4e5ae00::t_87ead07771841e 1-21
+apps/agentic-rag-business-service/src/modules/document/repository/document-content.repository.ts
+  s_a619cfd4e5ae00::t_f015c294b4360a 1-109
+docs/architecture/decisions/0013-use-postgresql-and-mongodb-for-documents.md
+  s_49acc62d317a2c::t_8db60715bd8b01 48-60
+apps/agentic-rag-business-service/src/modules/document/repository/document.repository.ts
+  s_a619cfd4e5ae00::t_e33d4fc5e6592c 1-95
+.rulesync/rules/backend.md
+  s_a619cfd4e5ae00::t_ccaa68e3891acc 35-37,40-41,62-70,78-91
+  s_a619cfd4e5ae00::t_42d724b1cefa47 42-61,71-77
+apps/agentic-rag-business-service/src/modules/document/helpers/build-content-summary.ts
+  s_a619cfd4e5ae00::t_583453dd9b6a45 1-10
+apps/agentic-rag-business-service/src/modules/document/type/create-document-meta.input.ts
+  s_a619cfd4e5ae00::t_8378839cf31e6c 1-28
+apps/agentic-rag-business-service/src/modules/document/document.module.ts
+  s_a619cfd4e5ae00::t_43a2f4a1e4ac2b 5,22-26
+  s_a619cfd4e5ae00::t_f25a9b0e7b2ed3 6-7
+apps/agentic-rag-business-service/src/modules/document/type/update-document-content.input.ts
+  s_a619cfd4e5ae00::t_a37f3e91110156 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "e1d09adc99a3ddd8b5b101284c1fbe69abd050b6",
+  "prompts": {},
+  "sessions": {
+    "s_49acc62d317a2c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ca09eecb-f046-4e15-9170-83ea06db4a38",
+        "model": "default"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    },
+    "s_a619cfd4e5ae00": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "460febef-54f7-4b38-9249-9a8ddbd1387f",
+        "model": "default"
+      },
+      "human_author": "ernest <keyuxu@trip.com>"
+    }
+  }
+}
