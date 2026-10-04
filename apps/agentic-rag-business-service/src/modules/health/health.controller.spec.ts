@@ -4,6 +4,7 @@ import {
   ServiceIdentityResponseSchema,
 } from '@repo/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { RabbitMqService } from '../../infrastructure/rabbitmq/rabbitmq.service';
 import { HealthController } from './health.controller';
 import { HealthModule } from './health.module';
 
@@ -13,7 +14,13 @@ describe('HealthController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HealthModule],
-    }).compile();
+    })
+      .overrideProvider(RabbitMqService)
+      .useValue({
+        isReady: () => true,
+        registeredHandlerCount: 1,
+      })
+      .compile();
 
     controller = module.get(HealthController);
   });
@@ -29,7 +36,7 @@ describe('HealthController', () => {
     expect(response.status).toBe('ok');
   });
 
-  it('reports the service as ready while no required dependencies exist', async () => {
+  it('reports the service as ready when RabbitMQ is connected', async () => {
     const response = await controller.getReadiness();
 
     expect(HealthProbeResponseSchema.safeParse(response).success).toBe(true);

@@ -3,11 +3,15 @@ import { ConfigModule } from '@nestjs/config';
 import { ORPCModule } from '@orpc/nest';
 import { validateEnvironment } from './config/environment';
 import { DatabaseModule } from './infrastructure/database/database.module';
+import { ElasticsearchModule } from './infrastructure/elasticsearch/elasticsearch.module';
+import { EmbeddingModule } from './infrastructure/embedding/embedding.module';
+import { RabbitmqModule } from './infrastructure/rabbitmq/rabbitmq.module';
 import { RustfsModule } from './infrastructure/rustfs/rustfs.module';
 import { ApiDocsModule } from './modules/api-docs/api-docs.module';
 import { DocumentModule } from './modules/document/document.module';
 import { GreetingModule } from './modules/greeting/greeting.module';
 import { HealthModule } from './modules/health/health.module';
+import { PipelineModule } from './modules/pipeline/pipeline.module';
 
 @Module({
   imports: [
@@ -22,6 +26,9 @@ import { HealthModule } from './modules/health/health.module';
     // 基础设施
     DatabaseModule,
     RustfsModule,
+    RabbitmqModule,
+    ElasticsearchModule,
+    EmbeddingModule,
 
     // 协议 / 平台
     ORPCModule.forRoot({}),
@@ -31,6 +38,7 @@ import { HealthModule } from './modules/health/health.module';
     GreetingModule,
     HealthModule,
     DocumentModule,
+    PipelineModule,
   ],
 })
 export class AppModule {}

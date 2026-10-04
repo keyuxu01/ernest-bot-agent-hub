@@ -104,6 +104,13 @@ cmd_list() {
   curl -sS "$BASE_URL/documents?page=1&pageSize=20" | pretty
 }
 
+cmd_publish() {
+  local id
+  id="$(load_id "${1:-}")"
+  echo "PUT /documents/$id/publish"
+  curl -sS -X PUT "$BASE_URL/documents/$id/publish" | pretty
+}
+
 cmd_patch() {
   local id
   id="$(load_id "${1:-}")"
@@ -166,6 +173,9 @@ curl -sS "\$BASE_URL/documents/\$DOC_ID" | jq '{id, title, content}'
 # 列表
 curl -sS "\$BASE_URL/documents?page=1&pageSize=20" | jq
 
+# 发布（要 id）
+curl -sS -X PUT "\$BASE_URL/documents/\$DOC_ID/publish" | jq '{id, title, status}'
+
 # 改标题（要 id）
 curl -sS -X PATCH "\$BASE_URL/documents/\$DOC_ID" \\
   -H 'Content-Type: application/json' \\
@@ -185,6 +195,7 @@ cmd_help() {
   create           JSON 创建一篇，记下 id
   get [id]         详情（默认用上次记下的 id）
   list             分页列表
+  publish [id]     发布并投递 RAG
   patch [id]       改标题
   delete [id]      软删后再 GET
   flow <file>      upload + get
@@ -199,7 +210,7 @@ main() {
   local cmd="${1:-help}"
   shift || true
   case "$cmd" in
-    samples | upload | create | get | list | patch | delete | flow | curls | help)
+    samples | upload | create | get | list | publish | patch | delete | flow | curls | help)
       "cmd_$cmd" "$@"
       ;;
     -h | --help)

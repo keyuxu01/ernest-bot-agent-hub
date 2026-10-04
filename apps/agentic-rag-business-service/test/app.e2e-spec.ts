@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   GreetingResponseSchema,
@@ -8,6 +9,8 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { DataSource } from 'typeorm';
 import request from 'supertest';
+import { VectorIndexService } from './../src/infrastructure/elasticsearch/vector-index.service';
+import { RabbitMqService } from './../src/infrastructure/rabbitmq/rabbitmq.service';
 import { AppModule } from './../src/app.module';
 import { MAX_UPLOAD_FILE_BYTES } from './../src/modules/document/constants/document-upload.constants';
 import { DocumentEntity } from './../src/modules/document/entities/document.entity';
@@ -19,7 +22,20 @@ describe('Business service (e2e)', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(RabbitMqService)
+      .useValue({
+        isReady: () => true,
+        registeredHandlerCount: 1,
+        registerHandler: () => undefined,
+        publish: async () => true,
+      })
+      .overrideProvider(VectorIndexService)
+      .useValue({
+        deleteByDocId: async () => undefined,
+        indexChunks: async () => undefined,
+      })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(

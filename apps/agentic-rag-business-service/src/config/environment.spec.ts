@@ -15,17 +15,31 @@ const validEnvironment = {
   RUSTFS_SECRET_KEY: 'rustfsadmin',
   RUSTFS_BUCKET: 'knowledge-hub',
   RUSTFS_PUBLIC_URL: 'http://localhost:9000',
+  RABBITMQ_URL: 'amqp://guest:guest@localhost:5672',
+  ELASTICSEARCH_NODE: 'http://localhost:9200',
+  RAG_CHUNK_SIZE: '512',
+  RAG_CHUNK_OVERLAP: '64',
+  QWEN_LLM_API_KEY: 'sk-test',
+  QWEN_CODER_TURBO_MODEL_BASE_URL:
+    'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  EMBEDDINGS_MODEL_NAME: 'text-embedding-v4',
+  EMBEDDING_DIMENSION: '1024',
+  EMBEDDING_BATCH_SIZE: '10',
 };
 
 describe('validateEnvironment', () => {
-  it('normalizes the PostgreSQL port', () => {
-    expect(validateEnvironment(validEnvironment)).toMatchObject({
+  it('returns the config and coerces numeric keys', () => {
+    expect(validateEnvironment(validEnvironment)).toEqual({
       ...validEnvironment,
       POSTGRES_PORT: 5432,
+      RAG_CHUNK_SIZE: 512,
+      RAG_CHUNK_OVERLAP: 64,
+      EMBEDDING_DIMENSION: 1024,
+      EMBEDDING_BATCH_SIZE: 10,
     });
   });
 
-  it('rejects a missing database variable', () => {
+  it('rejects a missing required variable', () => {
     const missingPassword: Record<string, unknown> = { ...validEnvironment };
     delete missingPassword.POSTGRES_PASSWORD;
 
@@ -34,34 +48,12 @@ describe('validateEnvironment', () => {
     );
   });
 
-  it('rejects an invalid PostgreSQL port', () => {
+  it('rejects a blank required variable', () => {
     expect(() =>
       validateEnvironment({
         ...validEnvironment,
-        POSTGRES_PORT: 'not-a-port',
+        QWEN_LLM_API_KEY: '   ',
       }),
-    ).toThrow(
-      'Environment variable POSTGRES_PORT must be an integer between 1 and 65535',
-    );
-  });
-
-  it('rejects a non-MongoDB URI', () => {
-    expect(() =>
-      validateEnvironment({
-        ...validEnvironment,
-        MONGO_URI: 'https://localhost:27017/knowledge_hub',
-      }),
-    ).toThrow(
-      'Environment variable MONGO_URI must use mongodb:// or mongodb+srv://',
-    );
-  });
-
-  it('rejects a missing RustFS variable', () => {
-    const missingBucket: Record<string, unknown> = { ...validEnvironment };
-    delete missingBucket.RUSTFS_BUCKET;
-
-    expect(() => validateEnvironment(missingBucket)).toThrow(
-      'Environment variable RUSTFS_BUCKET is required',
-    );
+    ).toThrow('Environment variable QWEN_LLM_API_KEY is required');
   });
 });

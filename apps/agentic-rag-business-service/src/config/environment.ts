@@ -1,52 +1,58 @@
 type Environment = Record<string, unknown>;
 
-function requireString(config: Environment, key: string): string {
-  const value = config[key];
-  if (typeof value !== 'string' || value.trim() === '') {
-    throw new Error(`Environment variable ${key} is required`);
-  }
+const REQUIRED_ENVIRONMENT_KEYS = [
+  'POSTGRES_HOST',
+  'POSTGRES_PORT',
+  'POSTGRES_USER',
+  'POSTGRES_PASSWORD',
+  'POSTGRES_DB',
+  'MONGO_URI',
+  'RUSTFS_ENDPOINT',
+  'RUSTFS_REGION',
+  'RUSTFS_ACCESS_KEY',
+  'RUSTFS_SECRET_KEY',
+  'RUSTFS_BUCKET',
+  'RUSTFS_PUBLIC_URL',
+  'RABBITMQ_URL',
+  'ELASTICSEARCH_NODE',
+  'RAG_CHUNK_SIZE',
+  'RAG_CHUNK_OVERLAP',
+  'QWEN_LLM_API_KEY',
+  'QWEN_CODER_TURBO_MODEL_BASE_URL',
+  'EMBEDDINGS_MODEL_NAME',
+  'EMBEDDING_DIMENSION',
+  'EMBEDDING_BATCH_SIZE',
+] as const;
 
-  return value;
-}
-
-function requirePort(config: Environment, key: string): number {
-  const rawValue = requireString(config, key);
-  const value = Number(rawValue);
-
-  if (!Number.isInteger(value) || value < 1 || value > 65_535) {
-    throw new Error(
-      `Environment variable ${key} must be an integer between 1 and 65535`,
-    );
-  }
-
-  return value;
-}
+const NUMERIC_ENVIRONMENT_KEYS = [
+  'POSTGRES_PORT',
+  'RAG_CHUNK_SIZE',
+  'RAG_CHUNK_OVERLAP',
+  'EMBEDDING_DIMENSION',
+  'EMBEDDING_BATCH_SIZE',
+] as const;
 
 /**
- * Validates infrastructure configuration before Nest creates database clients.
- * The returned object also normalizes numeric values for ConfigService.
+ * 启动前确认基建变量在场；数字项在这里转成 number，业务侧直接取。
+ * 协议、URI 格式交给连接失败时排查。
  */
-export function validateEnvironment(config: Environment): Environment {
-  const mongoUri = requireString(config, 'MONGO_URI');
-  if (!/^mongodb(?:\+srv)?:\/\//.test(mongoUri)) {
-    throw new Error(
-      'Environment variable MONGO_URI must use mongodb:// or mongodb+srv://',
-    );
+function validateEnvironment(config: Environment): Environment {
+  for (const key of REQUIRED_ENVIRONMENT_KEYS) {
+    const value = config[key];
+    if (value === undefined || value === null) {
+      throw new Error(`Environment variable ${key} is required`);
+    }
+    if (typeof value === 'string' && value.trim() === '') {
+      throw new Error(`Environment variable ${key} is required`);
+    }
   }
 
-  return {
-    ...config,
-    POSTGRES_HOST: requireString(config, 'POSTGRES_HOST'),
-    POSTGRES_PORT: requirePort(config, 'POSTGRES_PORT'),
-    POSTGRES_USER: requireString(config, 'POSTGRES_USER'),
-    POSTGRES_PASSWORD: requireString(config, 'POSTGRES_PASSWORD'),
-    POSTGRES_DB: requireString(config, 'POSTGRES_DB'),
-    MONGO_URI: mongoUri,
-    RUSTFS_ENDPOINT: requireString(config, 'RUSTFS_ENDPOINT'),
-    RUSTFS_REGION: requireString(config, 'RUSTFS_REGION'),
-    RUSTFS_ACCESS_KEY: requireString(config, 'RUSTFS_ACCESS_KEY'),
-    RUSTFS_SECRET_KEY: requireString(config, 'RUSTFS_SECRET_KEY'),
-    RUSTFS_BUCKET: requireString(config, 'RUSTFS_BUCKET'),
-    RUSTFS_PUBLIC_URL: requireString(config, 'RUSTFS_PUBLIC_URL'),
-  };
+  const normalized: Environment = { ...config };
+  for (const key of NUMERIC_ENVIRONMENT_KEYS) {
+    normalized[key] = Number(config[key]);
+  }
+
+  return normalized;
 }
+
+export { validateEnvironment };

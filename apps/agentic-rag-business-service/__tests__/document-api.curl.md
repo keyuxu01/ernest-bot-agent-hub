@@ -56,6 +56,9 @@ export DOC_ID='这里填响应里的 id'
 # 详情（含 Markdown 正文）
 curl -sS "$BASE_URL/documents/$DOC_ID" | jq '{id, title, status, wordCount, content}'
 
+# 发布（异步投递 RAG 分块 / Embedding / ES）
+curl -sS -X PUT "$BASE_URL/documents/$DOC_ID/publish" | jq '{id, title, status, publishTime}'
+
 # 改标题
 curl -sS -X PATCH "$BASE_URL/documents/$DOC_ID" \
   -H 'Content-Type: application/json' \

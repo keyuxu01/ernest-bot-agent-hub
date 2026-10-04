@@ -1,9 +1,11 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { nextSnowflakeId } from '../../common/helpers/snowflake-id';
+import { DocumentPipelinePublisher } from '../../infrastructure/rabbitmq/document-pipeline.publisher';
 import { DocumentContentRepository } from './repository/document-content.repository';
 import { DocumentRepository } from './repository/document.repository';
 import { CreateDocumentDto } from './dto/create-document.dto';
@@ -33,9 +35,12 @@ import { countWords } from './helpers/count-words';
  */
 @Injectable()
 export class DocumentService {
+  private readonly logger = new Logger(DocumentService.name);
+
   constructor(
     private readonly documentRepo: DocumentRepository,
     private readonly contentRepo: DocumentContentRepository,
+    private readonly pipelinePublisher: DocumentPipelinePublisher,
   ) {}
 
   /**
@@ -191,6 +196,53 @@ export class DocumentService {
     const contentDoc = await this.contentRepo.findActiveContentById(
       doc.contentId,
     );
+    return { ...saved, content: contentDoc?.content ?? '' };
+  }
+
+  /**
+   * 直接发布文档（不做审核）
+   *
+   * 流程：
+   * 1. 校验文档存在且状态为草稿 / 已发布
+   * 2. 写库：status=Published，刷新 publishTime
+   * 3. 投递 RabbitMQ（RAG 向量化）；失败只打日志，不回滚「已发布」
+   *
+   * 异步消费侧见 DocumentPipelineConsumer → PipelineOrchestrator：
+   * 分块 → 嵌入 → ES(kh_chunk)
+   */
+  async publish(id: string) {
+    this.logger.log(`发布文档：documentId=${id}`);
+
+    const doc = await this.documentRepo.findActiveById(id);
+    if (!doc) {
+      throw new NotFoundException(`Document ${id} not found`);
+    }
+
+    if (
+      doc.status !== DocumentStatus.Draft &&
+      doc.status !== DocumentStatus.Published
+    ) {
+      throw new BadRequestException('当前文档状态不允许发布');
+    }
+
+    doc.status = DocumentStatus.Published;
+    doc.publishTime = new Date();
+    const saved = await this.documentRepo.save(doc);
+
+    const contentDoc = await this.contentRepo.findActiveContentById(
+      doc.contentId,
+    );
+
+    try {
+      await this.pipelinePublisher.afterPublish(saved.id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `发布后管线投递失败（不影响发布）：documentId=${id}, error=${message}`,
+      );
+    }
+
+    this.logger.log(`文档发布成功：documentId=${id}`);
     return { ...saved, content: contentDoc?.content ?? '' };
   }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { QueryDocumentDto } from '../dto/query-document.dto';
 import { DocumentEntity } from '../entities/document.entity';
 import { CreateDocumentMetaInput } from '../type/create-document-meta.input';
@@ -41,6 +41,16 @@ export class DocumentRepository {
    */
   async findActiveById(id: string): Promise<DocumentEntity | null> {
     return this.repo.findOne({ where: { id, deleted: false } });
+  }
+
+  /**
+   * 按雪花 ID 列表查未软删元数据（RAG 批量重建）
+   */
+  async findActiveByIds(ids: string[]): Promise<DocumentEntity[]> {
+    if (!ids.length) {
+      return [];
+    }
+    return this.repo.find({ where: { id: In(ids), deleted: false } });
   }
 
   /**

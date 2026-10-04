@@ -6,6 +6,7 @@ import {
   type HealthProbeResponse,
   type ServiceIdentityResponse,
 } from '@repo/contracts';
+import { RabbitMqHealthIndicator } from '../../infrastructure/rabbitmq/rabbitmq.health-indicator';
 import {
   BUSINESS_SERVICE_NAME,
   LOCAL_INSTANCE_ID,
@@ -20,7 +21,10 @@ const getNonEmptyEnvironmentValue = (name: string): string | undefined => {
 
 @Controller('health')
 class HealthController {
-  constructor(private readonly healthCheckService: HealthCheckService) {}
+  constructor(
+    private readonly healthCheckService: HealthCheckService,
+    private readonly rabbitHealth: RabbitMqHealthIndicator,
+  ) {}
 
   @Get('live')
   @HealthCheck()
@@ -33,7 +37,9 @@ class HealthController {
   @Get('ready')
   @HealthCheck()
   async getReadiness(): Promise<HealthProbeResponse> {
-    const result = await this.healthCheckService.check([]);
+    const result = await this.healthCheckService.check([
+      () => this.rabbitHealth.isHealthy('rabbitmq'),
+    ]);
 
     return HealthProbeResponseSchema.parse(result);
   }

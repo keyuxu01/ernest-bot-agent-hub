@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RabbitmqModule } from '../../infrastructure/rabbitmq/rabbitmq.module';
 import { RustfsModule } from '../../infrastructure/rustfs/rustfs.module';
 import { DocumentParseService } from './document-parse.service';
 import { DocumentController } from './document.controller';
@@ -20,6 +21,7 @@ import {
       { name: DocumentContent.name, schema: DocumentContentSchema },
     ]),
     RustfsModule,
+    RabbitmqModule,
   ],
   controllers: [DocumentController],
   providers: [
@@ -28,6 +30,10 @@ import {
     DocumentService,
     DocumentParseService,
   ],
-  exports: [DocumentService],
+  exports: [
+    DocumentService,
+    DocumentRepository,
+    DocumentContentRepository,
+  ],
 })
 export class DocumentModule {}

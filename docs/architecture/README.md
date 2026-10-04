@@ -22,7 +22,8 @@
       +------------------+
       | Knowledge Stores |
       | PostgreSQL       |
-      | MongoDB / Vector |
+      | MongoDB          |
+      | Elasticsearch    |
       | RustFS objects   |
       +------------------+
 
@@ -32,8 +33,9 @@ Shared foundations:
 ```
 
 PostgreSQL is the system of record for structured knowledge metadata and MongoDB stores document bodies.
-The vector-store technology remains intentionally undecided in the first phase. See
-[ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md).
+Published documents are chunked and embedded with 通义千问, then written to Elasticsearch `kh_chunk`.
+See [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md) and
+[ADR-0016](./decisions/0016-use-elasticsearch-for-rag-chunks.md).
 
 ## Deployment Topology
 
@@ -111,7 +113,7 @@ the [deployment and infrastructure guide](../guides/deployment-and-infrastructur
 | ------------------------------- | ------------------------- | ----------------------------- |
 | Business facts and job records  | Database                  | Yes                           |
 | Original documents              | Object storage such as R2 | Yes                           |
-| Embeddings and vector indexes   | Vector database           | Yes                           |
+| Embeddings and vector indexes   | Elasticsearch `kh_chunk`  | Yes                           |
 | Commands and integration events | RabbitMQ                  | Yes, until acknowledged       |
 | Cache, locks and rate limits    | Redis                     | Depends on the use case       |
 | In-flight request data          | NestJS process memory     | No                            |
@@ -213,6 +215,19 @@ Conversion stays inside `DocumentModule`. The MVP waits inside the request and k
 state, so an interrupted request must be re-uploaded. See
 [ADR-0015](./decisions/0015-use-in-process-document-parsers.md).
 
+## Document Publish and RAG Index Boundary
+
+`PUT /documents/:id/publish` writes `Published` in PostgreSQL, then publishes
+`RagReindexMessageV1` to RabbitMQ. The message carries only document IDs. A consumer in
+`PipelineModule` loads metadata and Mongo bodies through document repositories, splits Markdown,
+embeds via `EmbeddingService` in `src/infrastructure/embedding` (Qwen / DashScope compatible-mode),
+and upserts Elasticsearch `kh_chunk`. Queue publish failure does not roll back the published status.
+RabbitMQ and Elasticsearch are required at startup; a down broker or cluster fails boot. See [ADR-0016](./decisions/0016-use-elasticsearch-for-rag-chunks.md),
+[ADR-0017](./decisions/0017-place-qwen-embedding-in-infrastructure.md) and the
+[RabbitMQ guide](../guides/rabbitmq.md). The HTTP process currently
+also runs the consumer; splitting that onto the Railway Consumer service in ADR-0007 is
+follow-up work.
+
 ## Architecture Decision Records
 
 | ADR                                                                      | Decision                                            | Status   |
@@ -231,6 +246,8 @@ state, so an interrupted request must be re-uploaded. See
 | [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md) | PostgreSQL metadata with MongoDB document content   | Accepted |
 | [ADR-0014](./decisions/0014-use-mineru-cloud-for-document-parsing.md)    | MinerU cloud API for upload document parsing        | Superseded |
 | [ADR-0015](./decisions/0015-use-in-process-document-parsers.md)          | In-process parsers for upload document parsing      | Accepted   |
+| [ADR-0016](./decisions/0016-use-elasticsearch-for-rag-chunks.md)         | Elasticsearch + Qwen embeddings for RAG chunks      | Accepted   |
+| [ADR-0017](./decisions/0017-place-qwen-embedding-in-infrastructure.md)   | Qwen embedding client in `src/infrastructure`       | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

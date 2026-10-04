@@ -66,6 +66,9 @@ Content-Type: text/markdown
 from __tests__/business-api.http
 ------AgentHubBoundary--
 
+### Publish uploaded document (async RAG)
+PUT {{baseUrl}}/documents/{{uploadMarkdown.response.body.id}}/publish
+
 ### Get uploaded document
 GET {{baseUrl}}/documents/{{uploadMarkdown.response.body.id}}
 
