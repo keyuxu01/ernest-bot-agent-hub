@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RagReindexMessageV1Schema } from './reindex';
+import { RagBusinessReindexMessageV1Schema } from './reindex';
 
 const validMessage = {
   taskId: '11111111-1111-4111-8111-111111111111',
@@ -7,9 +7,9 @@ const validMessage = {
   documentIds: ['10001'],
 };
 
-describe('RagReindexMessageV1Schema', () => {
+describe('RagBusinessReindexMessageV1Schema', () => {
   it('accepts a command without schemaVersion and defaults it to 1', () => {
-    expect(RagReindexMessageV1Schema.parse(validMessage)).toEqual({
+    expect(RagBusinessReindexMessageV1Schema.parse(validMessage)).toEqual({
       ...validMessage,
       schemaVersion: 1,
     });
@@ -17,7 +17,7 @@ describe('RagReindexMessageV1Schema', () => {
 
   it('rejects an empty document id list', () => {
     expect(() =>
-      RagReindexMessageV1Schema.parse({
+      RagBusinessReindexMessageV1Schema.parse({
         ...validMessage,
         documentIds: [],
       }),
@@ -26,7 +26,7 @@ describe('RagReindexMessageV1Schema', () => {
 
   it('rejects an unknown reindex type', () => {
     expect(() =>
-      RagReindexMessageV1Schema.parse({
+      RagBusinessReindexMessageV1Schema.parse({
         ...validMessage,
         type: 'BY_CATEGORY',
       }),

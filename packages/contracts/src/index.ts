@@ -13,10 +13,10 @@ export {
   SharedServiceIdentityResponseSchema,
 } from './shared/health';
 export type {
-  RagReindexMessageV1,
-  RagReindexMessageV1Input,
-} from './rag/reindex';
+  RagBusinessReindexMessageV1,
+  RagBusinessReindexMessageV1Input,
+} from './rag-business/reindex';
 export {
-  RagReindexMessageV1Schema,
-  RagReindexTypeSchema,
-} from './rag/reindex';
+  RagBusinessReindexMessageV1Schema,
+  RagBusinessReindexTypeSchema,
+} from './rag-business/reindex';

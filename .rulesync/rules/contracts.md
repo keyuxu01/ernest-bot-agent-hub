@@ -28,14 +28,13 @@ Zod 运行时契约唯一真相源。
 
 | 前缀 | 产品线 / 用途 | 示例 |
 | ---- | ------------- | ---- |
-| `RagBusiness` | Agentic RAG 业务 API（`agentic-rag-business-service` / client） | `RagBusinessGreetingResponse` |
-| `Rag` | RAG 管线消息与领域载荷 | `RagReindexMessageV1` |
+| `RagBusiness` | Agentic RAG 业务线（`agentic-rag-business-service` / client，含 HTTP 与管线消息） | `RagBusinessGreetingResponse` |
 | `Mcp` | `mcp-app-collections` 对外载荷 | `McpHelloResponse` |
 | `Shared` | 跨服务基础设施（health 等） | `SharedHealthProbeResponse` |
 | `UserPlatform` | 预留：登录 / 用户平台微服务 | `UserPlatformSession` |
 
 - Schema 名 = `{Prefix}{Name}Schema`，类型名 = `{Prefix}{Name}`。
-- 源文件按作用域分目录：`src/rag-business/`、`src/rag/`、`src/mcp/`、`src/shared/`。
+- 源文件按作用域分目录：`src/rag-business/`、`src/mcp/`、`src/shared/`。
 - `src/orpc/` 按同一作用域再分子目录（如 `src/orpc/rag-business/`）；operation 与 router 导出名也必须带前缀（如 `RagBusinessGreetingContract`）。
 - 形状碰巧相同也不要导出无前缀名；可复制 schema 或抽私有 `z.object`，但 **export 必须带前缀**。
 - 新增契约（含 oRPC）一律落进对应作用域目录并带前缀，禁止再往 `src/` 根目录平铺。

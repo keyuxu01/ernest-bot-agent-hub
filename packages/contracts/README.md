@@ -10,8 +10,7 @@
 
 | 前缀 | 产品线 / 用途 | 示例 |
 |------|----------------|------|
-| `RagBusiness` | Agentic RAG 业务 API | `RagBusinessGreetingResponse` |
-| `Rag` | RAG 管线消息 | `RagReindexMessageV1` |
+| `RagBusiness` | Agentic RAG 业务线（HTTP 与管线消息） | `RagBusinessGreetingResponse` |
 | `Mcp` | `mcp-app-collections` | `McpHelloResponse` |
 | `Shared` | 跨服务基础设施 | `SharedHealthProbeResponse` |
 | `UserPlatform` | 预留：登录 / 用户平台 | `UserPlatformSession` |
@@ -19,7 +18,7 @@
 规则：
 
 1. Schema 名 = `{Prefix}{Name}Schema`，类型名 = `{Prefix}{Name}`。
-2. 源文件按作用域分目录：`src/rag-business/`、`src/rag/`、`src/mcp/`、`src/shared/`。
+2. 源文件按作用域分目录：`src/rag-business/`、`src/mcp/`、`src/shared/`。
 3. oRPC 同样按作用域分子目录：`src/orpc/rag-business/`；operation 名也要前缀（`RagBusinessGreetingContract`）。
 4. 形状碰巧相同也不要复用无前缀名；export 必须带前缀。
 5. 以后增量契约一律进对应目录，禁止再平铺到 `src/` 根下。

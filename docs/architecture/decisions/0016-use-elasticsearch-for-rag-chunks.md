@@ -23,7 +23,7 @@ The embedding vendor is 通义千问, not OpenAI. Environment names such as `OPE
   `QWEN_LLM_API_KEY`, `QWEN_CODER_TURBO_MODEL_BASE_URL`, `EMBEDDINGS_MODEL_NAME`.
 - Split Markdown with LangChain `RecursiveCharacterTextSplitter`.
 - Trigger rebuilds with the RabbitMQ command already required by ADR-0007. The HTTP publish
-  path writes `Published` first, then publishes `RagReindexMessageV1`; a failed publish does
+  path writes `Published` first, then publishes `RagBusinessReindexMessageV1`; a failed publish does
   not roll back the document status.
 - Keep RabbitMQ and Elasticsearch clients under `src/infrastructure/*`. Keep chunking
   and orchestration in `src/modules/pipeline`. The Qwen embedding client lives in

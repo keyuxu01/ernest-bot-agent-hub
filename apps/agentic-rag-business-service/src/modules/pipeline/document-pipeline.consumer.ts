@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RagReindexMessageV1Schema } from '@repo/contracts';
+import { RagBusinessReindexMessageV1Schema } from '@repo/contracts';
 import type { ConsumeMessage } from 'amqplib';
 import { RAG_REINDEX_QUEUE } from '../../infrastructure/rabbitmq/constants/rabbitmq.constants';
 import { RabbitMqService } from '../../infrastructure/rabbitmq/rabbitmq.service';
@@ -28,7 +28,7 @@ class DocumentPipelineConsumer {
 
   /** RAG：分块 → 向量化 → ES kh_chunk（dense_vector） */
   private async handleRag(msg: ConsumeMessage): Promise<void> {
-    const body = RagReindexMessageV1Schema.parse(
+    const body = RagBusinessReindexMessageV1Schema.parse(
       // Publish 时候是 JSON 字符串，这里转回 JS 对象
       // 再校验解析结果
       JSON.parse(msg.content.toString('utf8')),

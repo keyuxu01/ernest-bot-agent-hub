@@ -36,7 +36,7 @@ cursor:
   数据访问层）访问数据库；禁止在 Controller、Service 中直接注入 `EntityManager`、TypeORM
   `Repository` 或 Mongoose `Model`。
 - 跨应用数据模型从 `@repo/contracts` 获取，不在应用内复制 Schema 或类型；导入名必须带域前缀
-  （`RagBusiness*` / `Rag*` / `Mcp*` / `Shared*`；后续按 `Business` / `Platform` 风格补全作用域，如 `UserPlatform*`）。
+  （`RagBusiness*` / `Mcp*` / `Shared*`；后续按 `Business` / `Platform` 风格补全作用域，如 `UserPlatform*`）。
 
 ## Code Style
 

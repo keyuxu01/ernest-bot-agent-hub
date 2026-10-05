@@ -326,10 +326,10 @@ Broker 把队列拆成两列，**Unacked 绑在某个 channel 上**，另一实�
 消息只带标识，不带正文，避免把文档内容送进 broker。消费侧自己按 ID 去库里拉。
 
 ```12:17:packages/contracts/src/rag-reindex.ts
-const RagReindexMessageV1Schema = z.object({
+const RagBusinessReindexMessageV1Schema = z.object({
   schemaVersion: z.literal(1).default(1),
   taskId: z.string().uuid(),
-  type: RagReindexTypeSchema,
+  type: RagBusinessReindexTypeSchema,
   documentIds: z.array(z.string().min(1)).min(1),
 });
 ```
@@ -389,7 +389,7 @@ DocumentService.publish
         └─ ② afterPublish(saved.id)       ← 只负责通知管线
                 │
                 ▼
-           组 RagReindexMessageV1
+           组 RagBusinessReindexMessageV1
            publish(rag.reindex.exchange, rag.reindex.by_ids, message)
 ```
 
@@ -413,11 +413,11 @@ DocumentService.publish
 
 ```26:36:apps/agentic-rag-business-service/src/infrastructure/rabbitmq/document-pipeline.publisher.ts
   async afterPublish(documentId: string): Promise<void> {
-    const message = RagReindexMessageV1Schema.parse({
+    const message = RagBusinessReindexMessageV1Schema.parse({
       taskId: randomUUID(),
       type: 'BY_DOC_IDS',
       documentIds: [documentId],
-    } satisfies RagReindexMessageV1Input);
+    } satisfies RagBusinessReindexMessageV1Input);
     const ok = await this.rabbit.publish(
       RAG_REINDEX_EXCHANGE,
       RAG_RK_BY_IDS,
@@ -444,7 +444,7 @@ DocumentService.publish
   }
 
   private async handleRag(msg: ConsumeMessage): Promise<void> {
-    const body = RagReindexMessageV1Schema.parse(
+    const body = RagBusinessReindexMessageV1Schema.parse(
       JSON.parse(msg.content.toString('utf8')),
     );
     await this.orchestrator.handleRagReindex(body.type, body.documentIds);

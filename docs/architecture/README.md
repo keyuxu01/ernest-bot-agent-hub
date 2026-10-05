@@ -218,7 +218,7 @@ state, so an interrupted request must be re-uploaded. See
 ## Document Publish and RAG Index Boundary
 
 `PUT /documents/:id/publish` writes `Published` in PostgreSQL, then publishes
-`RagReindexMessageV1` to RabbitMQ. The message carries only document IDs. A consumer in
+`RagBusinessReindexMessageV1` to RabbitMQ. The message carries only document IDs. A consumer in
 `PipelineModule` loads metadata and Mongo bodies through document repositories, splits Markdown,
 embeds via `EmbeddingService` in `src/infrastructure/embedding` (Qwen / DashScope compatible-mode),
 and upserts Elasticsearch `kh_chunk`. Queue publish failure does not roll back the published status.
