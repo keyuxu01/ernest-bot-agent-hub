@@ -43,12 +43,13 @@ ADR 记录长期有效的技术决策，两者不得互相替代。
 Skills 按任务加载，不是始终生效的编码规范。项目 RuleSync rules 与 skill 冲突时，
 以项目 rules 为准。
 
-| 任务                      | Skill                                              |
-| ------------------------- | -------------------------------------------------- |
-| Next.js                   | `.agents/skills/next-best-practices/SKILL.md`      |
-| React 性能与组合          | `.agents/skills/react-best-practices/SKILL.md`     |
-| shadcn/ui                 | `.agents/skills/shadcn/SKILL.md`                   |
-| NestJS                    | `.agents/skills/nestjs-best-practices/SKILL.md`    |
-| Turborepo                 | `.agents/skills/turborepo/SKILL.md`                |
-| Vercel AI SDK             | `.agents/skills/use-ai-sdk/SKILL.md`               |
-| 新增 NestJS workspace app | `.agents/skills/setup-turbo-nest-service/SKILL.md` |
+| 任务                            | Skill                                                                  |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| Next.js                         | `.agents/skills/next-best-practices/SKILL.md`                          |
+| React 性能与组合                | `.agents/skills/react-best-practices/SKILL.md`                         |
+| shadcn/ui                       | `.agents/skills/shadcn/SKILL.md`                                       |
+| NestJS                          | `.agents/skills/nestjs-best-practices/SKILL.md`                        |
+| Turborepo                       | `.agents/skills/turborepo/SKILL.md`                                    |
+| Vercel AI SDK                   | `.agents/skills/use-ai-sdk/SKILL.md`                                   |
+| 新增 NestJS workspace app       | `.agents/skills/setup-turbo-nest-service/SKILL.md`                     |
+| MCP App / MCP UI / ChatGPT Apps | `.agents/skills/mcp-app/SKILL.md`（双平台：官方 MCP Apps + ChatGPT） |

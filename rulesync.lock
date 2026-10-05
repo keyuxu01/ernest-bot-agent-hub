@@ -40,6 +40,38 @@
           "integrity": "sha256-9681d8dfeb5e6cdff767f1bcaba5d7ac55732a9d6c02ee120f44229f8ec25e7e"
         }
       }
+    },
+    "modelcontextprotocol/ext-apps": {
+      "requestedRef": "main",
+      "resolvedRef": "82221c0c8ce7661efa6771c9d461511b1650495f",
+      "resolvedAt": "2026-10-05T05:26:01.048Z",
+      "skills": {
+        "add-app-to-server": {
+          "integrity": "sha256-9916a6a7b0a6b411a0e011d74b3dcf4123cd64ffa36728613bc91cb8605eaa69"
+        },
+        "convert-web-app": {
+          "integrity": "sha256-46dfe1472362f3b62f636b96fd80f2b8e1766dc02a88fb9f7d58725f9ca471f3"
+        },
+        "create-mcp-app": {
+          "integrity": "sha256-abbe7b06ae1fbf12fb38457a3fb5a66492cc65f09992eea06e94da14abe30c47"
+        },
+        "migrate-oai-app": {
+          "integrity": "sha256-65612402e6753d4890e895a284578c17c97813f144ae4229f8f4c1645c19ba03"
+        }
+      }
+    },
+    "openai/plugins": {
+      "requestedRef": "main",
+      "resolvedRef": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+      "resolvedAt": "2026-10-05T05:26:09.213Z",
+      "skills": {
+        "build-chatgpt-app": {
+          "integrity": "sha256-20b21bcdab0cf11d73038c7f86de3130f5f0280fa13fca3e9ef45146afdf42ab"
+        },
+        "chatgpt-app-submission": {
+          "integrity": "sha256-9b6f68816b5863f10f289631405591d00155c20bc6569bea00332ba7a029a7aa"
+        }
+      }
     }
   }
 }

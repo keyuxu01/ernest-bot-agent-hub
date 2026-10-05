@@ -1,0 +1,4 @@
+interface:
+  display_name: "MCP App"
+  short_description: "Build official MCP Apps and ChatGPT-compatible widgets in this repo"
+  default_prompt: "Use $mcp-app so the widget runs on official MCP Apps hosts and ChatGPT. Load $create-mcp-app and $build-chatgpt-app together."

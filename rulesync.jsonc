@@ -50,6 +50,23 @@
       "transport": "git",
       "skills": ["turborepo"],
     },
+    {
+      "source": "https://github.com/modelcontextprotocol/ext-apps.git",
+      "transport": "git",
+      "path": "plugins/mcp-apps/skills",
+      "skills": [
+        "create-mcp-app",
+        "add-app-to-server",
+        "migrate-oai-app",
+        "convert-web-app",
+      ],
+    },
+    {
+      "source": "https://github.com/openai/plugins.git",
+      "transport": "git",
+      "path": "plugins/openai-developers/skills",
+      "skills": ["build-chatgpt-app", "chatgpt-app-submission"],
+    },
   ],
 
   "outputRoots": ["."],

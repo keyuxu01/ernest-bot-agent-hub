@@ -31,6 +31,15 @@ cursor:
 
 ## MCP UI
 
+- 涉及 MCP App / MCP UI / ChatGPT Apps 时加载 `.agents/skills/mcp-app/SKILL.md`。
+  每个 widget 必须同时能在官方 MCP Apps 宿主和 ChatGPT 上运行。官方 MCP Apps
+  是协议基线；不能只加载 OpenAI `build-chatgpt-app`。
+- 实现前同时对照官方文档
+  [Build an MCP App](https://modelcontextprotocol.io/extensions/apps/build)
+  以及官方 skill：`create-mcp-app`、`add-app-to-server`、`migrate-oai-app`。
+- 双平台时同时加载 OpenAI `build-chatgpt-app`。Tool 适配层必须同时带
+  `_meta.ui.resourceUri` 和 `_meta["openai/outputTemplate"]`。
+  UI resource 用 `@mcp-ui/server` 的 `createUIResource`（[mcpui.dev](https://mcpui.dev/)）。
 - MCP Widget 前端放在 `apps/mcp-app-collections/web/**`，遵守 frontend rules。
 - 可复用展示组件从 `packages/ui` 获取，但 Widget 构建入口和宿主 Web 应用保持独立。
 - MCP UI 返回格式、资源 URI 和宿主专用 `_meta` 只存在于 MCP 适配层，不泄漏到领域模型。
@@ -42,4 +51,3 @@ cursor:
 - 新增或修改 Tool 时测试 schema 拒绝路径、成功响应和业务错误路径。
 - MCP Server 采用 `@rekog/mcp-nest` v2（`McpStrategy` + `@McpController`），协议以官方 MCP SDK 与
   [ADR-0005](docs/architecture/decisions/0005-evaluate-mcp-nest.md) 为准。不要抄 v1 `McpModule.forRoot()`。
-- 涉及 ChatGPT Apps/MCP UI 时加载 OpenAI `build-chatgpt-app` skill。
