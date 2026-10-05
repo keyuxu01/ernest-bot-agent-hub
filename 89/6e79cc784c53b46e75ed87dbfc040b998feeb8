@@ -1,0 +1,79 @@
+openspec/schemas/evidence-gated/templates/research.md
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-26
+openspec/schemas/evidence-gated/templates/end-audit.yaml
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-32
+openspec/schemas/evidence-gated/templates/start-contract.yaml
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-39
+openspec/schemas/evidence-gated/templates/boundary-change.yaml
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-26
+openspec/schemas/evidence-gated/templates/tasks.md
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-13,16-18,21-22
+  s_65bb1375b50d0f::t_ca2abb447abd8e 14-15,19-20
+docs/development/openspec/README.md
+  s_65bb1375b50d0f::t_a1f6726755202b 1-24,26-27
+  s_65bb1375b50d0f::t_ca2abb447abd8e 25
+openspec/schemas/evidence-gated/schema.yaml
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-2,4-118,129-136,140-147
+  s_65bb1375b50d0f::t_ca2abb447abd8e 119-128,137-139
+  s_65bb1375b50d0f::t_9c6b73d335e250 3
+docs/development/openspec/examples/generic-change.md
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-27,30-40,43-46,48-53
+  s_65bb1375b50d0f::t_ca2abb447abd8e 28-29,41-42,47
+openspec/schemas/evidence-gated/templates/design.md
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-63
+openspec/config.yaml
+  s_65bb1375b50d0f::t_a1f6726755202b 1,12-15
+openspec/schemas/evidence-gated/templates/proposal.md
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-42
+docs/development/openspec-workflow.md
+  s_65bb1375b50d0f::t_ca2abb447abd8e 28-30,44,68-69,82-83
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-27,31-43,45-67,70-81,84-93
+docs/development/openspec/evidence-and-receipts.md
+  s_65bb1375b50d0f::t_ca2abb447abd8e 19-24,40
+  s_65bb1375b50d0f::t_a1f6726755202b 7
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-6,8-18,25-39,41-60
+openspec/schemas/evidence-gated/templates/baseline.md
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-45
+openspec/schemas/evidence-gated/templates/evidence-receipt.yaml
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-28,39-43,45-57
+  s_65bb1375b50d0f::t_ca2abb447abd8e 29-38,44
+openspec/schemas/evidence-gated/templates/spec-audit.md
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-44
+openspec/schemas/evidence-gated/templates/spec.md
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-25
+docs/development/openspec/subagent-roles.md
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-73,77-78,82-104
+  s_65bb1375b50d0f::t_ca2abb447abd8e 74-76,79-81
+openspec/schemas/evidence-gated/templates/release-readiness.yaml
+  s_65bb1375b50d0f::t_ca2abb447abd8e 30
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-29,31-48
+openspec/schemas/evidence-gated/templates/workflow-state.yaml
+  s_65bb1375b50d0f::t_d8c9d461921a99 1-5,7-40,47-73
+  s_65bb1375b50d0f::t_ca2abb447abd8e 6,41-46
+.rulesync/rules/overview.md
+  s_65bb1375b50d0f::t_88c3b329eb7f31 35,37-43
+  s_65bb1375b50d0f::t_1af24958ea294f 36
+docs/development/openspec/code-and-secret-review.md
+  s_65bb1375b50d0f::t_ca2abb447abd8e 1-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "896e79cc784c53b46e75ed87dbfc040b998feeb8",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_65bb1375b50d0f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10aad-d90e-7b63-837a-6fd3102bc17c",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
