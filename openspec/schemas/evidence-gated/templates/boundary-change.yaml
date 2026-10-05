@@ -1,0 +1,26 @@
+version: 1
+eventId: "<boundary-change-id>"
+change: "<change-id>"
+sessionId: "<session-id>"
+observedAt: "<ISO-8601>"
+observedBy: "<identity>"
+
+trigger:
+  type: requirement # clarification | requirement | specification | design | task-scope | authorization | validation-assumption | implementation-defect
+  summary: "<what contradicted or exceeded the current contract>"
+  evidence: []
+
+impact:
+  affectedRequirements: []
+  affectedArtifacts: []
+  affectedTasks: []
+  invalidatedReceipts: []
+  earliestNodeToReopen: "<node>"
+
+disposition:
+  status: blocked # blocked | accepted | rejected | clarified
+  decidedBy: null
+  decidedAt: null
+  decisionRef: null
+  requiredUpdates: []
+  resumeCondition: "<explicit condition>"

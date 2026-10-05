@@ -1,0 +1,48 @@
+version: 1
+receiptId: "release-audit-<timestamp-or-sequence>"
+change: "<change-id>"
+createdAt: "<ISO-8601>"
+auditor:
+  role: Verification or Release Auditor
+  identity: "<identity>"
+  independentOf: []
+
+candidate:
+  planningRevision: "<hash>"
+  sourceRevision: "<manifest hash>"
+  testRevision: "<manifest hash>"
+  artifactRevision: "<manifest hash>"
+  frozenAt: "<ISO-8601>"
+
+joinedReceipts:
+  specificationAudit: []
+  sessions: []
+  capabilityAudit: []
+  implementationReview: []
+  verification: []
+  humanAcceptance: []
+
+checks:
+  manifestsMatch: blocked # passed | failed | blocked | not-applicable
+  boundaryChangesResolved: blocked
+  durableSpecsSynchronized: blocked
+  requiredTestsAndStaticChecks: blocked
+  secretScanning: blocked # must reference current redacted Implementation Review claims
+  migrationAndRollback: blocked
+  securityAndPrivacy: blocked
+  documentation: blocked
+  repositoryReleasePolicy: blocked
+
+waivers: []
+# - id: "<waiver-id>"
+#   authority: "<authorized identity>"
+#   scope: "<bounded gate/check>"
+#   reason: "<reason>"
+#   expiresAt: "<ISO-8601>"
+
+findings: []
+limitations: []
+releaseVerdict: blocked # ready | blocked | not-applicable
+archiveVerdict: blocked # ready | force-ready | blocked
+supersedes: []
+writes: []

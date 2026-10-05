@@ -1,0 +1,39 @@
+version: 1
+sessionId: "<session-id>"
+change: "<change-id>"
+createdAt: "<ISO-8601>"
+coordinator: "<identity>"
+implementer: "<identity>"
+
+authorization:
+  userRequestRef: "<message, issue, or approval id>"
+  planningRevision: "<audited planning hash>"
+  specificationAuditReceipt: "<passed independent receipt id>"
+  taskSlice: ["<task ids>"]
+
+scope:
+  repository: "<repository>"
+  worktree: "<path-or-id>"
+  baselineRevision: "<commit or manifest>"
+  allowedPaths: []
+  allowedActions: []
+  prohibitedActions: []
+  separatelyAuthorizedActions: []
+
+validationPlan: []
+# - check: "<check>"
+#   ownerRole: "<role>"
+#   passCondition: "<condition>"
+#   evidencePath: "<receipt/output path>"
+
+stopConditions:
+  - Planning artifacts conflict with repository reality.
+  - Work requires a path, action, dependency, or permission outside this contract.
+  - A normative requirement or design decision must change.
+  - A required validation cannot run or produces conflicting evidence.
+  - The session is handed off, interrupted, or ends.
+
+expectedOutputs: []
+handoffTarget: "<end-audit path>"
+acknowledgedAt: "<ISO-8601>"
+startStatement: "Apply session <id> started for planning revision <hash>, tasks <ids>, allowed paths <paths>; stop on <conditions>; expected evidence <ids/paths>."

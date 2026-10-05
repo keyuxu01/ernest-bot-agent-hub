@@ -1,0 +1,32 @@
+version: 1
+sessionId: "<session-id>"
+change: "<change-id>"
+endedAt: "<ISO-8601>"
+reason: completed # completed | handoff | interrupted | blocked
+
+contract:
+  startContract: "<path>"
+  planningRevision: "<audited planning hash>"
+  taskSlice: []
+
+reconciliation:
+  actualWrites: []
+  expectedButUnwritten: []
+  outOfContractWrites: []
+  completedTasks: []
+  incompleteTasks: []
+  boundaryChanges: []
+
+checks: []
+# - check: "<command or inspection>"
+#   result: passed # passed | failed | blocked | not-run
+#   evidence: "<output or receipt ref>"
+
+workingTree:
+  statusRef: "<git status or equivalent evidence>"
+  unrelatedPreExistingChangesPreserved: []
+
+residualRisks: []
+invalidatedReceipts: []
+nextAction: "<review, reopen node, new session, or final verification>"
+endStatement: "Apply session <id> ended <completed|blocked|interrupted|handoff> on source revision <hash or none>; changed <paths>; checks <receipt IDs/results>; boundary events <ids>; next <action>."

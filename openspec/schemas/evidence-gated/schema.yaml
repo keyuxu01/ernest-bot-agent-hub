@@ -1,0 +1,147 @@
+name: evidence-gated
+version: 1
+description: OpenSpec workflow with independent pre-Apply audit, controlled implementation, post-Apply code and secret review, revision-bound evidence, and release/archive gates
+
+artifacts:
+  - id: baseline
+    generates: baseline.md
+    description: Authorized requirement, current-state baseline, scope, source revision, and unknowns
+    template: baseline.md
+    instruction: |
+      Record the user goal, authorization, goals/non-goals, current behavior,
+      target surface, constraints, source anchors, baseline revision, and unknowns.
+      Separate verified facts from assumptions. Do not propose implementation yet.
+    requires: []
+
+  - id: research
+    generates: research.md
+    description: Claim-to-evidence matrix for decisions that the change depends on
+    template: research.md
+    instruction: |
+      Investigate baseline questions using repository evidence and primary sources.
+      Classify each entry as observed fact, external fact, engineering judgment,
+      or unknown. Record source, revision/date, limitation, and decision impact.
+      Do not hide conflicting or inaccessible evidence.
+    requires:
+      - baseline
+
+  - id: proposal
+    generates: proposal.md
+    description: Why, scope, capabilities, exclusions, compatibility, and rollout impact
+    template: proposal.md
+    instruction: |
+      Propose the smallest change justified by baseline and research. Name each
+      added, modified, removed, or renamed capability. Include non-goals,
+      compatibility, migration/rollout impact, risks, and unresolved decisions.
+    requires:
+      - baseline
+      - research
+
+  - id: specs
+    generates: specs/**/*.md
+    description: Normative, scenario-based delta specifications per capability
+    template: spec.md
+    instruction: |
+      Create one delta specification per capability. Use normative SHALL or MUST
+      requirements and testable WHEN/THEN scenarios, including failures and
+      boundary cases. Fully restate modified requirements.
+    requires:
+      - proposal
+
+  - id: design
+    generates: design.md
+    description: Evidence-backed engineering design and verification strategy
+    template: design.md
+    instruction: |
+      Map every capability and requirement to boundaries, decisions, data/control
+      flow, failure handling, compatibility/migration, rollback, observability,
+      security, concrete landing points, and verification. Record rejected
+      alternatives and assumptions; do not treat source code as approval.
+    requires:
+      - research
+      - proposal
+      - specs
+
+  - id: tasks
+    generates: tasks.md
+    description: Ordered, traceable implementation and verification tasks
+    template: tasks.md
+    instruction: |
+      Derive bounded tasks from the design landing map. Every task names its
+      artifact/file/symbol or validation surface, requirement IDs, owner role,
+      expected evidence, dependencies, and completion condition. Keep promotion,
+      archive, and release as gates rather than implementation checkboxes.
+    requires:
+      - specs
+      - design
+
+  - id: spec-audit
+    generates: spec-audit.md
+    description: Independent consistency, feasibility, scope, and testability audit before Apply
+    template: spec-audit.md
+    instruction: |
+      Assign an independent Spec Auditor who did not author the audited planning
+      revision. Audit baseline/research/proposal/specs/design/tasks as one join.
+      Record hashes, findings, limitations, and passed/failed/blocked verdict.
+      Do not fix artifacts during the audit. A non-passed verdict blocks Apply.
+    requires:
+      - baseline
+      - research
+      - proposal
+      - specs
+      - design
+      - tasks
+
+apply:
+  requires:
+    - spec-audit
+  tracks: tasks.md
+  instruction: |
+    Follow the repository's evidence-gated OpenSpec SOP.
+
+    Before the first production edit, require a current passed independent
+    specification-audit receipt and create
+    .workflow/sessions/<session-id>/start-contract.yaml from the provided
+    template. Bind it to the planning revision, task slice, allowed paths,
+    roles, validation plan, and stop conditions.
+
+    During implementation, write boundary-change records whenever observed
+    reality changes requirement, specification, design, task scope, permissions,
+    or validation assumptions. Stop affected work and return to the earliest
+    invalidated artifact. Implementation defects that merely restore conformance
+    do not rewrite planning artifacts.
+
+    At stop, completion, or handoff, write an end audit that reconciles the start
+    contract, actual writes, task state, commands/results, boundary records,
+    residual risks, and working tree. Implementers may self-check but cannot
+    issue independent Capability, Implementation, or Release passes.
+
+    After a completed end audit, freeze the source and test manifests and assign
+    an independent Implementation Reviewer for that exact revision. The review
+    must combine semantic code review with an automated secret scan that covers
+    the frozen working tree, including untracked and generated files. Scan the
+    relevant Git revision range when one exists. Record scanner version,
+    configuration identity, coverage, command, exit status, and a fully redacted
+    report reference. A missing scanner, incomplete coverage, or unredacted
+    evidence blocks the review. Remediation requires a new Apply start contract
+    and invalidates the review and all downstream receipts.
+
+    Only the coordinator updates workflow-state.yaml after checking receipt role
+    eligibility, revision/manifests, freshness, findings, limitations, and
+    waivers. File presence and task checkboxes never promote state.
+
+archive:
+  instruction: |
+    Freeze source, test, and artifact manifests. Require terminal independent
+    Capability Auditor, Implementation Reviewer, and Verification/Release
+    Auditor receipts for that exact revision. The Implementation Review receipt
+    must contain current SECRET-WORKTREE and, when applicable, SECRET-GIT-RANGE
+    claims plus semantic secret-handling review. Join all session end audits and
+    boundary-change records; synchronize durable specs; and check repository
+    migration, rollback, security, documentation, acceptance, and release policy.
+
+    Record archive and release verdicts separately in
+    .workflow/final/release-readiness.yaml. Normal archive requires passed or
+    policy-valid not-applicable checks with no unresolved blockers. Force archive
+    must preserve findings and waivers and must not be represented as release
+    approval.

@@ -32,7 +32,15 @@ Turborepo monorepo：`apps/agentic-rag-client`（Next.js）、`apps/agentic-rag-
 
 ## OpenSpec
 
-使用 `openspec init` 自带的标准工作流与命令（`/opsx-propose`、`/opsx-apply` 等）。配置见 `openspec/config.yaml`。
+使用 `openspec init` 自带的标准命令（`/opsx-propose`、`/opsx-apply` 等），并遵循
+[`docs/development/openspec-workflow.md`](docs/development/openspec-workflow.md) 的 evidence-gated
+流程。配置见 `openspec/config.yaml`；新 change 默认使用 `evidence-gated`，已有 change 继续使用其
+`.openspec.yaml` 固定的 schema，不得仅为统一格式而迁移。
+
+规划产物作者不得为自己的 planning revision 签发独立 `spec-audit` 回执；实现者也不得为自己的
+实现签发 Capability、Implementation 或 Verification/Release 通过回执。若当前执行环境无法提供独立
+审计者，停在相应 gate 并明确报告，不得自证通过。文件存在、task checkbox 或历史命令成功都不构成
+当前 revision 的放行证据。
 
 涉及框架、协议、数据库、跨应用依赖方向或其他架构边界的变更，必须同步更新
 `docs/architecture/README.md`，并新增或替代对应 ADR。OpenSpec 描述一次变更的设计与实施，

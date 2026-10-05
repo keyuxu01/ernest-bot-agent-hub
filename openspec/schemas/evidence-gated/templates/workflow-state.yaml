@@ -1,0 +1,73 @@
+version: 1
+change: "<change-id>"
+
+# Only the coordinator updates this file after validating terminal receipts.
+# File presence, task checkboxes, or an agent's self-report never promote state.
+state: draft # draft ... implemented | implementation-reviewed | verified ... archived
+planningRevision: null
+sourceRevision: null
+
+gates:
+  baseline:
+    status: pending # pending | passed | blocked | reopened
+    receipts: []
+  research:
+    status: pending
+    receipts: []
+  proposal:
+    status: pending
+    receipts: []
+  specification:
+    status: pending
+    receipts: []
+  design:
+    status: pending
+    receipts: []
+  tasks:
+    status: pending
+    receipts: []
+  specificationAudit:
+    status: pending
+    receipts: []
+  apply:
+    status: pending
+    sessions: []
+  capabilityAudit:
+    status: pending
+    receipts: []
+  implementationReview:
+    status: pending
+    receipts: []
+    sourceRevision: null
+    requiredClaims:
+      - SECRET-WORKTREE
+      - SEMANTIC-SECRET-HANDLING
+    conditionalClaims:
+      - SECRET-GIT-RANGE
+  verification:
+    status: pending
+    receipts: []
+
+boundaryChanges: []
+
+promotions: []
+# - from: specified
+#   to: designed
+#   at: "<ISO-8601>"
+#   coordinator: "<identity>"
+#   revision: "<content hash or manifest revision>"
+#   receipts: ["<receipt-id>"]
+#   limitations: []
+
+release:
+  status: blocked # blocked | ready | released
+  candidateRevision: null
+  receipt: null
+  releasedAt: null
+
+archive:
+  status: blocked # blocked | ready | force-ready | archived
+  receipt: null
+  waivers: []
+  targetPath: null
+  archivedAt: null

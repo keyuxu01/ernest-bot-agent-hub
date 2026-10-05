@@ -1,0 +1,57 @@
+version: 1
+receiptId: "<role>-<check>-<timestamp-or-sequence>"
+change: "<change-id>"
+gate: "<gate-name>"
+checkType: "<research|spec-audit|capability-audit|implementation-review|verification|release-audit>"
+producer:
+  role: "<role>"
+  identity: "<agent/session/person>"
+  independentOf: []
+createdAt: "<ISO-8601>"
+verdict: blocked # passed | failed | blocked | not-applicable
+
+scope:
+  repository: "<repository>"
+  worktree: "<path-or-id>"
+  branch: "<branch-or-null>"
+  planningRevision: "<hash-or-null>"
+  sourceRevision: "<manifest-hash-or-null>"
+  testRevision: "<manifest-hash-or-null>"
+
+inputs: []
+# - path: "<project-relative-path>"
+#   sha256: "<sha256>"
+
+claims: []
+# - id: "<claim-or-requirement-id>"
+#   result: supports # supports | contradicts | inconclusive | not-checked
+#   evidence: ["<command-log, file anchor, runtime observation, source, or approval id>"]
+# Implementation Review uses at least SECRET-WORKTREE, SECRET-GIT-RANGE (when a
+# commit range exists), and SEMANTIC-SECRET-HANDLING. Missing coverage is blocked,
+# not silently not-applicable.
+
+tooling: []
+# - tool: "gitleaks"
+#   version: "<exact version>"
+#   configuration: "<built-in version identity or project config sha256>"
+#   coverage: "<frozen working tree including untracked/generated, or git range>"
+#   reportRef: "<stable fully redacted report path>"
+
+commands: []
+# - command: "<exact command without secrets>"
+#   environment: "<relevant environment>"
+#   exitCode: 0
+#   outputRef: "<stable fully redacted path or concise result; never secret material>"
+
+findings: []
+# - id: "<finding-id>"
+#   severity: blocking # blocking | non-blocking
+#   anchor: "<artifact/file/line/check>"
+#   summary: "<finding>"
+#   reopenNode: "<earliest invalidated node>"
+
+limitations: []
+degradedSubstitutions: []
+waivers: []
+supersedes: []
+writes: []

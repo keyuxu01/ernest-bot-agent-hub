@@ -1,4 +1,4 @@
-schema: spec-driven
+schema: evidence-gated
 
 context: |
   Tech stack: TypeScript, Turborepo, pnpm, Next.js (App Router), NestJS, React, Vitest.
@@ -9,3 +9,7 @@ context: |
   - packages/ui — shared frontend components
   Frontend coding rules: .rulesync/rules/frontend.md, scoped to apps/agentic-rag-client/**, packages/ui/**, and apps/mcp-app-collections/web/** only.
   Backend: follow NestJS module conventions and .agents/skills/nestjs-best-practices/
+  OpenSpec workflow: follow docs/development/openspec-workflow.md. New changes use
+  the evidence-gated schema; existing changes keep the schema pinned in their
+  own .openspec.yaml. Evidence must be revision-bound, and authors must not
+  issue independent audit receipts for their own work.
