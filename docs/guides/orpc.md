@@ -22,22 +22,22 @@ format 不兼容：本项目使用 `.route(...)`、`@orpc/openapi-client` 和 v1
 ```text
 Next.js Server Component or browser query hook
   -> apps/agentic-rag-client/lib/api.ts
-  -> apps/agentic-rag-client/lib/business-api-query.ts (browser query only)
+  -> apps/agentic-rag-client/lib/rag-business-api-query.ts (browser query only)
   -> oRPC OpenAPILink + ResponseValidationPlugin
   -> GET /api/greeting
   -> NestJS GreetingRpcController
   -> GreetingService
-  -> GreetingResponseSchema validates the output
+  -> RagBusinessGreetingResponseSchema validates the output
 ```
 
 关键文件：
 
-- 基础 Zod schema：`packages/contracts/src/greeting.ts`
-- oRPC contract：`packages/contracts/src/orpc/business-api.ts`
+- 基础 Zod schema：`packages/contracts/src/rag-business/greeting.ts`
+- oRPC contract：`packages/contracts/src/orpc/rag-business/api.ts`
 - NestJS 实现：`apps/agentic-rag-business-service/src/modules/greeting/greeting-rpc.controller.ts`
 - OpenAPI 输出：`apps/agentic-rag-business-service/src/modules/api-docs/openapi.controller.ts`
 - Next.js client：`apps/agentic-rag-client/lib/api.ts`
-- TanStack Query utilities：`apps/agentic-rag-client/lib/business-api-query.ts`
+- TanStack Query utilities：`apps/agentic-rag-client/lib/rag-business-api-query.ts`
 - Browser QueryClient：`apps/agentic-rag-client/lib/query-client.ts`
 - Greeting query hook：`apps/agentic-rag-client/hooks/use-greeting.ts`
 
@@ -99,10 +99,10 @@ Client Component 不直接创建 link，也不手写 query key。Hook 使用 con
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { businessApiQuery } from '../lib/business-api-query';
+import { ragBusinessApiQuery } from '../lib/rag-business-api-query';
 
 const useGreeting = () => {
-  return useQuery(businessApiQuery.greeting.queryOptions());
+  return useQuery(ragBusinessApiQuery.greeting.queryOptions());
 };
 ```
 
@@ -126,10 +126,10 @@ const greeting = await getGreeting();
 const queryClient = useQueryClient();
 
 const updateKnowledge = useMutation(
-  businessApiQuery.knowledge.update.mutationOptions({
+  ragBusinessApiQuery.knowledge.update.mutationOptions({
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: businessApiQuery.knowledge.key({ type: 'query' }),
+        queryKey: ragBusinessApiQuery.knowledge.key({ type: 'query' }),
       });
     },
   }),
@@ -153,7 +153,7 @@ client waterfall 有明确需求的页面，才增加 `prefetchQuery`、`dehydra
 ```tsx
 const queryClient = createQueryClient();
 
-await queryClient.prefetchQuery(businessApiQuery.greeting.queryOptions());
+await queryClient.prefetchQuery(ragBusinessApiQuery.greeting.queryOptions());
 
 return (
   <HydrationBoundary state={dehydrate(queryClient)}>
@@ -166,41 +166,45 @@ return (
 
 ### 1. 定义基础 Schema
 
-在 `packages/contracts/src/` 对应领域文件中定义 Zod schema，并从根 `index.ts` 显式导出。
-类型必须从 schema 推导，不要重复手写相同 shape。
+在 `packages/contracts/src/rag-business/` 对应领域文件中定义 Zod schema，并从根 `index.ts` 显式导出。
+类型必须从 schema 推导，不要重复手写相同 shape。前缀用完整产品线名（`RagBusiness`），不要用泛称 `Business`。
 
 ```ts
-const KnowledgeSearchInputSchema = z.object({
+const RagBusinessKnowledgeSearchInputSchema = z.object({
   query: z.string().min(1),
 });
 
-const KnowledgeSearchOutputSchema = z.object({
+const RagBusinessKnowledgeSearchOutputSchema = z.object({
   items: z.array(z.object({ id: z.string(), title: z.string() })),
 });
 
-type KnowledgeSearchInput = z.input<typeof KnowledgeSearchInputSchema>;
-type KnowledgeSearchOutput = z.output<typeof KnowledgeSearchOutputSchema>;
+type RagBusinessKnowledgeSearchInput = z.input<
+  typeof RagBusinessKnowledgeSearchInputSchema
+>;
+type RagBusinessKnowledgeSearchOutput = z.output<
+  typeof RagBusinessKnowledgeSearchOutputSchema
+>;
 ```
 
 ### 2. 扩展 oRPC Contract
 
-在 `packages/contracts/src/orpc/business-api.ts` 使用稳定 v1 的 `.route(...)`：
+在 `packages/contracts/src/orpc/rag-business/api.ts` 使用稳定 v1 的 `.route(...)`：
 
 ```ts
-const KnowledgeSearchContract = oc
+const RagBusinessKnowledgeSearchContract = oc
   .route({
     method: 'GET',
     path: '/api/knowledge/search',
     summary: 'Search the knowledge base',
     tags: ['Knowledge'],
   })
-  .input(KnowledgeSearchInputSchema)
-  .output(KnowledgeSearchOutputSchema);
+  .input(RagBusinessKnowledgeSearchInputSchema)
+  .output(RagBusinessKnowledgeSearchOutputSchema);
 
-const BusinessApiContract = {
-  greeting: GreetingContract,
+const RagBusinessApiContract = {
+  greeting: RagBusinessGreetingContract,
   knowledge: {
-    search: KnowledgeSearchContract,
+    search: RagBusinessKnowledgeSearchContract,
   },
 };
 ```
@@ -212,9 +216,9 @@ contract 只描述输入、输出、错误与 HTTP metadata，不包含数据库
 Controller 只做协议适配，并把业务处理委托给 service/use case：
 
 ```ts
-@Implement(BusinessApiContract.knowledge.search)
+@Implement(RagBusinessApiContract.knowledge.search)
 searchKnowledge() {
-  return implement(BusinessApiContract.knowledge.search).handler(({ input }) =>
+  return implement(RagBusinessApiContract.knowledge.search).handler(({ input }) =>
     this.knowledgeService.search({ query: input.query }),
   );
 }
@@ -224,13 +228,13 @@ searchKnowledge() {
 
 ### 4. 在 Next.js Client 暴露函数
 
-共享 contract 更新后，`businessApiClient` 会自动获得对应方法：
+共享 contract 更新后，`ragBusinessApiClient` 会自动获得对应方法：
 
 ```ts
 const searchKnowledge = async (
-  input: KnowledgeSearchInput,
-): Promise<KnowledgeSearchOutput> => {
-  return businessApiClient.knowledge.search(input);
+  input: RagBusinessKnowledgeSearchInput,
+): Promise<RagBusinessKnowledgeSearchOutput> => {
+  return ragBusinessApiClient.knowledge.search(input);
 };
 ```
 

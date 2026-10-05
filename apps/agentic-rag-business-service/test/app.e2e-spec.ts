@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
-  GreetingResponseSchema,
-  HealthProbeResponseSchema,
-  ServiceIdentityResponseSchema,
+  RagBusinessGreetingResponseSchema,
+  SharedHealthProbeResponseSchema,
+  SharedServiceIdentityResponseSchema,
 } from '@repo/contracts';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
@@ -54,9 +54,9 @@ describe('Business service (e2e)', () => {
       .expect(200)
       .expect({ message: 'Hello World!' })
       .expect((response) => {
-        expect(GreetingResponseSchema.safeParse(response.body).success).toBe(
-          true,
-        );
+        expect(
+          RagBusinessGreetingResponseSchema.safeParse(response.body).success,
+        ).toBe(true);
       });
   });
 
@@ -66,9 +66,9 @@ describe('Business service (e2e)', () => {
       .expect(200)
       .expect({ message: 'Hello World!' })
       .expect((response) => {
-        expect(GreetingResponseSchema.safeParse(response.body).success).toBe(
-          true,
-        );
+        expect(
+          RagBusinessGreetingResponseSchema.safeParse(response.body).success,
+        ).toBe(true);
       });
   });
 
@@ -93,9 +93,9 @@ describe('Business service (e2e)', () => {
       .get('/health/live')
       .expect(200)
       .expect((response) => {
-        expect(HealthProbeResponseSchema.safeParse(response.body).success).toBe(
-          true,
-        );
+        expect(
+          SharedHealthProbeResponseSchema.safeParse(response.body).success,
+        ).toBe(true);
         expect(response.body.status).toBe('ok');
       });
   });
@@ -105,9 +105,9 @@ describe('Business service (e2e)', () => {
       .get('/health/ready')
       .expect(200)
       .expect((response) => {
-        expect(HealthProbeResponseSchema.safeParse(response.body).success).toBe(
-          true,
-        );
+        expect(
+          SharedHealthProbeResponseSchema.safeParse(response.body).success,
+        ).toBe(true);
         expect(response.body.status).toBe('ok');
       });
   });
@@ -119,7 +119,7 @@ describe('Business service (e2e)', () => {
       .expect('Cache-Control', 'no-store')
       .expect((response) => {
         expect(
-          ServiceIdentityResponseSchema.safeParse(response.body).success,
+          SharedServiceIdentityResponseSchema.safeParse(response.body).success,
         ).toBe(true);
       });
   });

@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { GreetingResponseSchema, type GreetingResponse } from '@repo/contracts';
+import {
+  RagBusinessGreetingResponseSchema,
+  type RagBusinessGreetingResponse,
+} from '@repo/contracts';
 
 @Injectable()
 export class GreetingService {
-  getHello(): GreetingResponse {
-    return GreetingResponseSchema.parse({ message: 'Hello World!' });
+  getHello(): RagBusinessGreetingResponse {
+    return RagBusinessGreetingResponseSchema.parse({ message: 'Hello World!' });
   }
 }

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GreetingResponseSchema } from '@repo/contracts';
+import { McpHelloResponseSchema } from '@repo/contracts';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -19,7 +19,7 @@ describe('AppController', () => {
     it('returns the service greeting', () => {
       const response = appController.getHello();
 
-      expect(GreetingResponseSchema.safeParse(response).success).toBe(true);
+      expect(McpHelloResponseSchema.safeParse(response).success).toBe(true);
       expect(response).toEqual({
         message: 'Hello from mcp-app-collections!',
       });

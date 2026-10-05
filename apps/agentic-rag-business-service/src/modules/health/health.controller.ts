@@ -1,10 +1,10 @@
 import { Controller, Get, Header } from '@nestjs/common';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 import {
-  HealthProbeResponseSchema,
-  ServiceIdentityResponseSchema,
-  type HealthProbeResponse,
-  type ServiceIdentityResponse,
+  SharedHealthProbeResponseSchema,
+  SharedServiceIdentityResponseSchema,
+  type SharedHealthProbeResponse,
+  type SharedServiceIdentityResponse,
 } from '@repo/contracts';
 import { RabbitMqHealthIndicator } from '../../infrastructure/rabbitmq/rabbitmq.health-indicator';
 import {
@@ -28,25 +28,25 @@ class HealthController {
 
   @Get('live')
   @HealthCheck()
-  async getLiveness(): Promise<HealthProbeResponse> {
+  async getLiveness(): Promise<SharedHealthProbeResponse> {
     const result = await this.healthCheckService.check([]);
 
-    return HealthProbeResponseSchema.parse(result);
+    return SharedHealthProbeResponseSchema.parse(result);
   }
 
   @Get('ready')
   @HealthCheck()
-  async getReadiness(): Promise<HealthProbeResponse> {
+  async getReadiness(): Promise<SharedHealthProbeResponse> {
     const result = await this.healthCheckService.check([
       () => this.rabbitHealth.isHealthy('rabbitmq'),
     ]);
 
-    return HealthProbeResponseSchema.parse(result);
+    return SharedHealthProbeResponseSchema.parse(result);
   }
 
   @Get('whoami')
   @Header('Cache-Control', 'no-store')
-  getIdentity(): ServiceIdentityResponse {
+  getIdentity(): SharedServiceIdentityResponse {
     const deploymentId = getNonEmptyEnvironmentValue('RAILWAY_DEPLOYMENT_ID');
     const instanceId =
       getNonEmptyEnvironmentValue('RAILWAY_REPLICA_ID') ??
@@ -54,7 +54,7 @@ class HealthController {
       deploymentId ??
       LOCAL_INSTANCE_ID;
 
-    return ServiceIdentityResponseSchema.parse({
+    return SharedServiceIdentityResponseSchema.parse({
       status: 'ok',
       service: BUSINESS_SERVICE_NAME,
       instanceId,

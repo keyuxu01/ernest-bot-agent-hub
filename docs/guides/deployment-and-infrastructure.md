@@ -183,12 +183,13 @@ Redis 负责：
 - 查询和 RAG 结果缓存；
 - 分布式锁和短租约；
 - 限流计数器；
-- 短期 Session 或 token deny list；
+- 短期 Session / Agent 运行时工作集（滑动窗口、近期摘要、turn 中间态）或 token deny list；
 - 多副本通知或 Pub/Sub；
 - 可丢失、可重建的短期任务进度。
 
-Redis 不负责业务事实，不替代 RabbitMQ，也不作为关键任务唯一的幂等存储。Key 必须有命名空间，缓存
-必须有 TTL 与失效策略；分布式锁不能替代幂等业务设计。
+Redis **可以**承载带 TTL 的短期对话上下文（ADR-0008 的 short-lived session data）。  
+Redis **不负责**业务事实、完整聊天记录、任务状态与幂等记录的唯一真源，也不替代 RabbitMQ。  
+Key 必须有命名空间，缓存必须有 TTL 与失效策略；分布式锁不能替代幂等业务设计。
 
 ## 健康检查、重启与监控
 

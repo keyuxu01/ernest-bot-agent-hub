@@ -35,7 +35,8 @@ cursor:
 - 数据访问必须经过明确的数据访问抽象：Service / use case 通过 feature 内 Repository（或等价
   数据访问层）访问数据库；禁止在 Controller、Service 中直接注入 `EntityManager`、TypeORM
   `Repository` 或 Mongoose `Model`。
-- 跨应用数据模型从 `@repo/contracts` 获取，不在应用内复制 Schema 或类型。
+- 跨应用数据模型从 `@repo/contracts` 获取，不在应用内复制 Schema 或类型；导入名必须带域前缀
+  （`RagBusiness*` / `Rag*` / `Mcp*` / `Shared*`；后续按 `Business` / `Platform` 风格补全作用域，如 `UserPlatform*`）。
 
 ## Code Style
 
@@ -68,7 +69,7 @@ src/modules/<feature>/
   `type/` 导入。
 - Entity / Schema 类本身留在 `entities/`、`schemas/`；与 ORM 类紧耦合的别名（如
   `HydratedDocument<T>`）可留在 schema 旁，其余独立类型仍进 `type/`。
-- 跨应用共享类型继续走 `@repo/contracts`，不要复制进模块 `type/`。
+- 跨应用共享类型继续走 `@repo/contracts`，不要复制进模块 `type/`；导入必须使用带域前缀的导出名。
 
 ### Zod Schema 与推断类型
 

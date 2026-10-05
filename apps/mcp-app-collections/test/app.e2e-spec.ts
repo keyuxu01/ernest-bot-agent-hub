@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GreetingResponseSchema } from '@repo/contracts';
+import { McpHelloResponseSchema } from '@repo/contracts';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 
@@ -22,7 +22,7 @@ describe('AppController (e2e)', () => {
       .expect(200)
       .expect({ message: 'Hello from mcp-app-collections!' })
       .expect((response) => {
-        expect(GreetingResponseSchema.safeParse(response.body).success).toBe(
+        expect(McpHelloResponseSchema.safeParse(response.body).success).toBe(
           true,
         );
       });

@@ -1,1 +1,4 @@
-export { BusinessApiContract, GreetingContract } from './business-api';
+export {
+  RagBusinessApiContract,
+  RagBusinessGreetingContract,
+} from './rag-business/api';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { businessApiQuery } from '../lib/business-api-query';
+import { ragBusinessApiQuery } from '../lib/rag-business-api-query';
 
 /**
  * @description Load the runtime-validated greeting through the shared oRPC query options.
@@ -9,7 +9,7 @@ import { businessApiQuery } from '../lib/business-api-query';
  * @returns TanStack Query state for the greeting operation.
  */
 const useGreeting = () => {
-  return useQuery(businessApiQuery.greeting.queryOptions());
+  return useQuery(ragBusinessApiQuery.greeting.queryOptions());
 };
 
 export { useGreeting };

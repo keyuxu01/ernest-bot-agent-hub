@@ -1,6 +1,6 @@
 import { Test, type TestingModule } from '@nestjs/testing';
 import { call } from '@orpc/server';
-import { GreetingResponseSchema } from '@repo/contracts';
+import { RagBusinessGreetingResponseSchema } from '@repo/contracts';
 import { GreetingRpcController } from './greeting-rpc.controller';
 import { GreetingService } from './greeting.service';
 
@@ -19,7 +19,7 @@ describe('GreetingRpcController', () => {
   it('returns a contract-valid greeting', async () => {
     const response = await call(controller.greeting(), undefined);
 
-    expect(GreetingResponseSchema.safeParse(response).success).toBe(true);
+    expect(RagBusinessGreetingResponseSchema.safeParse(response).success).toBe(true);
     expect(response).toEqual({ message: 'Hello World!' });
   });
 });

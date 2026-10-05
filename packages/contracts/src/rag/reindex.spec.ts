@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RagReindexMessageV1Schema } from './rag-reindex';
+import { RagReindexMessageV1Schema } from './reindex';
 
 const validMessage = {
   taskId: '11111111-1111-4111-8111-111111111111',

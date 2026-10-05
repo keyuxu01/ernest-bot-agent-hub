@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GreetingResponseSchema } from '@repo/contracts';
+import { RagBusinessGreetingResponseSchema } from '@repo/contracts';
 import { GreetingController } from './greeting.controller';
 import { GreetingService } from './greeting.service';
 
@@ -19,7 +19,7 @@ describe('GreetingController', () => {
     it('should return "Hello World!"', () => {
       const response = greetingController.getHello();
 
-      expect(GreetingResponseSchema.safeParse(response).success).toBe(true);
+      expect(RagBusinessGreetingResponseSchema.safeParse(response).success).toBe(true);
       expect(response).toEqual({ message: 'Hello World!' });
     });
   });

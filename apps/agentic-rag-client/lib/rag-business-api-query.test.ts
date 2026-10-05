@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { businessApiQuery } from './business-api-query';
+import { ragBusinessApiQuery } from './rag-business-api-query';
 
-describe('businessApiQuery', () => {
+describe('ragBusinessApiQuery', () => {
   it('derives a stable greeting query key from the contract path', () => {
-    const firstKey = businessApiQuery.greeting.queryKey();
-    const secondKey = businessApiQuery.greeting.queryKey();
+    const firstKey = ragBusinessApiQuery.greeting.queryKey();
+    const secondKey = ragBusinessApiQuery.greeting.queryKey();
 
     expect(firstKey).toEqual(secondKey);
     expect(firstKey).toEqual([['greeting'], { type: 'query' }]);

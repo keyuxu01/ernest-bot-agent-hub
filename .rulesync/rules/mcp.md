@@ -25,7 +25,7 @@ cursor:
 
 - Tool 用于执行操作，Resource 用于读取上下文或 UI 资源；不得用 Resource 隐式执行副作用。
 - Tool 与 Resource handler 只负责 MCP 协议适配，业务规则下沉到可测试的 service 或 use case。
-- Tool input、structured content 和共享响应优先复用 `@repo/contracts` 的 Zod Schema。
+- Tool input、structured content 和共享响应优先复用 `@repo/contracts` 的 Zod Schema，导出名使用 `Mcp` 前缀。
 - Tool 名称、描述、参数说明和错误信息必须清晰、稳定，能让 Agent 在没有额外提示的情况下正确选择。
 - 有副作用的 Tool 必须在描述中明确副作用，并保留业务层的鉴权、幂等和审计能力。
 
@@ -40,5 +40,6 @@ cursor:
 
 - 业务失败返回可操作且稳定的错误信息；内部异常不得暴露堆栈、密钥或敏感文档内容。
 - 新增或修改 Tool 时测试 schema 拒绝路径、成功响应和业务错误路径。
-- MCP Server 优先采用已评估的 NestJS 集成方案，并以官方 MCP SDK 与项目 ADR 为协议依据。
+- MCP Server 采用 `@rekog/mcp-nest` v2（`McpStrategy` + `@McpController`），协议以官方 MCP SDK 与
+  [ADR-0005](docs/architecture/decisions/0005-evaluate-mcp-nest.md) 为准。不要抄 v1 `McpModule.forRoot()`。
 - 涉及 ChatGPT Apps/MCP UI 时加载 OpenAI `build-chatgpt-app` skill。

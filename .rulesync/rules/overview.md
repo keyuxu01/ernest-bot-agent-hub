@@ -12,6 +12,10 @@ cursor:
 
 Turborepo monorepo：`apps/agentic-rag-client`（Next.js）、`apps/agentic-rag-business-service`（NestJS）、`apps/mcp-app-collections`（NestJS + MCP Widget）、`packages/*`。
 
+## 产品线命名
+
+`Business` 与 `Platform` 是微服务命名风格，不是产品名。新增 app、契约、oRPC 目录和导出名必须使用完整作用域（产品身份 + 风格），例如 `RagBusiness`、未来登录拆分为 `UserPlatform`。禁止裸 `Business` / `Platform`，也禁止无前缀通用类型名。
+
 ## 编码规范
 
 | 代码范围                                     | 规范来源                                        |
@@ -21,6 +25,7 @@ Turborepo monorepo：`apps/agentic-rag-client`（Next.js）、`apps/agentic-rag-
 | MCP Widget `apps/mcp-app-collections/web/**` | `.rulesync/rules/frontend.md`                   |
 | 后端 `apps/agentic-rag-business-service/**`  | `.agents/skills/nestjs-best-practices/SKILL.md` |
 | MCP 后端 `apps/mcp-app-collections/src/**`   | `.agents/skills/nestjs-best-practices/SKILL.md` |
+| 共享契约 `packages/contracts/**`             | `.rulesync/rules/contracts.md`                  |
 | Next.js                                      | `.agents/skills/next-best-practices/SKILL.md`   |
 
 前端 coding 规范仅应用于表中三个前端范围，不应用于 NestJS 或 MCP Server 代码。

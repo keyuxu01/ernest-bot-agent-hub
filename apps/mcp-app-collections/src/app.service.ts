@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { GreetingResponseSchema, type GreetingResponse } from '@repo/contracts';
+import { McpHelloResponseSchema, type McpHelloResponse } from '@repo/contracts';
 
 @Injectable()
 export class AppService {
-  getHello(): GreetingResponse {
-    return GreetingResponseSchema.parse({
+  getHello(): McpHelloResponse {
+    return McpHelloResponseSchema.parse({
       message: 'Hello from mcp-app-collections!',
     });
   }

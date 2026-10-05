@@ -2,8 +2,8 @@ import { createORPCClient } from '@orpc/client';
 import type { ContractRouterClient } from '@orpc/contract';
 import { ResponseValidationPlugin } from '@orpc/contract/plugins';
 import { OpenAPILink } from '@orpc/openapi-client/fetch';
-import type { GreetingResponse } from '@repo/contracts';
-import { BusinessApiContract } from '@repo/contracts/orpc';
+import type { RagBusinessGreetingResponse } from '@repo/contracts';
+import { RagBusinessApiContract } from '@repo/contracts/orpc';
 import { resolveApiBaseUrl } from '../utils/resolve-api-base-url';
 
 const apiBaseUrl = resolveApiBaseUrl({
@@ -12,24 +12,24 @@ const apiBaseUrl = resolveApiBaseUrl({
   serverBaseUrl: process.env.API_BASE_URL,
 });
 
-const businessApiLink = new OpenAPILink(BusinessApiContract, {
+const ragBusinessApiLink = new OpenAPILink(RagBusinessApiContract, {
   url: apiBaseUrl,
   fetch: request => fetch(request, { cache: 'no-store' }),
-  plugins: [new ResponseValidationPlugin(BusinessApiContract)],
+  plugins: [new ResponseValidationPlugin(RagBusinessApiContract)],
 });
 
 /**
- * @description Typed business API client shared by direct calls and TanStack Query utilities.
+ * @description Typed RagBusiness API client shared by direct calls and TanStack Query utilities.
  */
-const businessApiClient: ContractRouterClient<typeof BusinessApiContract> =
-  createORPCClient(businessApiLink);
+const ragBusinessApiClient: ContractRouterClient<typeof RagBusinessApiContract> =
+  createORPCClient(ragBusinessApiLink);
 
 /**
- * @description Fetch and validate the greeting returned by the business service.
+ * @description Fetch and validate the greeting returned by the RagBusiness service.
  * @returns A greeting that satisfies the shared runtime contract.
  */
-const getGreeting = async (): Promise<GreetingResponse> => {
-  return businessApiClient.greeting();
+const getGreeting = async (): Promise<RagBusinessGreetingResponse> => {
+  return ragBusinessApiClient.greeting();
 };
 
-export { businessApiClient, getGreeting };
+export { ragBusinessApiClient, getGreeting };

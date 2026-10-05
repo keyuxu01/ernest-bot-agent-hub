@@ -64,7 +64,7 @@ Ernest Bot Agent 面向企业内部知识分散、跨部门资料缺少统一入
 | 原始文档和解析产物                       | 由对象存储持久化；MinIO 只是输入材料中的候选示意                                  |
 | 向量和索引                               | 由向量存储承担；PGVector/Elasticsearch 尚未接受为最终选型                         |
 | 知识图谱                                 | Neo4j 是输入材料中的目标方案，尚未形成项目 ADR 或实现                             |
-| 缓存、锁、限流和短期状态                 | Redis 已接受；不得作为业务事实或可靠任务队列                                      |
+| 缓存、锁、限流和短期状态                 | Redis 已接受（含 short-lived session / Agent 滑动窗口）；不得作为业务事实或可靠任务队列的唯一真源 |
 | 异步命令与事件                           | RabbitMQ 已接受，使用持久消息、publisher confirm、manual ack、重试/DLQ 和幂等处理 |
 | 长期记忆                                 | Mem0 是输入材料中的目标方案，尚未形成项目 ADR 或实现                              |
 | 观测与评测                               | LangSmith/LangFuse 是候选工具，尚未形成最终选型或运行验证                         |

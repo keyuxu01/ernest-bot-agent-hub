@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { businessApiQuery } from './business-api-query';
+import { ragBusinessApiQuery } from './rag-business-api-query';
 import { createQueryClient } from './query-client';
 
 const createJsonResponse = (body: unknown): Response => {
@@ -9,7 +9,7 @@ const createJsonResponse = (body: unknown): Response => {
   });
 };
 
-describe('businessApiQuery greeting integration', () => {
+describe('ragBusinessApiQuery greeting integration', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
@@ -22,11 +22,11 @@ describe('businessApiQuery greeting integration', () => {
     const queryClient = createQueryClient();
 
     await expect(
-      queryClient.fetchQuery(businessApiQuery.greeting.queryOptions()),
+      queryClient.fetchQuery(ragBusinessApiQuery.greeting.queryOptions()),
     ).resolves.toEqual({ message: 'Hello World!' });
   });
 
-  it('rejects a malformed business response', async () => {
+  it('rejects a malformed RagBusiness response', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(createJsonResponse({ message: 42 })),
@@ -34,16 +34,16 @@ describe('businessApiQuery greeting integration', () => {
     const queryClient = createQueryClient();
 
     await expect(
-      queryClient.fetchQuery(businessApiQuery.greeting.queryOptions()),
+      queryClient.fetchQuery(ragBusinessApiQuery.greeting.queryOptions()),
     ).rejects.toThrow();
   });
 
-  it('rejects when the business service is unavailable', async () => {
+  it('rejects when the RagBusiness service is unavailable', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('unavailable')));
     const queryClient = createQueryClient();
 
     await expect(
-      queryClient.fetchQuery(businessApiQuery.greeting.queryOptions()),
+      queryClient.fetchQuery(ragBusinessApiQuery.greeting.queryOptions()),
     ).rejects.toThrow('unavailable');
   });
 
@@ -53,11 +53,11 @@ describe('businessApiQuery greeting integration', () => {
       vi.fn().mockResolvedValue(createJsonResponse({ message: 'Hello World!' })),
     );
     const queryClient = createQueryClient();
-    const greetingQueryKey = businessApiQuery.greeting.queryKey();
+    const greetingQueryKey = ragBusinessApiQuery.greeting.queryKey();
 
-    await queryClient.fetchQuery(businessApiQuery.greeting.queryOptions());
+    await queryClient.fetchQuery(ragBusinessApiQuery.greeting.queryOptions());
     await queryClient.invalidateQueries({
-      queryKey: businessApiQuery.greeting.key({ type: 'query' }),
+      queryKey: ragBusinessApiQuery.greeting.key({ type: 'query' }),
     });
 
     expect(queryClient.getQueryState(greetingQueryKey)?.isInvalidated).toBe(true);
@@ -69,7 +69,7 @@ describe('businessApiQuery greeting integration', () => {
       .mockResolvedValue(createJsonResponse({ message: 'Hello World!' }));
     vi.stubGlobal('fetch', fetchMock);
     const queryClient = createQueryClient();
-    const greetingQueryOptions = businessApiQuery.greeting.queryOptions();
+    const greetingQueryOptions = ragBusinessApiQuery.greeting.queryOptions();
 
     const firstGreeting = await queryClient.fetchQuery(greetingQueryOptions);
     const secondGreeting = await queryClient.fetchQuery(greetingQueryOptions);

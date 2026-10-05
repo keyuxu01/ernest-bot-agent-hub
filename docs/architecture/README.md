@@ -91,7 +91,7 @@ publish versioned, idempotent commands and exit; scheduled processes never perfo
 operation themselves. Ordinary API instances and Consumer instances are not the scheduler of record.
 
 RabbitMQ uses durable managed infrastructure and remains the primary command and integration-event transport.
-Redis provides cache, distributed coordination and short-lived state; it does not replace RabbitMQ or the
+Redis provides cache, distributed coordination and short-lived state (including Agent session working sets with TTL); it does not replace RabbitMQ or the
 system-of-record database. Application containers do not own durable state.
 
 This is the selected target topology, not the current provisioning state. Cloudflare already manages the

@@ -1,7 +1,7 @@
 import { Test, type TestingModule } from '@nestjs/testing';
 import {
-  HealthProbeResponseSchema,
-  ServiceIdentityResponseSchema,
+  SharedHealthProbeResponseSchema,
+  SharedServiceIdentityResponseSchema,
 } from '@repo/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RabbitMqService } from '../../infrastructure/rabbitmq/rabbitmq.service';
@@ -32,21 +32,21 @@ describe('HealthController', () => {
   it('reports the process as live', async () => {
     const response = await controller.getLiveness();
 
-    expect(HealthProbeResponseSchema.safeParse(response).success).toBe(true);
+    expect(SharedHealthProbeResponseSchema.safeParse(response).success).toBe(true);
     expect(response.status).toBe('ok');
   });
 
   it('reports the service as ready when RabbitMQ is connected', async () => {
     const response = await controller.getReadiness();
 
-    expect(HealthProbeResponseSchema.safeParse(response).success).toBe(true);
+    expect(SharedHealthProbeResponseSchema.safeParse(response).success).toBe(true);
     expect(response.status).toBe('ok');
   });
 
   it('returns a validated instance identity', () => {
     const response = controller.getIdentity();
 
-    expect(ServiceIdentityResponseSchema.safeParse(response).success).toBe(
+    expect(SharedServiceIdentityResponseSchema.safeParse(response).success).toBe(
       true,
     );
     expect(response.service).toBe('agentic-rag-business-service');
