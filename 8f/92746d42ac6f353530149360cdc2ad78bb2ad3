@@ -1,0 +1,134 @@
+packages/contracts/src/rag-business/greeting.ts
+  s_cb926ad6c1a0a7::t_5e7a2b59fa8b5c 1-15
+packages/contracts/src/orpc/rag-business/api.ts
+  s_cb926ad6c1a0a7::t_82e1c7c7957633 2,5,7,14,17,19-20,23
+apps/agentic-rag-business-service/src/modules/greeting/greeting-rpc.controller.ts
+  s_cb926ad6c1a0a7::t_b0264e16f0236a 10,12
+  s_cb926ad6c1a0a7::t_61368b4096a83f 3
+packages/contracts/src/rag-business/greeting.spec.ts
+  s_cb926ad6c1a0a7::t_f4493e0fd3e213 2,4-8,13-17
+packages/contracts/src/rag/reindex.spec.ts
+  s_cb926ad6c1a0a7::t_21ca4aee598bd8 2
+apps/agentic-rag-business-service/src/modules/greeting/greeting-rpc.controller.spec.ts
+  s_cb926ad6c1a0a7::t_88f6dafc8af0fe 3
+  s_cb926ad6c1a0a7::t_e5c886c2608556 22
+apps/agentic-rag-client/lib/rag-business-api-query.ts
+  s_cb926ad6c1a0a7::t_3861a1211c4d7b 2,5,7,9
+packages/contracts/src/mcp/hello.ts
+  s_cb926ad6c1a0a7::t_8282fef4b21a10 4,6,10,12-13
+packages/contracts/src/orpc/rag-business/api.spec.ts
+  s_cb926ad6c1a0a7::t_cc7414d08b2ae2 2-3,5,7,11,14-17
+.rulesync/rules/mcp.md
+  s_cb926ad6c1a0a7::t_afba879ab2191f 43-44
+  s_cb926ad6c1a0a7::t_f5c4d3bc763c6a 28
+apps/mcp-app-collections/test/app.e2e-spec.ts
+  s_cb926ad6c1a0a7::t_1ce08dbcd1df07 3
+  s_cb926ad6c1a0a7::t_d9acb22342de72 25
+docs/architecture/README.md
+  s_cb926ad6c1a0a7::t_9e6a9f054486d2 94
+packages/contracts/src/index.ts
+  s_cb926ad6c1a0a7::t_329713277111ee 5,10
+  s_cb926ad6c1a0a7::t_83a92a435ab5ea 3-4,9,14,18,22
+  s_cb926ad6c1a0a7::t_7ece3349b718d7 1-2
+  s_cb926ad6c1a0a7::t_210ac4e5152c7e 6-8,11-13
+apps/agentic-rag-client/hooks/use-greeting.ts
+  s_cb926ad6c1a0a7::t_da341ebd8e7aab 4,12
+apps/agentic-rag-client/lib/api.ts
+  s_cb926ad6c1a0a7::t_0cdfb64681a0d8 5-6,15,18,22,24-25,28,31-32,35
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_cb926ad6c1a0a7::t_b8e5e785366226 96-98,108-110
+  s_cb926ad6c1a0a7::t_7184c79a96e8cd 5-6
+  s_cb926ad6c1a0a7::t_be7811d5fab3c7 122
+  s_cb926ad6c1a0a7::t_3315ec1ce630c5 57-59,69-71
+  s_cb926ad6c1a0a7::t_4470a748fb5864 4
+apps/agentic-rag-business-service/src/modules/health/health.controller.spec.ts
+  s_cb926ad6c1a0a7::t_22d8927028aebf 3-4
+  s_cb926ad6c1a0a7::t_b540b1b86d84ff 49
+  s_cb926ad6c1a0a7::t_723d9674b0d25e 35,42
+.rulesync/rules/contracts.md
+  s_cb926ad6c1a0a7::t_f0e315d91d58dd 31,35,39
+  s_cb926ad6c1a0a7::t_e9bed4a002c7ef 24-27,38
+  s_cb926ad6c1a0a7::t_caa05acbf7db9f 41
+  s_cb926ad6c1a0a7::t_e66e5681b25fb7 22-23,28-30,32-34,36-37,40,42
+  s_cb926ad6c1a0a7::t_71b0e0c8b9fdcf 64
+apps/agentic-rag-client/lib/rag-business-api-query.test.ts
+  s_cb926ad6c1a0a7::t_864ef0e7893dca 2,4,6-7
+apps/mcp-app-collections/src/app.controller.spec.ts
+  s_cb926ad6c1a0a7::t_f72a83112ec675 2
+  s_cb926ad6c1a0a7::t_05fe7800401413 22
+apps/agentic-rag-business-service/src/modules/api-docs/openapi.controller.ts
+  s_cb926ad6c1a0a7::t_b262a72d4881e1 14
+  s_cb926ad6c1a0a7::t_36c2520a1e6bbe 4
+apps/agentic-rag-client/lib/rag-business-api-query.integration.test.ts
+  s_cb926ad6c1a0a7::t_fe37c07524f77e 2,12,25,29,37,41,46,56,58,60,72
+docs/guides/orpc.md
+  s_cb926ad6c1a0a7::t_068e54b456ae82 30,35-36,40
+  s_cb926ad6c1a0a7::t_38430ca03e643d 129,132
+  s_cb926ad6c1a0a7::t_a9ce9dc65e5c89 156
+  s_cb926ad6c1a0a7::t_c29c5c00efd0ef 169-170,173,177,181-186,191,194,201-202,204-205,207
+  s_cb926ad6c1a0a7::t_857a302c1c6c21 219,221
+  s_cb926ad6c1a0a7::t_adf96663a67dd8 102,105
+  s_cb926ad6c1a0a7::t_9414818ab56379 25
+  s_cb926ad6c1a0a7::t_38d0d79ed8313a 231,235-237
+packages/contracts/README.md
+  s_cb926ad6c1a0a7::t_958c35609fee86 1-6,10-12,18-21
+  s_cb926ad6c1a0a7::t_49502b5a602511 15,24
+  s_cb926ad6c1a0a7::t_575975daf4bd94 25
+  s_cb926ad6c1a0a7::t_bbd218061eeea5 7-9,22,26
+apps/agentic-rag-business-service/src/modules/health/health.controller.ts
+  s_cb926ad6c1a0a7::t_28029c96fdce6f 49
+  s_cb926ad6c1a0a7::t_5b3071a832f3d6 34,44
+  s_cb926ad6c1a0a7::t_dccbaf50192d13 4-7
+  s_cb926ad6c1a0a7::t_88e48fbf5c67a5 31
+  s_cb926ad6c1a0a7::t_f6168497ab5545 39
+  s_cb926ad6c1a0a7::t_d91139dc95d222 57
+packages/contracts/src/shared/health.spec.ts
+  s_cb926ad6c1a0a7::t_b25f22acace795 2-5,7,10,20-22,24-28,30-31,34
+  s_cb926ad6c1a0a7::t_1e5600307e5bf1 19,23,29
+packages/contracts/src/shared/health.ts
+  s_cb926ad6c1a0a7::t_7423fbdd7989c9 3,9,11,13-15,18-22,24,26,28,35-39,41-50
+packages/contracts/src/orpc/index.ts
+  s_cb926ad6c1a0a7::t_1b7bbdcdec9869 1-4
+apps/agentic-rag-business-service/src/modules/greeting/greeting.service.ts
+  s_cb926ad6c1a0a7::t_624420d85c815d 3-4,9-10
+  s_cb926ad6c1a0a7::t_a4f7c3622c8e97 2,5
+docs/guides/product-overview.md
+  s_cb926ad6c1a0a7::t_98c54a1a9eff84 67
+apps/agentic-rag-business-service/src/modules/greeting/greeting.controller.ts
+  s_cb926ad6c1a0a7::t_c0ae2a024f5da1 2
+  s_cb926ad6c1a0a7::t_897a50ddc09426 10
+.rulesync/rules/overview.md
+  s_cb926ad6c1a0a7::t_29825ba8aa4f60 15-18
+  s_cb926ad6c1a0a7::t_a5f32e6ad0fdfb 28
+apps/mcp-app-collections/src/app.service.ts
+  s_cb926ad6c1a0a7::t_97a0d195f381ab 2,6-7
+.rulesync/rules/backend.md
+  s_cb926ad6c1a0a7::t_5212855dc67e78 72
+  s_cb926ad6c1a0a7::t_115b02e5134c4b 38
+  s_cb926ad6c1a0a7::t_416508787e7c45 39
+apps/mcp-app-collections/src/app.controller.ts
+  s_cb926ad6c1a0a7::t_9917828565dc4f 2
+apps/agentic-rag-business-service/src/modules/greeting/greeting.controller.spec.ts
+  s_cb926ad6c1a0a7::t_2bbb2983ca63db 22
+  s_cb926ad6c1a0a7::t_c2181848edbed8 2
+docs/guides/deployment-and-infrastructure.md
+  s_cb926ad6c1a0a7::t_61a6a5163394d2 186,190-192
+packages/contracts/src/mcp/hello.spec.ts
+  s_cb926ad6c1a0a7::t_58a53262fb423a 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "8f92746d42ac6f353530149360cdc2ad78bb2ad3",
+  "prompts": {},
+  "sessions": {
+    "s_cb926ad6c1a0a7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ad437a7f-ec0a-40fb-a897-01bbd8499cdd",
+        "model": "grok-4.6"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
