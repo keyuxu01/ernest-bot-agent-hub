@@ -1,0 +1,45 @@
+packages/contracts/README.md
+  s_cb926ad6c1a0a7::t_20740f77ff0586 13
+  s_cb926ad6c1a0a7::t_f7e4321140a8a8 21
+docs/architecture/decisions/0016-use-elasticsearch-for-rag-chunks.md
+  s_cb926ad6c1a0a7::t_d2793b9b06c6a8 26
+packages/contracts/src/index.ts
+  s_cb926ad6c1a0a7::t_1a336d6d986ea4 16-18,20-22
+.rulesync/rules/backend.md
+  s_cb926ad6c1a0a7::t_af4293784235cd 39
+docs/guides/rabbitmq.md
+  s_cb926ad6c1a0a7::t_2c944c0d443afd 392,420
+  s_cb926ad6c1a0a7::t_30a384b83f4c44 329,416,447
+  s_cb926ad6c1a0a7::t_fbe129c1d20f74 332
+apps/agentic-rag-business-service/src/modules/pipeline/document-pipeline.consumer.ts
+  s_cb926ad6c1a0a7::t_c01ac5544d31c2 2
+  s_cb926ad6c1a0a7::t_148dff27e90bef 31
+apps/agentic-rag-business-service/src/infrastructure/rabbitmq/document-pipeline.publisher.ts
+  s_cb926ad6c1a0a7::t_8f3bc89ef3d306 27,31
+  s_cb926ad6c1a0a7::t_7b4074f54c52fc 3-4
+packages/contracts/src/rag-business/reindex.ts
+  s_cb926ad6c1a0a7::t_b4d95d47b1a37b 6,12,15,22-24,29-31,33-34
+.rulesync/rules/contracts.md
+  s_cb926ad6c1a0a7::t_58f9f5710794fe 31
+  s_cb926ad6c1a0a7::t_7aae17d55c9c63 37
+docs/architecture/README.md
+  s_cb926ad6c1a0a7::t_397f219d8561b9 221
+packages/contracts/src/rag-business/reindex.spec.ts
+  s_cb926ad6c1a0a7::t_f3ed5f07fc2135 2,10,12,20,29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "3f8d2f6ff307265bcaa41c92a3deacb631d5aa98",
+  "prompts": {},
+  "sessions": {
+    "s_cb926ad6c1a0a7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ad437a7f-ec0a-40fb-a897-01bbd8499cdd",
+        "model": "grok-4.6"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
