@@ -32,6 +32,33 @@ Shared foundations:
   @repo/ui         reusable React presentation components
 ```
 
+The Assistant is a parallel product boundary with three deployables: `user-platform-service` authenticates
+the Assistant allowlist, `assistant-runtime-service` owns durable Agent execution, and `assistant-cli` is the
+Ink client and local workspace capability host. See [ADR-0018](./decisions/0018-separate-user-platform-assistant-runtime-and-cli.md),
+[ADR-0019](./decisions/0019-use-postgresql-runtime-truth-redis-coordination-and-mem0-facts.md), and
+[ADR-0020](./decisions/0020-use-deep-agents-local-tool-gateway-and-ink.md).
+The illustrated walkthrough is
+[Node Assistant Runtime knowledge sharing](./proposals/2026-10-05-node-agent-runtime-knowledge-sharing.md).
+The CLI reaches UserPlatform and AssistantRuntime through loopback HTTP/HTTP+SSE in local development and
+HTTPS/HTTPS+SSE outside localhost. Runtime verifies UserPlatform's
+five-minute asymmetric token locally; disabling a user blocks new issuance/refresh immediately and existing
+tokens/streams end by expiry. The two services do not use Nest TCP, a revocation bus, or per-request introspection.
+The repository-owned MCP collection uses `http://localhost:9021` in development/test. User-configured remote
+MCP is restricted to public HTTPS with connection-time SSRF checks; server and workstation stdio MCP
+are unsupported. Local workspace tools instead use a binding-specific authenticated SSE downlink and HTTPS
+ack/result uplink to the exact CLI. The CLI enforces workspace confinement and local approvals.
+User-owned model base URLs use the same initial, redirect and actual-connect public-network revalidation before
+any API key or model request is transmitted.
+The concrete PostgreSQL, Redis and Mem0 configuration is documented in the
+[Assistant Runtime environment guide](../guides/assistant-runtime-environment.md).
+Phase 1 consumes managed Mem0 Platform through the Runtime adapter; Mem0 OSS is neither vendored into this
+monorepo nor added as a Git submodule, and self-hosting is deferred to a separate architecture/OpenSpec decision.
+PostgreSQL owns durable conversation/execution truth, Redis owns reconstructable hot coordination, Mem0 stores
+only filtered semantic facts, and object storage owns artifacts. Fork creates an independent PostgreSQL Session;
+Revert and Revert-and-edit preserve audit history. Deep Agents child Runs are the only SubAgent model, while
+Suggested Sessions and LangGraph Studio are explicit exclusions. Users provide their own model connection and
+free-form model name; optional reasoning effort and service tier are snapshotted on each Run.
+
 PostgreSQL is the system of record for structured knowledge metadata and MongoDB stores document bodies.
 Published documents are chunked and embedded with 通义千问, then written to Elasticsearch `kh_chunk`.
 See [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md) and
@@ -130,6 +157,9 @@ and idempotent handlers allow RabbitMQ to redeliver work after a process failure
 | `docs`                         | Project documentation application        |       `3001` |
 | `agentic-rag-business-service` | Knowledge-base domain and business APIs  |       `9020` |
 | `mcp-app-collections`          | MCP Tools, Resources and MCP App widgets |       `9021` |
+| `user-platform-service`        | Assistant OAuth, allowlist and grants    |          TBD |
+| `assistant-runtime-service`    | Durable Assistant execution and SSE      |       `9030` |
+| `assistant-cli`                | Ink UI and local workspace capability    |          N/A |
 
 ## Protocol Boundaries
 
@@ -140,6 +170,9 @@ and idempotent handlers allow RabbitMQ to redeliver work after a process failure
 | Web to business service            | HTTP with Zod contracts; stable oRPC v1 PoC          | Current / PoC |
 | Browser business server state      | oRPC query options with TanStack Query v5            | Accepted      |
 | Third-party HTTP documentation     | Generated OpenAPI at `/openapi.json` for the PoC     | PoC           |
+| Assistant CLI product events       | Local HTTP; deployed HTTPS commands + Session SSE    | Accepted      |
+| Assistant local tool dispatch      | Binding-specific SSE + local HTTP/deployed HTTPS     | Accepted      |
+| Assistant remote MCP               | Public-network HTTPS MCP only                        | Accepted      |
 
 AI streaming endpoints keep their native stream framing and are not wrapped in ordinary RPC responses.
 MCP remains an Agent-facing protocol and does not replace standard business APIs.
@@ -206,10 +239,11 @@ must define compensation or retry behavior for partial failure. See
 
 `POST /documents/upload/parse` accepts one PDF, DOCX, XLSX, PPTX, TXT or Markdown file up to 50 MB.
 TXT and Markdown are read as UTF-8; the other formats are converted in-process (`pdf-parse`, `mammoth`
-+ `turndown`, `exceljs`, OOXML for PPTX, `officeparser` as fallback). Extracted images are stored in
-RustFS and their Markdown links rewritten, then the draft is persisted through the existing MongoDB
-content and PostgreSQL metadata flow without changing either record shape. The link between a document
-and its RustFS source file is returned to the client but not yet persisted.
+
+- `turndown`, `exceljs`, OOXML for PPTX, `officeparser` as fallback). Extracted images are stored in
+  RustFS and their Markdown links rewritten, then the draft is persisted through the existing MongoDB
+  content and PostgreSQL metadata flow without changing either record shape. The link between a document
+  and its RustFS source file is returned to the client but not yet persisted.
 
 Conversion stays inside `DocumentModule`. The MVP waits inside the request and keeps no parse-task
 state, so an interrupted request must be re-uploaded. See
@@ -230,20 +264,20 @@ follow-up work.
 
 ## Architecture Decision Records
 
-| ADR                                                                      | Decision                                            | Status   |
-| ------------------------------------------------------------------------ | --------------------------------------------------- | -------- |
-| [ADR-0001](./decisions/0001-use-zod-contracts.md)                        | Zod-based shared runtime contracts                  | Accepted |
-| [ADR-0002](./decisions/0002-use-shadcn-tailwind.md)                      | shadcn/ui and Tailwind CSS for frontend UI          | Accepted |
-| [ADR-0003](./decisions/0003-separate-ai-stream-rpc-and-mcp.md)           | Separate AI stream, business API and MCP boundaries | Accepted |
-| [ADR-0004](./decisions/0004-evaluate-orpc.md)                            | Evaluate oRPC for Web-to-service APIs               | Proposed |
-| [ADR-0005](./decisions/0005-evaluate-mcp-nest.md)                        | Evaluate `@rekog/mcp-nest` v2 for the MCP service   | Proposed |
-| [ADR-0007](./decisions/0007-use-rabbitmq.md)                             | RabbitMQ for asynchronous messaging                 | Accepted |
-| [ADR-0008](./decisions/0008-use-redis.md)                                | Redis for cache and distributed coordination        | Accepted |
-| [ADR-0009](./decisions/0009-defer-kubernetes.md)                         | Defer Kubernetes during phase 1                     | Accepted |
-| [ADR-0010](./decisions/0010-use-tanstack-query.md)                       | TanStack Query for browser server state             | Accepted |
-| [ADR-0011](./decisions/0011-use-vercel-and-railway.md)                   | Use Vercel Web with Railway Backend Workloads       | Accepted |
-| [ADR-0012](./decisions/0012-use-commonjs-nestjs.md)                      | CommonJS NestJS applications with NodeNext          | Accepted |
-| [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md) | PostgreSQL metadata with MongoDB document content   | Accepted |
+| ADR                                                                      | Decision                                            | Status     |
+| ------------------------------------------------------------------------ | --------------------------------------------------- | ---------- |
+| [ADR-0001](./decisions/0001-use-zod-contracts.md)                        | Zod-based shared runtime contracts                  | Accepted   |
+| [ADR-0002](./decisions/0002-use-shadcn-tailwind.md)                      | shadcn/ui and Tailwind CSS for frontend UI          | Accepted   |
+| [ADR-0003](./decisions/0003-separate-ai-stream-rpc-and-mcp.md)           | Separate AI stream, business API and MCP boundaries | Accepted   |
+| [ADR-0004](./decisions/0004-evaluate-orpc.md)                            | Evaluate oRPC for Web-to-service APIs               | Proposed   |
+| [ADR-0005](./decisions/0005-evaluate-mcp-nest.md)                        | Evaluate `@rekog/mcp-nest` v2 for the MCP service   | Proposed   |
+| [ADR-0007](./decisions/0007-use-rabbitmq.md)                             | RabbitMQ for asynchronous messaging                 | Accepted   |
+| [ADR-0008](./decisions/0008-use-redis.md)                                | Redis for cache and distributed coordination        | Accepted   |
+| [ADR-0009](./decisions/0009-defer-kubernetes.md)                         | Defer Kubernetes during phase 1                     | Accepted   |
+| [ADR-0010](./decisions/0010-use-tanstack-query.md)                       | TanStack Query for browser server state             | Accepted   |
+| [ADR-0011](./decisions/0011-use-vercel-and-railway.md)                   | Use Vercel Web with Railway Backend Workloads       | Accepted   |
+| [ADR-0012](./decisions/0012-use-commonjs-nestjs.md)                      | CommonJS NestJS applications with NodeNext          | Accepted   |
+| [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md) | PostgreSQL metadata with MongoDB document content   | Accepted   |
 | [ADR-0014](./decisions/0014-use-mineru-cloud-for-document-parsing.md)    | MinerU cloud API for upload document parsing        | Superseded |
 | [ADR-0015](./decisions/0015-use-in-process-document-parsers.md)          | In-process parsers for upload document parsing      | Accepted   |
 | [ADR-0016](./decisions/0016-use-elasticsearch-for-rag-chunks.md)         | Elasticsearch + Qwen embeddings for RAG chunks      | Accepted   |
@@ -251,6 +285,16 @@ follow-up work.
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.
+
+## Active Implementation Proposals
+
+The following documents retain detailed design and capability acceptance material while accepted ADRs own the
+long-lived architecture decisions:
+
+- [Assistant Runtime + local console Node capability plan](./proposals/2026-10-05-node-agent-runtime-plan.md) —
+  defines the active OpenSpec Apply scope for a product-scoped Assistant runtime, durable PostgreSQL execution
+  model, Redis working set, Mem0 long-term memory, replayable SSE and a local CLI tool gateway. ADR-0018 through
+  ADR-0020 own the accepted architecture boundaries; the capability ledger owns implementation evidence.
 
 ## Maintenance
 

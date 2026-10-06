@@ -1,0 +1,61 @@
+version: 1
+sessionId: 20261005T090200Z-runtime-event-contracts
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T09:02:00Z
+coordinator: /root
+implementer: /root
+
+authorization:
+  userRequestRef: conversation request "一切好了就开始 apply"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  previousSession:
+    path: .workflow/sessions/20261005T084228Z-foundation-contracts/end-audit.yaml
+    manifestSha256: f46b81e9a268342562700d8829cedfcbea848483cd2fca1375997eb960a59977
+    independentReview: passed
+  taskSlice: ["3.3", "3.4"]
+
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  allowedPaths:
+    - packages/contracts/src/assistant-runtime/**
+    - packages/contracts/src/index.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - define and test versioned Session, Run, Turn, model-attempt, command, settings, compact, fork, revert and revert-and-edit schemas
+    - define and test versioned durable event and SSE frame schemas with heartbeat, sequence, usage, interrupt, tool, artifact and terminal variants
+    - add compile-time exhaustiveness fixtures and runtime round-trip fixtures
+    - update only evidence-supported task and ledger records
+  prohibitedActions:
+    - add controllers, persistence, migrations, Redis, SSE delivery, model execution or any other production implementation
+    - change normative planning semantics or capability status
+    - implement Suggested Sessions, stdio MCP, Nest TCP, self-hosted Mem0, Studio or real credentials
+    - commit, push or deploy
+
+validationPlan:
+  - check: pnpm --filter @repo/contracts test
+    passCondition: all valid/invalid and replay round-trip fixtures pass
+  - check: pnpm --filter @repo/contracts check-types
+    passCondition: discriminated unions compile and exhaustive reducers have no unhandled variant
+  - check: pnpm --filter @repo/contracts lint && pnpm --filter @repo/contracts build
+    passCondition: lint and package build pass
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    passCondition: valid=true with issues=[]
+  - check: git diff --check and protected-secret scan
+    passCondition: no formatting defect or real credential
+
+stopConditions:
+  - Required schema semantics conflict with the frozen OpenSpec or require a new product decision.
+  - Work requires a path, dependency or behavior outside this contract.
+  - A required validation fails and cannot be corrected within the declared task slice.
+
+expectedOutputs:
+  - explicit named Zod contracts and derived types for tasks 3.3 and 3.4
+  - exhaustive compile/runtime fixtures and durable-event/SSE round-trip evidence
+  - evidence-supported task state and end audit
+  - independent implementation review before the next Apply session
+handoffTarget: .workflow/sessions/20261005T090200Z-runtime-event-contracts/end-audit.yaml
+acknowledgedAt: 2026-10-05T09:02:00Z
+startStatement: "Apply session 20261005T090200Z-runtime-event-contracts started for tasks 3.3 and 3.4 after the prior slice passed independent review; writes are limited to Assistant runtime contracts, tests and evidence; stop on semantic conflict or failed validation."

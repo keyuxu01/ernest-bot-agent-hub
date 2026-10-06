@@ -1,0 +1,39 @@
+version: 1
+sessionId: 20261005T133223Z-owner-scoped-repositories
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T13:32:23Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "continue implementation"
+  taskSlice: ['4.4']
+scope:
+  allowedActions:
+    - add Runtime application repository and transaction ports that bind one explicit owner
+    - add a PostgreSQL adapter whose public surface never exposes TypeORM primitives or an unscoped query method
+    - add owner-scoped reads for directly addressable durable resources and minimal Session/Run update primitives
+    - add real PostgreSQL two-owner integration tests, transaction commit and rollback probes
+  prohibitedActions:
+    - modify migrations or UserPlatform
+    - implement event sequence allocation, event/outbox atomic append, command idempotency or outbox workers
+    - implement resource-version CAS, fencing, lifecycle use cases, pagination, query indexes or HTTP endpoints
+    - expose DataSource, EntityManager, Repository, raw query or dynamic table names through application ports
+acceptanceContract:
+  reviewer: /root/repository_boundary_review
+  ownerBoundary:
+    - owner is bound at forOwner or withOwnerTransaction entry
+    - every direct resource read or mutation matches resource ID and owner ID in one SQL statement
+    - foreign and unknown IDs have the same null or zero-affected result
+  transactionBoundary:
+    - callback receives only an owner-scoped repository bundle
+    - every repository in the callback uses the same transaction EntityManager
+    - callback failure rolls back all writes
+  exclusions:
+    - outbox and compaction remain internal to later task-specific transactions
+    - provider connection persistence remains deferred because no provider connection table exists
+  evidence:
+    - real PostgreSQL two-owner guessed-ID read and mutation probes
+    - transaction commit and rollback probes across repositories
+    - types, lint, unit tests, build and OpenSpec strict validation remain green
+handoffTarget: .workflow/sessions/20261005T133223Z-owner-scoped-repositories/end-audit.yaml
+startStatement: 'Task 4.4 Apply started for owner-bound repository and transaction ports; no business workflow, CAS, outbox or migration scope is authorized.'

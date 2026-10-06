@@ -1,0 +1,118 @@
+version: 1
+sessionId: 20261005T084228Z-foundation-contracts
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T08:54:00Z
+reason: completed
+
+contract:
+  startContract: .workflow/sessions/20261005T084228Z-foundation-contracts/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["2.3", "2.4", "2.5", "2.6", "3.2"]
+
+reconciliation:
+  actualWrites:
+    - apps/assistant-runtime-service/**
+    - apps/assistant-cli/**
+    - apps/user-platform-service/**
+    - packages/contracts/src/assistant-runtime/ping.ts
+    - packages/contracts/src/user-platform/**
+    - packages/contracts/src/index.ts
+    - docs/guides/assistant-runtime-environment.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+    - pnpm-lock.yaml
+    - turbo.json
+  ignoredLocalWrites:
+    - path: apps/assistant-runtime-service/.env.dev
+      reason: preserved the existing managed Mem0 credential and added non-secret local placeholders; file remains gitignored
+  expectedButUnwritten: []
+  outOfContractWrites: []
+  completedTasks: ["2.3", "2.4", "2.5", "2.6", "3.2"]
+  incompleteTasks: []
+  boundaryChanges: []
+  capabilityPromotions: []
+
+checks:
+  - check: pnpm --filter @repo/contracts test
+    result: passed
+    evidence: Vitest 7 files and 26 tests passed
+  - check: pnpm --filter @repo/contracts check-types && lint && build
+    result: passed
+    evidence: TypeScript, ESLint max-warnings 0 and build exited 0
+  - check: pnpm --filter assistant-runtime-service test
+    result: passed
+    evidence: Vitest 3 files and 29 tests passed, including every missing required environment setting
+  - check: pnpm --filter assistant-runtime-service test:e2e
+    result: passed
+    evidence: 2 real HTTP/SSE diagnostics passed; one request proved the same correlation ID in request header, response body/header and captured structured log with build metadata
+  - check: pnpm --filter assistant-runtime-service check-types && lint && build
+    result: passed
+    evidence: TypeScript, ESLint max-warnings 0 and Nest build exited 0
+  - check: pnpm --filter assistant-cli test
+    result: passed
+    evidence: Vitest 5 files and 23 tests passed, including TTY/non-TTY command harnesses, real startup-gate wiring and cleartext rejection
+  - check: packaged assistant-cli missing-environment startup
+    result: passed
+    evidence: isolated packaged CLI exited 1 before network access with the actionable redacted USER_PLATFORM_URL requirement
+  - check: pnpm --filter assistant-cli check-types && lint && build
+    result: passed
+    evidence: TypeScript, ESLint max-warnings 0 and CLI build exited 0
+  - check: pnpm --filter user-platform-service test
+    result: passed
+    evidence: Vitest 1 file and 19 tests passed, including every missing required environment setting
+  - check: pnpm --filter user-platform-service test:e2e
+    result: passed
+    evidence: 3 real HTTP health diagnostics passed with correlation and stable build metadata
+  - check: pnpm --filter user-platform-service check-types && lint && build
+    result: passed
+    evidence: TypeScript, ESLint max-warnings 0 and Nest build exited 0
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: valid=true and issues=[]
+  - check: git diff --check
+    result: passed
+    evidence: exit 0 after final task and ledger updates
+  - check: managed-memory protected-secret scan
+    result: passed
+    evidence: no managed-memory key pattern outside the pre-existing ignored Runtime .env.dev
+
+sourceState:
+  manifestScope: three Assistant applications excluding dist and .env.dev, changed Assistant contract sources, environment guide, capability ledger, tasks and turbo metadata
+  manifestCommand: >-
+    SOURCE_ROOTS=(apps/assistant-runtime-service apps/assistant-cli apps/user-platform-service packages/contracts/src/user-platform packages/contracts/src/assistant-runtime/ping.ts packages/contracts/src/shared/health.ts packages/contracts/src/index.ts docs/guides/assistant-runtime-environment.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md openspec/changes/implement-node-assistant-runtime/tasks.md turbo.json); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' ! -name '.env.dev' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: f46b81e9a268342562700d8829cedfcbea848483cd2fca1375997eb960a59977
+  workingTreeStatusSha256: 7cc650f86ed85fb742a44064a3bf981642d6c3209502dee6f4071df8c0ea45d1
+  unrelatedPreExistingChangesPreserved:
+    - root documentation, OpenSpec schema workflow changes and prior planning artifacts
+    - pre-existing untracked Assistant application scaffolds and contract work
+    - the real managed Mem0 credential remained only in the ignored local Runtime environment file
+
+residualRisks:
+  - OAuth exchange, allowlist persistence, signing, Runtime verification and refresh are contracts only; CAP-001 remains Specified.
+  - Runtime ping/echo and CLI diagnostics remain non-product scaffolds; Sessions, models, MCP, Mem0 adapter, tools and Ink UI are not implemented.
+  - Local Runtime MCP points at an HTTPS placeholder; the later hermetic environment must provide a trusted TLS fixture.
+  - EdDSA key material in local templates is placeholder-only; production secret management and rotation remain later tasks.
+
+invalidatedReceipts: []
+reviewHistory:
+  - reviewer: /root/foundation_impl_review
+    verdict: failed
+    blockers:
+      - CLI environment validation was not wired into the real cli.ts startup path.
+      - Runtime HTTP E2E did not capture the structured log emitted by the same diagnostic request.
+    remediation:
+      - Added resolveCliStartup to the real command path plus unit and packaged-process startup evidence.
+      - Extended Runtime HTTP E2E to assert the same correlation ID in response and captured structured diagnostic log.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/foundation_impl_review
+    verdict: passed
+    evidence:
+      - Packaged CLI non-help startup rejected missing environment before network access with exit code 1.
+      - One real Runtime HTTP diagnostic request preserved correlation ID through request, response header/body and structured log.
+      - Full read-only regression and reproducible manifest f46b81e9a268342562700d8829cedfcbea848483cd2fca1375997eb960a59977 passed.
+    nonBlockingFindings:
+      - An invalid ASSISTANT_RUNTIME_URL can still make the help command fail; defer to the later CLI product slice.
+    status: accepted
+nextAction: open a new Apply contract for the next bounded shared-protocol task slice
+endStatement: "Apply session 20261005T084228Z-foundation-contracts ended completed on reproducible source manifest f46b81e9a268342562700d8829cedfcbea848483cd2fca1375997eb960a59977; all declared checks passed, the first independent review blockers were remediated, no boundary changes occurred, no capability status was promoted, and the next gate is independent re-review."

@@ -1,0 +1,92 @@
+version: 1
+sessionId: 20261005T120319Z-postgres-durable-extensions
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T12:18:34Z
+reason: failed-independent-review
+contract:
+  startContract: .workflow/sessions/20261005T120319Z-postgres-durable-extensions/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["4.2"]
+reconciliation:
+  actualWrites:
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177720000-create-assistant-runtime-extensions.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/assistant-runtime-migration-data-source.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  outOfContractWrites: []
+  completedTasks: ["4.2"]
+  capabilityPromotions: []
+databaseScope:
+  engine: PostgreSQL 16
+  schema: assistant_runtime
+  previousTables: 7
+  addedTables:
+    - assistant_event
+    - assistant_outbox
+    - assistant_checkpoint
+    - assistant_compaction
+    - assistant_tool_execution
+    - assistant_interrupt
+    - assistant_artifact
+    - assistant_artifact_reference
+    - assistant_context_snapshot
+    - assistant_mcp_connection
+    - assistant_client_binding
+    - assistant_memory_operation
+    - assistant_deletion_receipt
+    - assistant_audit_record
+  totalTables: 21
+  crossSchemaForeignKeys: 0
+  startupMigrationExecution: false
+  task43BusinessUniqueOrPartialIndexes: 0
+checks:
+  - check: pnpm test:assistant-postgres-migrations against disposable pgvector/pgvector:pg16
+    result: passed
+    evidence: UserPlatform 5/5 and Runtime 8/8 compiled-DataSource tests passed, including twenty-one-table catalog, complete 4.2 legal chain, invalid ownership/lineage/lifecycle/protected-reference writes, explicit 4.3 absence, empty second run, latest-only down, full down and re-apply
+  - check: assistant-runtime-service unit tests, check-types and lint
+    result: passed
+    evidence: 4 files/64 unit tests passed; TypeScript no-emit and ESLint max-warnings-zero exited 0
+  - check: pnpm build
+    result: passed
+    evidence: Turbo root build completed 8 of 8 tasks
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: repository-pinned OpenSpec returned valid=true and issues=[] after task and ledger updates
+  - check: git diff --check and targeted Prettier check
+    result: passed
+    evidence: no whitespace defect and every task-4.2 migration/test/evidence file uses repository formatting
+  - check: protected-field, production-wiring, cross-schema and future-constraint scans
+    result: passed
+    evidence: no plaintext credential/checkpoint/secret-answer column, Runtime-to-UserPlatform FK, synchronize/migrationsRun true, unique partial index, external adapter or production module wiring was added
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(apps/assistant-runtime-service/src/infrastructure/database apps/assistant-runtime-service/test/migrations apps/assistant-runtime-service/vitest.config.migrations.mts apps/assistant-runtime-service/package.json .github/workflows/assistant-postgres-migrations.yml package.json pnpm-lock.yaml openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: 6bf0ee7b3cf01d5957408a0dc09b5b07d3bedda6462ebb8c91a61eba5a316088
+boundaryEvents: []
+residualRisks:
+  - The migration defines durable shapes only; repositories, atomic append/outbox transactions, workers, external adapters and product handlers remain later tasks.
+  - Task 4.3 business uniqueness and partial constraints are deliberately absent, so duplicate event identity/sequence, command IDs, active Runs and terminal tool attempts remain possible until the next accepted migration.
+  - JSONB columns enforce structural and lifecycle boundaries but application-layer Zod validation and protected-payload construction remain mandatory before production writes.
+  - Hosted CI was not triggered in this session; its PostgreSQL 16 workflow invokes the same compiled migration suite that passed locally.
+  - The disposable local PostgreSQL container is test infrastructure only and contains no production data or credentials.
+invalidatedReceipts: []
+reviewHistory:
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: pre-implementation-contract-issued
+    evidence:
+      - Fourteen-table ownership, lineage, version, lifecycle, protected-field, real PostgreSQL and explicit task-4.3 exclusion requirements were enumerated before Apply.
+    blockers: []
+    status: contract-consumed
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: failed
+    evidence:
+      - The frozen manifest reproduced exactly and automated gates passed, but semantic PostgreSQL probes found six High and one Medium finding.
+      - Artifact lineage prevented Fork references from sharing an immutable blob; ToolExecution and Interrupt persistence weakened public contract states and unknown/rejection reasons.
+      - Deletion JSONB checks accepted forged completed/partial receipts; required lifecycle/version/claim fields were missing across context, MCP, binding, outbox and tools.
+      - Committed compaction accepted a message event, and memory provenance had no relational owner/Session/event validation.
+    blockers: []
+    status: remediation-required
+nextAction: start a new bounded remediation Apply session, restore task 4.2 to incomplete and add PostgreSQL regressions for every finding
+endStatement: "Apply session 20261005T120319Z-postgres-durable-extensions ended failed independent review on frozen manifest 6bf0ee7b3cf01d5957408a0dc09b5b07d3bedda6462ebb8c91a61eba5a316088 with zero Blocker, six High and one Medium finding; no capability status was promoted."

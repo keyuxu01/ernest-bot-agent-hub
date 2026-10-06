@@ -1,0 +1,71 @@
+version: 1
+sessionId: 20261005T065405Z-cap001-bootstrap
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T06:57:41Z
+reason: completed
+
+contract:
+  startContract: .workflow/sessions/20261005T065405Z-cap001-bootstrap/start-contract.yaml
+  planningRevision: 0aa6b70b688c5ce4027c8276fb4fbe1dcf1d8853aa82a6de19769de20004ef36
+  taskSlice: ["2.1", "2.2"]
+
+reconciliation:
+  actualWrites:
+    - apps/user-platform-service/**
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - openspec/changes/implement-node-assistant-runtime/spec-audit.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+    - pnpm-lock.yaml
+  expectedButUnwritten: []
+  outOfContractWrites: []
+  completedTasks: ["2.1", "2.2"]
+  incompleteTasks: []
+  boundaryChanges: []
+
+checks:
+  - check: pnpm --filter user-platform-service build
+    result: passed
+    evidence: Nest build exit 0
+  - check: pnpm --filter user-platform-service check-types
+    result: passed
+    evidence: final tsc --noEmit exit 0; an earlier Supertest callback return-type defect was fixed before the final run
+  - check: pnpm --filter user-platform-service lint
+    result: passed
+    evidence: ESLint exit 0 with max-warnings 0
+  - check: pnpm --filter user-platform-service test
+    result: passed
+    evidence: Vitest 1 file and 5 tests passed
+  - check: pnpm --filter user-platform-service test:e2e
+    result: passed
+    evidence: Vitest 1 file and 3 health/bootstrap tests passed
+  - check: packaged service smoke on port 9040
+    result: passed
+    evidence: start:prod served /health/live and /health/whoami; process then stopped with SIGINT
+  - check: pnpm turbo run lint check-types build --filter=user-platform-service...
+    result: passed
+    evidence: 6 of 6 tasks passed for service and workspace dependencies
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: valid=true and issues=[]
+  - check: git diff --check
+    result: passed
+    evidence: exit 0
+  - check: accidental nested metadata scan
+    result: passed
+    evidence: no nested .git, pnpm-lock.yaml or tsbuildinfo under apps/user-platform-service
+
+workingTree:
+  statusRef: git status --short captured at 2026-10-05T06:57:41Z; source manifest 8e4006ca8221158ca75d10c392d041a74cf292be6cbd4c00930397bf44e5a822
+  unrelatedPreExistingChangesPreserved:
+    - .gitignore, README.md, docs/architecture/README.md and turbo.json
+    - apps/assistant-cli and apps/assistant-runtime-service
+    - existing ADRs, proposal files and Assistant contracts
+    - pnpm install retained and resolved pre-existing untracked workspace importers while adding user-platform-service
+
+residualRisks:
+  - The service intentionally contains no OAuth, registry, token or persistence behavior yet; no CAP is Implemented by this scaffold.
+  - The whoami service name is locally typed until the shared health contract is extended in a later contract task.
+invalidatedReceipts: []
+nextAction: independent implementation review of tasks 2.1 and 2.2, then a new Apply contract for the next task slice
+endStatement: "Apply session 20261005T065405Z-cap001-bootstrap ended completed on source manifest 8e4006ca8221158ca75d10c392d041a74cf292be6cbd4c00930397bf44e5a822; changed UserPlatform scaffold, inventory, task state, workflow evidence and lockfile; checks passed as recorded; boundary events none; next independent implementation review."

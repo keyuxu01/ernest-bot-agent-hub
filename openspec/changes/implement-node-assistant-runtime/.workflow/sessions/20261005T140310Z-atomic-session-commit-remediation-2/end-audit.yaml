@@ -1,0 +1,54 @@
+version: 1
+sessionId: 20261005T140310Z-atomic-session-commit-remediation-2
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T14:04:25Z
+reason: passed-independent-review
+contract:
+  startContract: .workflow/sessions/20261005T140310Z-atomic-session-commit-remediation-2/start-contract.yaml
+  taskSlice: ["4.5-remediation-2"]
+reconciliation:
+  completedTasks: ["4.5"]
+  implementationCandidates: []
+  capabilityPromotions: []
+  outOfContractWrites: []
+findingAddressed:
+  - checkpoint SELECT carries a stable diagnostic comment
+  - test observer polls pg_stat_activity until that exact query has wait_event_type Lock
+  - timeout fails the test; the lifecycle writer is released only after the barrier is observed
+verification:
+  postgresMigrations: "passed: 10/10"
+  postgresTransactions: "passed: 7/7 with deterministic lock-wait barrier"
+  repositoryRegression: "passed: 6/6"
+  runtimeUnit: "passed: 64/64"
+  runtimeTypesLintBuild: passed
+  rootBuild: "passed: 8/8"
+  openSpecStrict: "passed: valid=true, issues=[]"
+  diffCheck: passed
+sourceState:
+  manifestFiles:
+    - apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-atomic-commit.port.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/postgres/postgres-assistant-runtime-persistence.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177900000-add-atomic-session-commit-state.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/assistant-runtime-migration-data-source.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - apps/assistant-runtime-service/test/repositories/owner-scoped-repositories.e2e-spec.ts
+    - apps/assistant-runtime-service/test/transactions/atomic-session-commit.e2e-spec.ts
+    - apps/assistant-runtime-service/vitest.config.transactions.mts
+    - apps/assistant-runtime-service/package.json
+  manifestCommand: >-
+    SOURCE_FILES=(apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-atomic-commit.port.ts apps/assistant-runtime-service/src/infrastructure/database/postgres/postgres-assistant-runtime-persistence.ts apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177900000-add-atomic-session-commit-state.ts apps/assistant-runtime-service/src/infrastructure/database/assistant-runtime-migration-data-source.ts apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts apps/assistant-runtime-service/test/repositories/owner-scoped-repositories.e2e-spec.ts apps/assistant-runtime-service/test/transactions/atomic-session-commit.e2e-spec.ts apps/assistant-runtime-service/vitest.config.transactions.mts apps/assistant-runtime-service/package.json); printf '%s\0' "${SOURCE_FILES[@]}" | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: da8ea64bb8e8ad02ad9481bd00c6471023125f7e202fc1b34f1db37bc8bb3bf2
+residualRisks:
+  - Unknown commit outcomes remain unsafe to replay until task 4.6.
+  - Run transition legality, fencing and checkpoint creation remain later tasks.
+reviewer: /root/repository_boundary_review
+reviewResult:
+  verdict: passed
+  findings: { blocker: 0, high: 0, medium: 0 }
+  evidence:
+    - manifest remained stable before and after independent checks
+    - independent PostgreSQL 16.14 migrations 10/10, repositories 6/6 and transactions 7/7 passed
+    - deterministic checkpoint lock barrier fails if FOR SHARE is removed
+    - frozen-file secret pattern scan found no match
+nextAction: task 4.5 is accepted; task 4.6 requires a new bounded Apply session
+endStatement: "Task 4.5 passed independent review on reproducible manifest da8ea64bb8e8ad02ad9481bd00c6471023125f7e202fc1b34f1db37bc8bb3bf2 with zero remaining findings."

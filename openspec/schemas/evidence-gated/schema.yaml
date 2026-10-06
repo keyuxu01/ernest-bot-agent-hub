@@ -1,6 +1,6 @@
 name: evidence-gated
-version: 1
-description: OpenSpec workflow with independent pre-Apply audit, controlled implementation, post-Apply code and secret review, revision-bound evidence, and release/archive gates
+version: 2
+description: OpenSpec workflow with parallel requirements-to-E2E, solution/architecture, and test-case reviews before Apply, controlled implementation, revision-bound evidence, and release/archive gates
 
 artifacts:
   - id: baseline
@@ -62,6 +62,24 @@ artifacts:
       - proposal
       - specs
 
+  - id: client-e2e-plan
+    generates: client-e2e-plan.md
+    description: Requirement-derived real-client acceptance plan and executable case manifest
+    template: client-e2e-plan.md
+    instruction: |
+      Derive the acceptance plan from every normative requirement and scenario.
+      Identify the real product client, classify product E2E, integration,
+      live smoke, operational acceptance, manual acceptance, and release gates,
+      and define stable case/subcase IDs, fixtures, drivers, fault controls,
+      read-only evidence oracles, cleanup, pass conditions, and receipt paths.
+      Direct API or storage calls may support setup or diagnostics but may not
+      replace a required real-client path.
+    requires:
+      - baseline
+      - proposal
+      - specs
+      - design
+
   - id: tasks
     generates: tasks.md
     description: Ordered, traceable implementation and verification tasks
@@ -74,23 +92,88 @@ artifacts:
     requires:
       - specs
       - design
+      - client-e2e-plan
 
-  - id: spec-audit
-    generates: spec-audit.md
-    description: Independent consistency, feasibility, scope, and testability audit before Apply
-    template: spec-audit.md
+  # These three independent review artifacts have the same prerequisites and
+  # are intentionally unordered so separate subagents can produce them in parallel.
+  - id: requirements-e2e-review
+    generates: requirements-e2e-review.md
+    description: Independent scenario-level trace review from requirements to acceptance cases
+    template: requirements-e2e-review.md
     instruction: |
-      Assign an independent Spec Auditor who did not author the audited planning
-      revision. Audit baseline/research/proposal/specs/design/tasks as one join.
-      Record hashes, findings, limitations, and passed/failed/blocked verdict.
-      Do not fix artifacts during the audit. A non-passed verdict blocks Apply.
+      Assign an independent Requirements-to-E2E Reviewer. Enumerate every
+      normative requirement and scenario and verify a bidirectional mapping to
+      executable cases, assertions, evidence types, and baseline classifications.
+      Report orphan requirements/cases, weakened assertions, false parity, and
+      direct-API substitutions. Do not edit the reviewed artifacts.
     requires:
       - baseline
       - research
       - proposal
       - specs
       - design
+      - client-e2e-plan
       - tasks
+
+  - id: solution-architecture-review
+    generates: solution-architecture-review.md
+    description: Independent feasibility, architecture, security, operability, and scope review
+    template: solution-architecture-review.md
+    instruction: |
+      Assign an independent Solution and Architecture Reviewer. Check functional
+      completeness against the baseline, trust and data boundaries, protocols,
+      concurrency/recovery, security/privacy, deployment, migration, rollback,
+      observability, implementation feasibility, and unnecessary complexity.
+      Do not edit the reviewed artifacts.
+    requires:
+      - baseline
+      - research
+      - proposal
+      - specs
+      - design
+      - client-e2e-plan
+      - tasks
+
+  - id: test-case-review
+    generates: test-case-review.md
+    description: Independent executability, risk coverage, fixture, driver, oracle, and duplication review
+    template: test-case-review.md
+    instruction: |
+      Assign an independent Test Case Reviewer. Verify stable atomic IDs,
+      preconditions, deterministic actions, observable and durable assertions,
+      fixtures, product/fault drivers, evidence oracles, cleanup, traceability,
+      test-type classification, live/hermetic boundaries, and canonical reuse of
+      shared evidence. Do not edit the reviewed artifacts.
+    requires:
+      - baseline
+      - research
+      - proposal
+      - specs
+      - design
+      - client-e2e-plan
+      - tasks
+
+  - id: spec-audit
+    generates: spec-audit.md
+    description: Independent consistency, feasibility, scope, and testability audit before Apply
+    template: spec-audit.md
+    instruction: |
+      After the three parallel review artifacts pass for one frozen revision,
+      assign an independent Spec Auditor who did not author that revision or any
+      review. Audit the complete planning and review join, validate reviewer
+      independence and hashes, and record findings, limitations, and verdict.
+      Do not fix artifacts during the audit. A non-passed or stale verdict blocks Apply.
+    requires:
+      - baseline
+      - research
+      - proposal
+      - specs
+      - design
+      - client-e2e-plan
+      - tasks
+      - requirements-e2e-review
+      - solution-architecture-review
+      - test-case-review
 
 apply:
   requires:
@@ -100,7 +183,8 @@ apply:
     Follow the repository's evidence-gated OpenSpec SOP.
 
     Before the first production edit, require a current passed independent
-    specification-audit receipt and create
+    specification-audit receipt, three current passed parallel review receipts,
+    and create
     .workflow/sessions/<session-id>/start-contract.yaml from the provided
     template. Bind it to the planning revision, task slice, allowed paths,
     roles, validation plan, and stop conditions.

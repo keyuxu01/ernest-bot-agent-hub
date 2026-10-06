@@ -1,0 +1,20 @@
+version: 1
+sessionId: 20261005T140310Z-atomic-session-commit-remediation-2
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T14:03:11Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "continue implementation"
+  taskSlice: ["4.5-remediation-2"]
+scope:
+  allowedActions:
+    - replace timing-based checkpoint race coordination with a PostgreSQL lock-wait barrier
+    - rerun and refreeze task 4.5 evidence
+  prohibitedActions:
+    - change atomic commit behavior beyond adding a diagnostic SQL comment used by the test barrier
+acceptanceContract:
+  reviewer: /root/repository_boundary_review
+  findingToClose: checkpoint validation/use race test deterministically observes the atomic backend waiting on the checkpoint lock before releasing the lifecycle writer
+handoffTarget: .workflow/sessions/20261005T140310Z-atomic-session-commit-remediation-2/end-audit.yaml
+startStatement: "Task 4.5 remediation 2 started to replace a timing race test with a PostgreSQL lock-wait barrier."

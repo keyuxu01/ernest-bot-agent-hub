@@ -1,0 +1,37 @@
+version: 1
+sessionId: 20261005T134642Z-atomic-session-commit
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T13:46:42Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "continue implementation"
+  taskSlice: ["4.5"]
+scope:
+  allowedActions:
+    - add one forward migration for durable Session allocator/head, Run checkpoint pointer and outbox identity
+    - add an owner-scoped atomic Session commit port and PostgreSQL adapter
+    - atomically lock Session, optionally CAS a Run transition, validate an existing Ready checkpoint, append event, advance Session and insert Pending outbox
+    - add real PostgreSQL concurrency, ownership, conflict, failure and rollback tests
+  prohibitedActions:
+    - implement checkpoint serialization or encryption
+    - define the complete Run state machine, command idempotency, outbox workers, fencing or settings merge CAS
+    - retry the same business request or treat duplicate event/outbox identity as success
+    - hold a transaction across external I/O
+acceptanceContract:
+  reviewer: /root/repository_boundary_review
+  schema:
+    - assistant_session next_event_sequence and active_head_sequence remain distinct
+    - assistant_run current_checkpoint_id references same owner Session and Run checkpoint lineage
+    - outbox topic and aggregate identity sequence is unique
+  transaction:
+    - owner-scoped Session row lock serializes allocation
+    - all optional Run/checkpoint work, event, Session version/head/counter and outbox commit or roll back together
+    - foreign owner, version conflict and invalid checkpoint reveal no resource existence
+  evidence:
+    - concurrent same-Session commits are unique, ordered and gap-free
+    - injected failures leave no partial rows or consumed sequence
+    - a later successful commit reuses a rolled-back sequence
+    - clean migration up/down-or-roll-forward, types, lint, build and OpenSpec remain green
+handoffTarget: .workflow/sessions/20261005T134642Z-atomic-session-commit/end-audit.yaml
+startStatement: "Task 4.5 Apply started for one owner-scoped PostgreSQL atomic commit boundary; command replay, workers, full state machines and checkpoint production remain excluded."

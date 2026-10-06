@@ -1,0 +1,90 @@
+version: 1
+sessionId: 20261005T090200Z-runtime-event-contracts
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T09:05:00Z
+reason: completed
+contract:
+  startContract: .workflow/sessions/20261005T090200Z-runtime-event-contracts/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["3.3", "3.4"]
+reconciliation:
+  actualWrites:
+    - packages/contracts/src/assistant-runtime/session-runtime.ts
+    - packages/contracts/src/assistant-runtime/session-runtime.spec.ts
+    - packages/contracts/src/assistant-runtime/events.ts
+    - packages/contracts/src/assistant-runtime/events.spec.ts
+    - packages/contracts/src/index.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  outOfContractWrites: []
+  completedTasks: ["3.3", "3.4"]
+  capabilityPromotions: []
+checks:
+  - check: pnpm --filter @repo/contracts test
+    result: passed
+    evidence: Vitest 9 files and 45 tests passed after CAS, command completeness, usage, public-schema and replay remediation
+  - check: pnpm --filter @repo/contracts check-types
+    result: passed
+    evidence: exhaustive command consumer and derived types compiled
+  - check: pnpm --filter @repo/contracts lint && build
+    result: passed
+    evidence: ESLint max-warnings 0 and TypeScript build exited 0
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: valid=true and issues=[]
+  - check: git diff --check
+    result: passed
+    evidence: exit 0
+  - check: pnpm build
+    result: passed
+    evidence: Turbo root build completed 8 of 8 tasks
+  - check: protected-secret scan
+    result: passed
+    evidence: no managed-memory key pattern outside the ignored local Runtime environment file
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(packages/contracts/src/assistant-runtime packages/contracts/src/index.ts openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: 02d22ce64407b5151ad4e929d47f774ea8f93bbbf2f6af9ab355139e147b5b73
+residualRisks:
+  - Schemas do not implement transition legality, persistence, replay transport or authorization.
+  - Public payload text fields require later redaction, size and ownership enforcement in production adapters.
+invalidatedReceipts: []
+reviewHistory:
+  - reviewer: /root/runtime_event_contract_review
+    verdict: failed
+    blockers:
+      - CAS commands did not require expectedVersion and create/retry commands were absent.
+      - Unavailable usage required fabricated numeric fields and SSE event frames were nested against the design.
+      - Public schema types and valid/invalid replay coverage were incomplete.
+    remediation:
+      - Added version-required CAS metadata, create_session/retry, missing derived types, direct SSE event fields, unavailable usage and broader valid/invalid round-trip fixtures.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/runtime_event_contract_review
+    verdict: failed
+    blockers:
+      - SSE top-level type and payload discriminator could disagree.
+    remediation:
+      - Added shared refinement to durable events and event SSE frames plus a mismatch regression test.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/runtime_event_contract_review
+    verdict: failed
+    blockers:
+      - Public resource schemas and exact terminal states lacked valid/key-invalid tests.
+      - Direct SSE event frame lacked the top-level type field required by the design.
+      - CAS command metadata weakened commandId syntax validation.
+    remediation:
+      - Added table-driven public schema valid/key-invalid coverage and exact terminal-state assertion.
+      - Added top-level event type and corresponding frame fixtures.
+      - Reused AssistantRuntimeCommandIdSchema for versioned CAS metadata and added a regression test.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/runtime_event_contract_review
+    verdict: passed
+    evidence:
+      - Manifest 02d22ce64407b5151ad4e929d47f774ea8f93bbbf2f6af9ab355139e147b5b73 reproduced exactly.
+      - All prior CAS, command, usage, SSE shape/discriminator, derived-type and public-schema test blockers remained closed.
+      - Contracts 9 files and 45 tests, root build, strict validation, diff and protected-secret scan passed.
+    blockers: []
+    status: accepted
+nextAction: open the next bounded Apply contract for task 3.5
+endStatement: "Apply session 20261005T090200Z-runtime-event-contracts completed on reproducible manifest 02d22ce64407b5151ad4e929d47f774ea8f93bbbf2f6af9ab355139e147b5b73 after review remediation; checks and independent review passed with no capability status change."

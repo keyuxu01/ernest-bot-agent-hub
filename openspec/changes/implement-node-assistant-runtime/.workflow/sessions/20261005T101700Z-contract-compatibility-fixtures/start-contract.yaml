@@ -1,0 +1,74 @@
+version: 1
+sessionId: 20261005T101700Z-contract-compatibility-fixtures
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T10:17:00Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "继续"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  previousSession:
+    path: .workflow/sessions/20261005T095500Z-artifact-observability-contracts/end-audit.yaml
+    manifestSha256: b39d5c17bc420360d1ca8a155ec6a1773cc0c1ec75664e0808277335321eb9d7
+    independentReview: passed
+  taskSlice: ["3.8"]
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  allowedPaths:
+    - packages/contracts/fixtures/**
+    - packages/contracts/src/assistant-runtime/compatibility-fixtures.spec.ts
+    - packages/contracts/src/user-platform/access-control.ts
+    - packages/contracts/src/user-platform/access-control.spec.ts
+    - apps/assistant-cli/src/compatibility/**
+    - apps/assistant-runtime-service/src/compatibility/**
+    - apps/user-platform-service/src/compatibility/**
+    - apps/assistant-cli/package.json
+    - apps/assistant-runtime-service/package.json
+    - apps/user-platform-service/package.json
+    - package.json
+    - .github/workflows/assistant-contract-compatibility.yml
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - store immutable static JSON fixtures and a closed compatibility manifest
+    - add producer and consumer compatibility tests to contracts, CLI, Runtime and UserPlatform
+    - require every application test to load the built @repo/contracts package entry rather than source files
+    - add schemaVersion 1 to first-party UserPlatform wire requests and responses where needed to close the version boundary
+    - add a focused root compatibility command and CI workflow
+  prohibitedActions:
+    - implement production handlers, database migrations, adapters, authentication, SSE delivery or runtime orchestration
+    - generate compatibility fixtures dynamically from the schemas under test
+    - read local environment files or include live credentials in fixtures or test output
+    - promote any CAP status, commit, push or deploy
+acceptanceContract:
+  auditor: /root/compatibility_fixtures_acceptance
+  requiredEvidence:
+    - the manifest has no duplicate IDs, missing files or orphan JSON fixtures
+    - every manifest case is exercised by its named producer and all named consumers
+    - all three apps resolve @repo/contracts to packages/contracts/dist/index.js
+    - static positive fixtures parse and negative version or discriminator fixtures fail with the declared issue path
+    - one clean-install-compatible CI job runs contracts and all three app compatibility gates
+    - fixture and repository secret scans report no credential material
+validationPlan:
+  - check: pnpm test:assistant-contract-compatibility
+    passCondition: contracts and all three independently built consumers parse their assigned shared fixtures from dist
+  - check: per-package lint, check-types and build plus pnpm build
+    passCondition: all affected packages and the root graph pass
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    passCondition: valid=true and issues=[]
+  - check: git diff --check and fixture/working-tree secret scans
+    passCondition: no formatting defect, orphan fixture or credential material
+stopConditions:
+  - Compatibility evidence requires a production handler, database schema or protocol redesign beyond adding missing v1 envelope markers.
+  - A fixture would need real user data or credentials.
+  - Validation cannot be made green within task 3.8.
+expectedOutputs:
+  - immutable v1 JSON fixture corpus with a closed role manifest
+  - independent contract tests in CLI, Runtime and UserPlatform using the built contracts package
+  - reproducible root compatibility command and CI workflow
+  - end audit and independent implementation review
+handoffTarget: .workflow/sessions/20261005T101700Z-contract-compatibility-fixtures/end-audit.yaml
+acknowledgedAt: 2026-10-05T10:17:00Z
+startStatement: "Apply session 20261005T101700Z-contract-compatibility-fixtures started for task 3.8 after task 3.7 passed independent review; writes are limited to static compatibility fixtures, independent producer/consumer tests, missing v1 envelope markers, CI wiring and evidence."

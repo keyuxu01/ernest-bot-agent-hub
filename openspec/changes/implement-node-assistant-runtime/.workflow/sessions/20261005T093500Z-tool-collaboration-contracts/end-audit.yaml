@@ -1,0 +1,91 @@
+version: 1
+sessionId: 20261005T093500Z-tool-collaboration-contracts
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T09:54:00Z
+reason: completed
+contract:
+  startContract: .workflow/sessions/20261005T093500Z-tool-collaboration-contracts/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["3.6"]
+reconciliation:
+  actualWrites:
+    - packages/contracts/src/assistant-runtime/tools-collaboration.ts
+    - packages/contracts/src/assistant-runtime/tools-collaboration.spec.ts
+    - packages/contracts/src/index.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  separatelyAuthorizedWrites:
+    - path: apps/assistant-runtime-service/.env.dev
+      evidence: filled the complete variable structure while preserving the existing managed Mem0 key without reading or emitting it; file remains gitignored and nine user-supplied values remain empty
+  outOfContractWrites: []
+  completedTasks: ["3.6"]
+  capabilityPromotions: []
+checks:
+  - check: pnpm --filter @repo/contracts test
+    result: passed
+    evidence: Vitest 11 files and 66 tests passed; this slice added 11 tests
+  - check: pnpm --filter @repo/contracts check-types && lint && build
+    result: passed
+    evidence: TypeScript, ESLint max-warnings 0 and package build exited 0
+  - check: pnpm build
+    result: passed
+    evidence: Turbo root build completed 8 of 8 tasks
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: valid=true and issues=[]
+  - check: git diff --check
+    result: passed
+    evidence: exit 0
+  - check: forbidden-contract and protected-secret scans
+    result: passed
+    evidence: no excluded collaboration contract names in Assistant Runtime contract sources and no managed-memory key pattern outside the ignored local Runtime environment file
+  - check: .env.example and .env.dev key parity
+    result: passed
+    evidence: no key differences; nine intentionally empty user-supplied values reported
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(packages/contracts/src/assistant-runtime packages/contracts/src/index.ts openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: e67c99f0e64a8e59326974bcd4208c0616c16d332d1c9e1b6313ef7720e99456
+residualRisks:
+  - Public-host DNS, redirect and actual-connect validation requires the later MCP network adapter; URL schemas only reject clear static local/private targets.
+  - Canonical path and symbolic-link confinement requires the later CLI executor; contracts accept only its safe resolution receipt.
+  - Permission narrowing, result CAS, process ownership, durable HITL resume and child cancellation are contracts only and have no production adapter in this slice.
+invalidatedReceipts: []
+reviewHistory:
+  - reviewer: /root/tool_collaboration_contract_review
+    verdict: failed
+    blockers:
+      - Remote MCP lacked OAuth, health, discovery and generation-pinned invoke/result contracts; auth references admitted plaintext.
+      - Coding tool descriptors did not provide real per-tool versioned input/result schemas.
+      - Local terminal submissions lacked explicit CAS/idempotency receipts.
+      - Canonical paths, Session-scoped auto approval, HITL kind/responders and process operation/overflow semantics were incomplete.
+      - SubAgent permissions and budgets could expand and parent cancellation was absent.
+    remediation:
+      - Added opaque secret references, OAuth lifecycle, connection state, catalog hashes and generation-pinned remote execution contracts.
+      - Added ten concrete coding-tool input/result variants and bound Local Gateway requests to local variants.
+      - Added expected-version/idempotency submissions with accepted/replayed/conflict receipts.
+      - Confined canonical paths, scoped auto approval, typed HITL responders/results and idempotent CLI-owned process commands with artifact overflow.
+      - Added parent/child authority and budget subset validation plus parent cancellation and automatic return contracts.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/tool_collaboration_contract_review
+    verdict: failed
+    blockers:
+      - Coding tool result status was not discriminated, so completed outer results could contain failed inner results and failed tools could require success artifacts.
+      - SubAgent narrowing compared against parent authority asserted in the same request instead of a durable parent snapshot and versioned budget reservation.
+      - Process state/exit and HITL answer-format consistency remained under-constrained.
+    remediation:
+      - Split completed per-tool results from uniform failed, result-unknown and cancelled terminal variants; Local completed results accept completed variants only.
+      - Replaced asserted parent authority with a durable snapshot reference and added server admission against resolved parent authority plus next-version budget ledger CAS.
+      - Bound process state to exactly one exit code/signal and split HITL answer schemas by text, secret, single-choice and multiple-choice formats.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/tool_collaboration_contract_review
+    verdict: passed
+    evidence:
+      - Manifest e67c99f0e64a8e59326974bcd4208c0616c16d332d1c9e1b6313ef7720e99456 reproduced exactly.
+      - Coding terminal states, durable-parent SubAgent admission, process exit consistency and typed HITL answers passed direct negative probes.
+      - Contracts 11 files and 66 tests, root build, strict validation, diff, forbidden-contract and secret scans passed.
+    blockers: []
+    status: accepted
+nextAction: open the next bounded Apply contract after user continuation
+endStatement: "Apply session 20261005T093500Z-tool-collaboration-contracts completed on reproducible manifest e67c99f0e64a8e59326974bcd4208c0616c16d332d1c9e1b6313ef7720e99456 after two remediation rounds and final independent PASS; task 3.6 is complete and capability status remains Specified."

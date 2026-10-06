@@ -1,0 +1,52 @@
+version: 1
+sessionId: 20261005T093500Z-tool-collaboration-contracts
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T09:35:00Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "现在继续"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  previousSession:
+    path: .workflow/sessions/20261005T091500Z-model-context-contracts/end-audit.yaml
+    manifestSha256: eaf2c7ea4f8d96844f029fe19b94877829d2a8578c3978dc2ca90601566d82f5
+    independentReview: passed
+  taskSlice: ["3.6"]
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  allowedPaths:
+    - packages/contracts/src/assistant-runtime/**
+    - packages/contracts/src/index.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - define and test HTTPS-only remote MCP, client binding and Local Tool Gateway contracts
+    - define and test process, coding tool, durable HITL and true child-Run SubAgent contracts
+    - require execution identity, attempt, binding, request hash and fencing token where applicable
+    - prove no Suggested Session or stdio-MCP contract exists
+  prohibitedActions:
+    - implement MCP network calls, local execution, process launch, file mutation, HITL resume or SubAgent workers
+    - add stdio MCP, Suggested Sessions, self-hosted Mem0, Nest TCP or Studio
+    - change normative planning semantics, promote CAP status, commit, push or deploy
+validationPlan:
+  - check: pnpm --filter @repo/contracts test && pnpm --filter @repo/contracts check-types && pnpm --filter @repo/contracts lint && pnpm --filter @repo/contracts build
+    passCondition: every public schema has derived type and valid/key-invalid tests
+  - check: pnpm build
+    passCondition: root build passes after public exports
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    passCondition: valid=true and issues=[]
+  - check: git diff --check and forbidden-contract/secret scans
+    passCondition: no formatting defect, real key, stdio MCP or Suggested Session schema
+stopConditions:
+  - Required identity/fencing/idempotency semantics conflict with frozen requirements.
+  - Work requires a production adapter or path outside this contract.
+  - Validation cannot be made green within task 3.6.
+expectedOutputs:
+  - named Zod schemas and derived types for task 3.6
+  - negative fixtures for stale/wrong binding, path and unsupported transport states
+  - reproducible end audit and independent implementation review
+handoffTarget: .workflow/sessions/20261005T093500Z-tool-collaboration-contracts/end-audit.yaml
+acknowledgedAt: 2026-10-05T09:35:00Z
+startStatement: "Apply session 20261005T093500Z-tool-collaboration-contracts started for task 3.6 after task 3.5 passed independent review; writes are limited to tool/collaboration contracts, tests and evidence."

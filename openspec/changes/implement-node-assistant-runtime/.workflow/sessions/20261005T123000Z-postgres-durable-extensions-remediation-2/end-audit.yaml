@@ -1,0 +1,90 @@
+version: 1
+sessionId: 20261005T123000Z-postgres-durable-extensions-remediation-2
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T12:54:00Z
+reason: failed-independent-rereview
+contract:
+  startContract: .workflow/sessions/20261005T123000Z-postgres-durable-extensions-remediation-2/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["4.2-remediation-2"]
+reconciliation:
+  actualWrites:
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177720000-create-assistant-runtime-extensions.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  outOfContractWrites: []
+  completedTasks: ["4.2"]
+  capabilityPromotions: []
+databaseScope:
+  engine: PostgreSQL 16
+  schema: assistant_runtime
+  previousTables: 7
+  addedTables: 15
+  totalTables: 22
+  validationFunctions:
+    - assistant_is_valid_iso_datetime_with_offset(text)
+    - assistant_deletion_steps_are_valid(jsonb)
+  crossSchemaForeignKeys: 0
+  startupMigrationExecution: false
+  task43BusinessUniqueOrPartialIndexes: 0
+repairs:
+  - finding: Tool Conflict and Rejected terminal evidence was incomplete
+    result: repaired
+    evidence: Conflict requires error_message and optionally validates a 32-byte current_content_hash; Rejected requires rejection_reason; Failed also preserves contract message and retryability
+  - finding: Interrupt reason storage was narrower than the 4096-character contract
+    result: repaired
+    evidence: resolution_reason is varchar(4096); legal 1025- and 4096-character terminal reasons pass
+  - finding: Deletion steps accepted fractional attempts and invalid or overly narrow timestamps
+    result: repaired
+    evidence: schema-local immutable validators enforce strict keys, positive integer attempts, ISO datetime with Z or offset and a real PostgreSQL calendar cast; valid offset passes while fractional attempt and February 30 fail
+  - finding: Owner-scoped Mem0 extract could not attach relational event provenance
+    result: repaired
+    evidence: target session_id remains null for owner scope while source_session_id and run_id bind extraction provenance to same-owner Session, Run and event rows; session scope requires target and source Session equality
+checks:
+  - check: pnpm test:assistant-postgres-migrations against disposable pgvector/pgvector:pg16
+    result: passed
+    evidence: UserPlatform 5/5 and Runtime 8/8 passed, including both remediation rounds, 4.3 absence, latest-only down, full down and re-apply
+  - check: assistant-runtime-service unit tests, check-types and lint
+    result: passed
+    evidence: 4 files and 64 unit tests passed; TypeScript no-emit and ESLint max-warnings-zero exited 0
+  - check: pnpm build
+    result: passed
+    evidence: Turbo root build completed 8 of 8 tasks
+  - check: openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: valid=true and issues=[]
+  - check: git diff --check and targeted Prettier check
+    result: passed
+    evidence: no whitespace defect and all candidate files match repository formatting
+  - check: startup migration and task-4.3 future-constraint scans
+    result: passed
+    evidence: no synchronize or migrationsRun enablement, business unique partial index or premature 4.3 constraint was found; required structural composite keys remain
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(apps/assistant-runtime-service/src/infrastructure/database apps/assistant-runtime-service/test/migrations apps/assistant-runtime-service/vitest.config.migrations.mts apps/assistant-runtime-service/package.json .github/workflows/assistant-postgres-migrations.yml package.json pnpm-lock.yaml openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: 90b76f37f633bc74ca579859374d8eebfe2442ea0763b108332282b6a2ca5c02
+boundaryEvents:
+  - The implementation subagent exhausted its usage quota after completing edits and self-tests; the coordinator independently inspected and reran all required gates.
+residualRisks:
+  - The migration defines durable shapes only; repositories, transactions, workers, adapters and product handlers remain later tasks.
+  - Task 4.3 business uniqueness and partial constraints are deliberately absent.
+  - JSONB database validation remains paired with, rather than a substitute for, public Zod parsing in later application code.
+  - Hosted CI was not triggered; the same compiled migration suite passed locally on PostgreSQL 16.
+invalidatedReceipts:
+  - .workflow/sessions/20261005T121834Z-postgres-durable-extensions-remediation/end-audit.yaml
+reviewHistory:
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: failed-prior-candidate
+    findings: { blocker: 0, high: 4, medium: 0 }
+    status: partially-remediated
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: failed
+    findings: { blocker: 0, high: 2, medium: 0 }
+    evidence:
+      - Deletion steps still accepted fractional remainingArtifactReferences and empty cleanup identities rejected by the strict public contract.
+      - Mem0 provenance tied source events to owner and Session but not to the operation's declared source Run.
+    status: third-remediation-required
+nextAction: start a third bounded remediation session, leave task 4.2 incomplete and add exact PostgreSQL regressions for the two remaining High findings
+endStatement: "Second remediation candidate 90b76f37f633bc74ca579859374d8eebfe2442ea0763b108332282b6a2ca5c02 failed independent rereview with zero Blocker and two High findings; task 4.2 is incomplete and no capability status was promoted."

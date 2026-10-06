@@ -1,0 +1,77 @@
+version: 1
+sessionId: 20261005T134642Z-atomic-session-commit
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T13:53:14Z
+reason: failed-independent-review-superseded-by-remediation
+contract:
+  startContract: .workflow/sessions/20261005T134642Z-atomic-session-commit/start-contract.yaml
+  taskSlice: ["4.5"]
+reconciliation:
+  completedTasks: []
+  implementationCandidates: ["4.5"]
+  capabilityPromotions: []
+  outOfContractWrites: []
+implementation:
+  migration:
+    - durable next_event_sequence is distinct from active_head_sequence
+    - active head and current Run checkpoint use owner-preserving composite foreign keys
+    - outbox topic and aggregate sequence identity is unique
+    - non-contiguous legacy Session histories fail migration instead of being silently accepted
+  atomicBoundary:
+    - owner-scoped Session row lock allocates a rollback-safe product sequence
+    - optional Run version transition and existing Ready checkpoint validation
+    - Event, Session head/counter/version and Pending Outbox commit together
+  exclusions:
+    - no command replay or request-hash idempotency
+    - no outbox claiming, retry or poison worker
+    - no full Run transition policy, fencing, checkpoint creation or external I/O
+verification:
+  postgresMigrations: "passed: 9/9 including 4.5 down/up and legacy-gap rejection"
+  postgresTransactions: "passed: 6/6"
+  concurrentWriters: "passed: two Sessions with 32 writers each produced independent continuous sequences 1..32"
+  rollback: "passed: Run CAS conflict, foreign owner, checkpoint mismatch, duplicate event and forced Outbox failure consume no committed sequence"
+  repositoryRegression: "passed: 6/6"
+  runtimeUnit: "passed: 64/64"
+  runtimeTypesLintBuild: passed
+  rootBuild: "passed: 8/8"
+  openSpecStrict: "passed: valid=true, issues=[]"
+  diffCheck: passed
+remediationHistory:
+  - finding: active-head foreign key initially omitted owner lineage
+    observedFailure: "migration suite failed 1/8"
+    correction: added owner to the candidate key and composite foreign key
+    finalResult: "migration suite 9/9 passed"
+  - finding: TypeORM INSERT and UPDATE RETURNING use different raw result shapes
+    observedFailure: "transaction suite failed before Outbox insertion"
+    correction: centralized RETURNING row normalization for flat and tuple results
+    finalResult: "transaction suite 6/6 passed"
+sourceState:
+  manifestFiles:
+    - apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-atomic-commit.port.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/postgres/postgres-assistant-runtime-persistence.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177900000-add-atomic-session-commit-state.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/assistant-runtime-migration-data-source.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - apps/assistant-runtime-service/test/repositories/owner-scoped-repositories.e2e-spec.ts
+    - apps/assistant-runtime-service/test/transactions/atomic-session-commit.e2e-spec.ts
+    - apps/assistant-runtime-service/vitest.config.transactions.mts
+    - apps/assistant-runtime-service/package.json
+  manifestCommand: >-
+    SOURCE_FILES=(apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-atomic-commit.port.ts apps/assistant-runtime-service/src/infrastructure/database/postgres/postgres-assistant-runtime-persistence.ts apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177900000-add-atomic-session-commit-state.ts apps/assistant-runtime-service/src/infrastructure/database/assistant-runtime-migration-data-source.ts apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts apps/assistant-runtime-service/test/repositories/owner-scoped-repositories.e2e-spec.ts apps/assistant-runtime-service/test/transactions/atomic-session-commit.e2e-spec.ts apps/assistant-runtime-service/vitest.config.transactions.mts apps/assistant-runtime-service/package.json); printf '%s\0' "${SOURCE_FILES[@]}" | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: 4cefa2005eface23f04de9371eed7229519d247d9724cca5336e7399902aba38
+residualRisks:
+  - A transport failure after PostgreSQL commit has unknown outcome until task 4.6 adds command idempotency.
+  - Full Run transition legality and stale-worker fencing remain tasks 7.1 and 8.2.
+  - Checkpoint creation and encryption remain task 9.5; this primitive only binds an existing Ready checkpoint.
+reviewer: /root/repository_boundary_review
+reviewResult:
+  verdict: failed
+  findings: { blocker: 1, high: 2, medium: 2 }
+  high:
+    - checkpoint Ready validation had a validation/use race
+    - an omitted checkpointId cleared the existing Run pointer
+  medium:
+    - concurrent evidence did not directly join durable Event and Outbox rows
+    - migration backfill, exact keys, conflicts and 4.5-only down lacked direct probes
+nextAction: .workflow/sessions/20261005T135542Z-atomic-session-commit-remediation/end-audit.yaml
+endStatement: "Task 4.5 implementation candidate ended on reproducible manifest 4cefa2005eface23f04de9371eed7229519d247d9724cca5336e7399902aba38; promotion awaits independent review."

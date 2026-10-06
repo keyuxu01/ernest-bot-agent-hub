@@ -1,0 +1,73 @@
+version: 1
+sessionId: 20261005T104000Z-postgres-durable-core
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T10:40:00Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "继续"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  previousSession:
+    path: .workflow/sessions/20261005T101700Z-contract-compatibility-fixtures/end-audit.yaml
+    manifestSha256: 36ce7e592bf39cb28c2e22233c23ed2603418be52d515b368dfc96548c661d23
+    independentReview: passed
+  taskSlice: ["4.1"]
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  allowedPaths:
+    - apps/user-platform-service/src/config/**
+    - apps/user-platform-service/src/infrastructure/database/**
+    - apps/user-platform-service/test/migrations/**
+    - apps/user-platform-service/package.json
+    - apps/assistant-runtime-service/src/config/**
+    - apps/assistant-runtime-service/src/infrastructure/database/**
+    - apps/assistant-runtime-service/test/migrations/**
+    - apps/assistant-runtime-service/package.json
+    - .github/workflows/assistant-postgres-migrations.yml
+    - package.json
+    - pnpm-lock.yaml
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - add two independent TypeORM migration DataSources with explicit migration registration and schema-qualified SQL
+    - create UserPlatform identity/access-grant and Runtime Session/settings/command/Run/Turn/model-attempt/steer tables
+    - add only primary keys, structural checks and owner-preserving foreign keys needed for a valid initial model
+    - add real PostgreSQL 16 up/down/up integration tests and CI service wiring
+    - validate safe POSTGRES_SCHEMA identifiers without changing ordinary service startup behavior
+  prohibitedActions:
+    - connect a database module to AppModule or implement repositories, handlers, OAuth, token issuance, Session commands, workers or state transitions
+    - create any event, outbox, checkpoint, compaction, tool, interrupt, artifact, binding, MCP, memory, deletion or audit table owned by task 4.2
+    - add Google-subject, command-idempotency, active-Run, ordinal or other unique/partial constraints owned by task 4.3
+    - add cross-schema Runtime-to-UserPlatform foreign keys, synchronize=true, startup migrations, plaintext token/credential storage or init-script substitutes
+    - promote any CAP status, commit, push or deploy
+acceptanceContract:
+  auditor: /root/postgres_durable_core_acceptance
+  requiredEvidence:
+    - compiled migration DataSources independently run from an empty PostgreSQL 16 database and use separate public history tables
+    - PostgreSQL catalog proves two schemas, nine tables, timestamptz fields, checks and owner-preserving same-schema foreign keys
+    - legal user/grant and Session-to-steer chains insert successfully while negative version, hash, state, time and cross-owner writes fail
+    - a second migration run is empty; down removes only owned tables; up-down-up is reproducible
+    - Runtime has no foreign key into user_platform and no table or constraint from task 4.2/4.3
+    - CI cannot skip the PostgreSQL integration gate and uses no live credentials
+validationPlan:
+  - check: pnpm test:assistant-postgres-migrations against a disposable PostgreSQL 16 container
+    passCondition: both compiled DataSources pass catalog, legal insert, invalid insert, idempotent rerun and up-down-up checks
+  - check: affected service test, check-types, lint and build plus pnpm build
+    passCondition: both service packages and the root graph pass
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    passCondition: valid=true and issues=[]
+  - check: git diff --check and schema/secret/forbidden-scope scans
+    passCondition: no formatting defect, unsafe schema interpolation, plaintext secret field, cross-schema FK or future-task table
+stopConditions:
+  - A required invariant needs a table or uniqueness constraint assigned to task 4.2 or 4.3.
+  - Real PostgreSQL 16 cannot execute the compiled migrations and negative insert suite.
+  - Work would require production service wiring or a cross-bounded-context database dependency.
+expectedOutputs:
+  - two reversible initial TypeORM migrations and explicit compiled DataSources
+  - real PostgreSQL 16 integration tests plus a non-skippable CI gate
+  - reproducible end audit and independent implementation review
+handoffTarget: .workflow/sessions/20261005T104000Z-postgres-durable-core/end-audit.yaml
+acknowledgedAt: 2026-10-05T10:40:00Z
+startStatement: "Apply session 20261005T104000Z-postgres-durable-core started for task 4.1 after task 3.8 passed independent review; writes are limited to two reversible initial migrations, their compiled DataSources, real PostgreSQL tests, CI and evidence."

@@ -1,0 +1,23 @@
+version: 1
+sessionId: 20261005T135542Z-atomic-session-commit-remediation
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T13:55:42Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "continue implementation"
+  taskSlice: ["4.5-remediation"]
+scope:
+  allowedActions:
+    - lock a validated Ready checkpoint through the atomic commit
+    - preserve an existing Run checkpoint pointer when no replacement is supplied
+    - add a deterministic checkpoint validation/use race test
+  prohibitedActions:
+    - alter other task 4.5 semantics or expand into checkpoint lifecycle use cases
+acceptanceContract:
+  reviewer: /root/repository_boundary_review
+  findingsToClose:
+    - a concurrently quarantined or superseded checkpoint cannot be bound after Ready validation
+    - omitting checkpointId does not clear an existing pointer
+handoffTarget: .workflow/sessions/20261005T135542Z-atomic-session-commit-remediation/end-audit.yaml
+startStatement: "Task 4.5 remediation started for checkpoint validation/use locking and pointer preservation only."

@@ -1,0 +1,96 @@
+version: 1
+sessionId: 20261005T095500Z-artifact-observability-contracts
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T10:15:00Z
+reason: completed
+contract:
+  startContract: .workflow/sessions/20261005T095500Z-artifact-observability-contracts/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["3.7"]
+reconciliation:
+  actualWrites:
+    - packages/contracts/src/assistant-runtime/artifact-observability.ts
+    - packages/contracts/src/assistant-runtime/artifact-observability.spec.ts
+    - packages/contracts/src/assistant-runtime/events.ts
+    - packages/contracts/src/assistant-runtime/events.spec.ts
+    - packages/contracts/src/assistant-runtime/tools-collaboration.ts
+    - packages/contracts/src/assistant-runtime/tools-collaboration.spec.ts
+    - packages/contracts/src/index.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  outOfContractWrites: []
+  completedTasks: ["3.7"]
+  capabilityPromotions: []
+checks:
+  - check: pnpm --filter @repo/contracts test
+    result: passed
+    evidence: Vitest 12 files and 78 tests passed; this slice added 12 tests and updated artifact reference regressions
+  - check: pnpm --filter @repo/contracts check-types && lint && build
+    result: passed
+    evidence: TypeScript, ESLint max-warnings 0 and package build exited 0
+  - check: pnpm build
+    result: passed
+    evidence: Turbo root build completed 8 of 8 tasks
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: valid=true and issues=[]
+  - check: git diff --check
+    result: passed
+    evidence: exit 0
+  - check: protected public-field and secret scans
+    result: passed
+    evidence: no forbidden protected-content field in the new public module and no managed-memory key pattern outside the ignored local Runtime environment file
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(packages/contracts/src/assistant-runtime packages/contracts/src/index.ts openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: b39d5c17bc420360d1ca8a155ec6a1773cc0c1ec75664e0808277335321eb9d7
+residualRisks:
+  - Object-store persistence, authenticated range streaming, ownership guards and reference counting remain later production tasks.
+  - Deletion receipts do not execute the deletion saga; database constraints, compensators and reconciler remain later production tasks.
+  - Audit, telemetry, health and readiness contracts have no sink, endpoint, dependency probes or traffic admission wiring in this slice.
+  - Delivery-governance schemas do not execute migrations, rollback rehearsals, packaged E2E or release automation.
+invalidatedReceipts: []
+reviewHistory:
+  - reviewer: /root/artifact_observability_contract_acceptance
+    verdict: pre-implementation-contract-issued
+    evidence:
+      - Required strict public schemas, negative fixtures, protected-field exclusions and production-boundary limits were enumerated before Apply.
+    blockers: []
+    status: contract-consumed
+  - reviewer: /root/artifact_observability_contract_acceptance
+    verdict: failed
+    blockers:
+      - Deletion completed could be claimed with mandatory steps not deleted.
+      - Verified could omit specification, implementation and behavior evidence.
+      - Migration integration could masquerade as recovery verification.
+      - Release completion lacked exclusion, untested-platform and known-risk disclosures.
+      - Artifact commit did not bind metadata to attempt Run and ToolExecution.
+      - Readiness producer could mark PostgreSQL as not required.
+    remediation:
+      - Fixed legal disposition per deletion step and required explicit preservation/reference-count evidence.
+      - Made later CAP states inherit every earlier evidence gate and restricted audit evidence categories/references.
+      - Split forward migration verification from matching rollback or roll-forward recovery rehearsal.
+      - Added mandatory release disclosures and the fixed suggested_sessions exclusion.
+      - Bound artifact metadata to attempt Run/ToolExecution and strengthened metadata/reference equality.
+      - Fixed dependency-to-surface requirements in the contract and rejected producer-declared downgrades.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/artifact_observability_contract_acceptance
+    verdict: failed
+    blockers:
+      - Public deletion-step and retry schemas still admitted deletion of preservation-only resources, mismatched cleanup references and retryable receipts for permanent failure.
+      - Backup/restore evidence could replace the selected rollback or roll-forward rehearsal.
+    remediation:
+      - Replaced generic deletion steps with step-specific strict unions, excluded preservation-only steps from retry, bound cleanup references and separated retryable partial from permanent blocked failure.
+      - Required exact rollback_rehearsal or rollforward_rehearsal for the selected strategy and made backup_restore optional additional evidence only.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/artifact_observability_contract_acceptance
+    verdict: passed
+    evidence:
+      - Manifest b39d5c17bc420360d1ca8a155ec6a1773cc0c1ec75664e0808277335321eb9d7 reproduced exactly.
+      - Direct probes for deletion preservation/retry/cleanup, migration recovery, artifact identity, evidence inheritance, dependency surfaces and release disclosures all behaved as required.
+      - Contracts 12 files and 78 tests, root build, strict validation, diff, protected-field and secret scans passed.
+    blockers: []
+    status: accepted
+nextAction: open bounded Apply contract for task 3.8
+endStatement: "Apply session 20261005T095500Z-artifact-observability-contracts completed on reproducible manifest b39d5c17bc420360d1ca8a155ec6a1773cc0c1ec75664e0808277335321eb9d7 after two remediation rounds and final independent PASS; task 3.7 is complete and capability status remains Specified."

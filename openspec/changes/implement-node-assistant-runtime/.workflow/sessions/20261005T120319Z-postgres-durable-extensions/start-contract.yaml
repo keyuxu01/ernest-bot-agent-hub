@@ -1,0 +1,86 @@
+version: 1
+sessionId: 20261005T120319Z-postgres-durable-extensions
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T12:03:19Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "继续"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  previousSession:
+    path: .workflow/sessions/20261005T104000Z-postgres-durable-core/end-audit.yaml
+    manifestSha256: 9b1911e7bf58aec24aa13f002ace1869f7c16cf40e744713f2e9dc258cada8a1
+    independentReview: passed
+  taskSlice: ["4.2"]
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  allowedPaths:
+    - apps/assistant-runtime-service/src/infrastructure/database/**
+    - apps/assistant-runtime-service/test/migrations/**
+    - apps/assistant-runtime-service/vitest.config.migrations.mts
+    - apps/assistant-runtime-service/package.json
+    - .github/workflows/assistant-postgres-migrations.yml
+    - package.json
+    - pnpm-lock.yaml
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - add one reversible Runtime migration after the accepted 4.1 core migration and register it in the compiled DataSource
+    - add event, outbox, checkpoint, compaction, tool, interrupt, artifact/reference, context snapshot, MCP connection, client binding, memory operation, deletion receipt and audit tables
+    - add schema-version, resource-version, lifecycle, same-owner and same-lineage structural constraints needed for valid table shapes
+    - extend real PostgreSQL 16 migration tests for catalog, legal chains, invalid writes, 4.3 absence, second-run, last-migration down and re-apply
+    - update task/evidence records without promoting a capability
+  prohibitedActions:
+    - implement repositories, transaction ports, controllers, handlers, workers, projectors or production startup wiring
+    - implement Redis, Mem0, MCP, object-storage or secret-provider adapters
+    - add Google-subject, command-idempotency, Session-event-sequence, event-identity, active-Run, terminal-tool-result, interrupt-resolution or current-lease-epoch unique/partial constraints owned by task 4.3
+    - add outbox business deduplication uniqueness, cross-schema Runtime-to-UserPlatform foreign keys, synchronize=true or migrationsRun=true
+    - store plaintext tokens, API keys, OAuth credentials, private keys, checkpoint state or secret answers
+    - add stdio MCP, self-hosted Mem0, Suggested Sessions, CAP status promotion, commit, push or deploy
+acceptanceContract:
+  auditor: /root/postgres_durable_extensions_acceptance
+  preImplementationVerdict: passed
+  requiredTables:
+    - assistant_event
+    - assistant_outbox
+    - assistant_checkpoint
+    - assistant_compaction
+    - assistant_tool_execution
+    - assistant_interrupt
+    - assistant_artifact
+    - assistant_artifact_reference
+    - assistant_context_snapshot
+    - assistant_mcp_connection
+    - assistant_client_binding
+    - assistant_memory_operation
+    - assistant_deletion_receipt
+    - assistant_audit_record
+  requiredEvidence:
+    - compiled DataSource executes 4.1 then 4.2 against empty PostgreSQL 16 and exposes all twenty-one Runtime tables
+    - one complete owner-scoped Session-to-audit chain inserts while cross-owner, cross-Session, invalid version/hash/state/time/scope/location and deletion shapes fail
+    - all Session/Run/Turn/Tool/Interrupt/Artifact/Memory child rows carry owner identity and preserve same-owner and same-lineage references
+    - protected values use hashes, encrypted bytes or secret/storage references and no plaintext credential/checkpoint/secret-answer column exists
+    - a second migration run is empty, undo removes only 4.2 tables, 4.1 remains, and re-apply restores the exact 4.2 catalog
+    - catalog probes prove task 4.3 business unique/partial constraints are absent
+validationPlan:
+  - check: pnpm test:assistant-postgres-migrations against disposable PostgreSQL 16
+    passCondition: existing UserPlatform migration suite and extended Runtime compiled-DataSource suite pass every catalog, valid, invalid, boundary and up/down/up assertion
+  - check: affected service tests, check-types, lint and root build
+    passCondition: assistant-runtime-service and the root graph pass without production database wiring
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    passCondition: valid=true and issues=[]
+  - check: git diff --check, Prettier, protected-field and prohibited-scope scans
+    passCondition: no formatting defect, plaintext protected field, future-task uniqueness, runtime adapter or CAP promotion
+stopConditions:
+  - A required relation cannot preserve owner and Session/Run lineage without implementing a task-4.3 business uniqueness constraint.
+  - The contract would require plaintext protected content or a production adapter to make a 4.2 row valid.
+  - Real PostgreSQL 16 cannot execute the compiled migrations, reject invalid chains or reverse only the latest migration.
+expectedOutputs:
+  - one reversible 4.2 TypeORM migration registered after 4.1
+  - real PostgreSQL 16 integration coverage for the fourteen new tables and explicit 4.3 absence
+  - reproducible end audit and independent implementation review
+handoffTarget: .workflow/sessions/20261005T120319Z-postgres-durable-extensions/end-audit.yaml
+acknowledgedAt: 2026-10-05T12:03:19Z
+startStatement: "Apply session 20261005T120319Z-postgres-durable-extensions started for task 4.2 after task 4.1 passed independent review; writes are limited to one reversible Runtime extension migration, its compiled registration, real PostgreSQL tests and evidence."

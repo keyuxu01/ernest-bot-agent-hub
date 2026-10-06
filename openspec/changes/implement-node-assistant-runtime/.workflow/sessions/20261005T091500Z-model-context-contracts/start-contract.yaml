@@ -1,0 +1,56 @@
+version: 1
+sessionId: 20261005T091500Z-model-context-contracts
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T09:15:00Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "现在继续"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  previousSession:
+    path: .workflow/sessions/20261005T090200Z-runtime-event-contracts/end-audit.yaml
+    manifestSha256: 02d22ce64407b5151ad4e929d47f774ea8f93bbbf2f6af9ab355139e147b5b73
+    independentReview: passed
+  taskSlice: ["3.5"]
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  allowedPaths:
+    - packages/contracts/src/assistant-runtime/**
+    - packages/contracts/src/index.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - define and test provider connection, free-form model, optional reasoning/service-tier and capability catalog contracts
+    - define and test context snapshot, Mem0 operation, Hook and normalized usage contracts
+    - express unsupported capabilities and unavailable usage as explicit states
+    - update task and evidence only after validation
+  prohibitedActions:
+    - implement provider network calls, secret persistence, Mem0 SDK calls, Hook execution or billing
+    - add self-hosted Mem0, private-network endpoints, Nest TCP, stdio MCP, Suggested Sessions or Studio
+    - change normative planning semantics, promote CAP status, commit, push or deploy
+  separatelyAuthorizedActions:
+    - requestRef: conversation request "apps/assistant-runtime-service/.env.dev 创建我需要准备的环境变量我去填充 PG redis so on"
+      path: apps/assistant-runtime-service/.env.dev
+      action: prepare the ignored local Runtime environment template while preserving the existing Mem0 credential
+validationPlan:
+  - check: pnpm --filter @repo/contracts test && pnpm --filter @repo/contracts check-types && pnpm --filter @repo/contracts lint && pnpm --filter @repo/contracts build
+    passCondition: public schemas have valid/key-invalid tests and package gates pass
+  - check: pnpm build
+    passCondition: root build passes after public exports change
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    passCondition: valid=true and issues=[]
+  - check: git diff --check and protected-secret scan
+    passCondition: clean diff and no credential pattern outside ignored local environment
+stopConditions:
+  - Schema semantics require a new product decision or conflict with frozen requirements.
+  - Required work leaves the declared contracts/evidence paths.
+  - Validation cannot be made green within task 3.5.
+expectedOutputs:
+  - explicit named Zod schemas and derived types for every task 3.5 category
+  - provider-independent, managed-Mem0-only and no-billing contract tests
+  - reproducible end audit and independent implementation review
+handoffTarget: .workflow/sessions/20261005T091500Z-model-context-contracts/end-audit.yaml
+acknowledgedAt: 2026-10-05T09:15:00Z
+startStatement: "Apply session 20261005T091500Z-model-context-contracts started for task 3.5 after tasks 3.3/3.4 passed independent review; writes are limited to model/context/memory/hook/usage contracts and evidence."

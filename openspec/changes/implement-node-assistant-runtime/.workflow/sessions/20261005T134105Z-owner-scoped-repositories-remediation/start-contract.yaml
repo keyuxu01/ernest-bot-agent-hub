@@ -1,0 +1,23 @@
+version: 1
+sessionId: 20261005T134105Z-owner-scoped-repositories-remediation
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T13:41:05Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "continue implementation"
+  taskSlice: ["4.4-remediation"]
+scope:
+  allowedActions:
+    - add valid two-owner deletion-receipt fixtures and positive/foreign repository probes
+    - record one reproducible manifest command and corrected frozen hash
+  prohibitedActions:
+    - change production repository or transaction behavior
+    - expand task 4.4 or alter migrations
+acceptanceContract:
+  reviewer: /root/repository_boundary_review
+  findingsToClose:
+    - every exposed find method has an owner-hit and foreign-owner-null probe
+    - manifest command exactly reproduces the recorded frozen source hash
+handoffTarget: .workflow/sessions/20261005T134105Z-owner-scoped-repositories-remediation/end-audit.yaml
+startStatement: "Task 4.4 remediation started for deletion-receipt coverage and reproducible manifest evidence only."

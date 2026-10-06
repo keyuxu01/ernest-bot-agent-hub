@@ -1,0 +1,61 @@
+version: 1
+sessionId: 20261005T095500Z-artifact-observability-contracts
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T09:55:00Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "继续"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  previousSession:
+    path: .workflow/sessions/20261005T093500Z-tool-collaboration-contracts/end-audit.yaml
+    manifestSha256: e67c99f0e64a8e59326974bcd4208c0616c16d332d1c9e1b6313ef7720e99456
+    independentReview: passed
+  taskSlice: ["3.7"]
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  allowedPaths:
+    - packages/contracts/src/assistant-runtime/**
+    - packages/contracts/src/index.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - define and test owned artifact, image metadata, authenticated retrieval and persistence outcome contracts
+    - define and test deletion target, step, partial-failure, retry and receipt contracts
+    - define and test safe correlation, audit, liveness, dependency, public-exposure and readiness contracts
+    - define and test capability ledger, independent audit, migration evidence and release gate contracts
+    - replace broad artifact event/reference strings with typed references where required by task 3.7
+  prohibitedActions:
+    - implement object storage, download endpoints, deletion saga, telemetry sinks, readiness endpoints or release automation
+    - expose secrets, raw protected content, signed URLs, bucket/object keys, local absolute paths or arbitrary diagnostic maps
+    - promote any CAP status, commit, push or deploy
+acceptanceContract:
+  auditor: /root/artifact_observability_contract_acceptance
+  requiredEvidence:
+    - every public schema has a derived type, strict unknown-field rejection and valid/key-invalid tests
+    - artifact failure has no successful reference and retrieval denial cannot reveal existence or metadata
+    - deletion completed/partial states, scope preservation and shared-blob reference semantics are enforced
+    - stale-fence audit, five-control public exposure gate and dependency/worker readiness invariants are enforced
+    - governance schemas prevent compile-only promotion, self-audit, unverified migration recovery and false target/parity claims
+validationPlan:
+  - check: pnpm --filter @repo/contracts test && pnpm --filter @repo/contracts check-types && pnpm --filter @repo/contracts lint && pnpm --filter @repo/contracts build
+    passCondition: all public schemas and discriminated branches have positive and key-negative coverage
+  - check: pnpm build
+    passCondition: root build passes after explicit public exports
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    passCondition: valid=true and issues=[]
+  - check: git diff --check and protected-field/secret scans
+    passCondition: no formatting defect, secret value or serializable protected-content field
+stopConditions:
+  - Required lifecycle/readiness/governance invariant conflicts with frozen requirements.
+  - Work requires a production adapter or path outside this contract.
+  - Validation cannot be made green within task 3.7.
+expectedOutputs:
+  - named strict Zod schemas and derived types for task 3.7
+  - negative fixtures for unsafe artifact, deletion, audit, readiness and release states
+  - reproducible end audit and independent implementation review
+handoffTarget: .workflow/sessions/20261005T095500Z-artifact-observability-contracts/end-audit.yaml
+acknowledgedAt: 2026-10-05T09:55:00Z
+startStatement: "Apply session 20261005T095500Z-artifact-observability-contracts started for task 3.7 after task 3.6 passed independent review; writes are limited to artifact, deletion, observability, readiness and delivery-governance contracts, tests and evidence."

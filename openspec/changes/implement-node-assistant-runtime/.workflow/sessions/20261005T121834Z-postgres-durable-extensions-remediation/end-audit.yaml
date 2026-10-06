@@ -1,0 +1,112 @@
+version: 1
+sessionId: 20261005T121834Z-postgres-durable-extensions-remediation
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T12:26:00Z
+reason: failed-independent-rereview
+contract:
+  startContract: .workflow/sessions/20261005T121834Z-postgres-durable-extensions-remediation/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["4.2-remediation"]
+reconciliation:
+  actualWrites:
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177720000-create-assistant-runtime-extensions.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  outOfContractWrites: []
+  completedTasks: ["4.2"]
+  capabilityPromotions: []
+databaseScope:
+  engine: PostgreSQL 16
+  schema: assistant_runtime
+  previousTables: 7
+  addedTables:
+    - assistant_event
+    - assistant_outbox
+    - assistant_checkpoint
+    - assistant_compaction
+    - assistant_tool_execution
+    - assistant_interrupt
+    - assistant_artifact
+    - assistant_artifact_reference
+    - assistant_context_snapshot
+    - assistant_mcp_connection
+    - assistant_client_binding
+    - assistant_memory_operation
+    - assistant_memory_operation_source
+    - assistant_deletion_receipt
+    - assistant_audit_record
+  totalTables: 22
+  crossSchemaForeignKeys: 0
+  startupMigrationExecution: false
+  task43BusinessUniqueOrPartialIndexes: 0
+repairs:
+  - finding: H1 forked artifact references were forced onto the artifact origin Session and Run
+    result: repaired
+    evidence: artifact ownership and reference target lineage are independent composite foreign keys; a second Session and Run can reference the same owner artifact
+  - finding: H2 tool persistence weakened locations, version, result states and ResultUnknown evidence
+    result: repaired
+    evidence: tool_version, runtime and remote_service, Rejected and Conflict, explicit unknown reason and side-effect flag, plus cancellation outcome are constrained and regression tested
+  - finding: H3 interrupt persistence allowed invalid question approval and lost rejection or cancellation reason
+    result: repaired
+    evidence: question and approval state matrices are separated and terminal negative states require resolution_reason
+  - finding: H4 deletion receipts accepted forged or incomplete terminal receipts
+    result: repaired
+    evidence: only three terminal statuses remain and all eleven steps validate attempt, timestamp, disposition, reason, cleanup identity and artifact reference count branches
+  - finding: H5 catalog fields and context artifact referential integrity were incomplete
+    result: repaired
+    evidence: context lifecycle and artifact-reference FK, MCP enable and revoke, binding lease version, outbox claimer and tool outcome fields exist and are catalog asserted
+  - finding: H6 committed compaction could reference a non-compaction event
+    result: repaired
+    evidence: Committed state and a composite event-row/type/Session/owner FK reject a message event used as the summary
+  - finding: M1 Mem0 provenance was arbitrary JSON without relational ownership and event validation
+    result: repaired
+    evidence: assistant_memory_operation_source has operation and event composite foreign keys and rejects a cross-Session source
+checks:
+  - check: pnpm test:assistant-postgres-migrations against disposable pgvector/pgvector:pg16
+    result: passed
+    evidence: UserPlatform 5/5 and Runtime 8/8 passed, including legal and illegal probes, 4.3 absence, latest-only down, full down and re-apply
+  - check: assistant-runtime-service unit tests, check-types and lint
+    result: passed
+    evidence: 4 files and 64 unit tests passed; TypeScript no-emit and ESLint max-warnings-zero exited 0
+  - check: pnpm build
+    result: passed
+    evidence: Turbo root build completed 8 of 8 tasks
+  - check: openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: valid=true and issues=[]
+  - check: git diff --check and targeted Prettier check
+    result: passed
+    evidence: no whitespace defect and all task-4.2 migration, test, task and ledger files match repository formatting
+  - check: secret, startup migration and task-4.3 future-constraint scans
+    result: passed
+    evidence: no credential literal, synchronize or migrationsRun enablement, business unique partial index or premature 4.3 constraint was found; required structural composite keys remain
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(apps/assistant-runtime-service/src/infrastructure/database apps/assistant-runtime-service/test/migrations apps/assistant-runtime-service/vitest.config.migrations.mts apps/assistant-runtime-service/package.json .github/workflows/assistant-postgres-migrations.yml package.json pnpm-lock.yaml openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: b4f248a3088ff8e522e1cbbadccb1fc28b9b1da69b66b2d14301ad0ec92fb995
+boundaryEvents: []
+residualRisks:
+  - The migration defines durable shapes only; repositories, transactions, workers, adapters and product handlers remain later tasks.
+  - Task 4.3 business uniqueness and partial constraints are deliberately absent, so duplicate business identities and concurrent active rows remain possible until the next accepted migration.
+  - JSONB database checks do not replace application-layer Zod parsing and protected-payload construction.
+  - Hosted CI was not triggered; the same compiled migration suite passed locally on PostgreSQL 16.
+invalidatedReceipts:
+  - .workflow/sessions/20261005T120319Z-postgres-durable-extensions/end-audit.yaml
+reviewHistory:
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: failed
+    findings: { blocker: 0, high: 6, medium: 1 }
+    status: partially-remediated
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: failed
+    findings: { blocker: 0, high: 4, medium: 0 }
+    evidence:
+      - Conflict and Rejected tool rows could not preserve their required message, reason and optional current-content hash.
+      - Interrupt terminal reasons were limited to 1024 although the public contract permits 4096 characters.
+      - Deletion JSON accepted fractional step attempts and used a timestamp regex weaker and narrower than the public ISO-offset contract.
+      - Owner-scoped Mem0 extract could not attach relational source events because target scope and extraction-source Session were conflated.
+    status: second-remediation-required
+nextAction: start a second bounded remediation session, leave task 4.2 incomplete and add one PostgreSQL regression for each of the four High findings
+endStatement: "Remediation candidate b4f248a3088ff8e522e1cbbadccb1fc28b9b1da69b66b2d14301ad0ec92fb995 failed independent rereview with zero Blocker and four High findings; task 4.2 is incomplete and no capability status was promoted."

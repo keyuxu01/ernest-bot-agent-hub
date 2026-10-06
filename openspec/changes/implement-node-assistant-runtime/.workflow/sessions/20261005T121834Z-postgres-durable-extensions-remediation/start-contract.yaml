@@ -1,0 +1,55 @@
+version: 1
+sessionId: 20261005T121834Z-postgres-durable-extensions-remediation
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T12:18:34Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "继续"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  failedCandidate:
+    path: .workflow/sessions/20261005T120319Z-postgres-durable-extensions/end-audit.yaml
+    manifestSha256: 6bf0ee7b3cf01d5957408a0dc09b5b07d3bedda6462ebb8c91a61eba5a316088
+    independentReview: failed
+    findings: { blocker: 0, high: 6, medium: 1 }
+  taskSlice: ["4.2-remediation"]
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  allowedPaths:
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177720000-create-assistant-runtime-extensions.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - repair only the independently reported task-4.2 schema defects and add one real PostgreSQL regression per finding
+    - normalize memory provenance with an additional owned relation inside the existing migration if required
+    - restore task 4.2 complete only after every self-check passes and the candidate is ready for independent rereview
+  prohibitedActions:
+    - expand beyond task 4.2 or alter its public contracts/specification
+    - add task-4.3 business unique/partial constraints, repositories, handlers, workers, adapters or production wiring
+    - promote a CAP, commit, push or deploy
+acceptanceContract:
+  auditor: /root/postgres_durable_extensions_acceptance
+  requiredRepairs:
+    - artifact references validate artifact owner independently from their target Session/Run so Fork references may share one immutable blob
+    - tool rows include tool version, runtime/remote-service locations, Conflict/Rejected, and explicit ResultUnknown reason plus may-have-side-effects
+    - interrupt question/approval state matrices and rejection/cancellation reasons exactly preserve the public contract
+    - deletion receipts accept only the three public terminal statuses and validate every step field, reason, cleanup identity and timestamp shape
+    - context lifecycle, MCP enabled/revoked time, binding lease version, outbox claimer and every other catalog field named by H5 exist with checks/FKs
+    - committed compaction references a compaction event in the same Session/owner
+    - memory provenance references existing same-owner/same-Session events through normalized rows or equivalent relational enforcement
+  requiredEvidence:
+    - each previous false-positive or false-negative PostgreSQL probe is encoded as a regression and now behaves correctly
+    - full legal chain, 4.3 absence, latest-only down, full down/up and all repository gates remain green
+stopConditions:
+  - A finding cannot be repaired without changing a public contract or introducing task-4.3 behavior.
+  - The normalized provenance or Fork reference model creates an unresolved ownership/deletion cycle.
+expectedOutputs:
+  - corrected reversible 4.2 migration
+  - expanded real PostgreSQL regression suite
+  - new frozen manifest, end audit and independent rereview
+handoffTarget: .workflow/sessions/20261005T121834Z-postgres-durable-extensions-remediation/end-audit.yaml
+acknowledgedAt: 2026-10-05T12:18:34Z
+startStatement: "Apply session 20261005T121834Z-postgres-durable-extensions-remediation started to repair the six High and one Medium task-4.2 findings on manifest 6bf0ee7b3cf01d5957408a0dc09b5b07d3bedda6462ebb8c91a61eba5a316088; no scope beyond those findings is authorized."

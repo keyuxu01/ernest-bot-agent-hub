@@ -1,0 +1,1365 @@
+schema_version: 2
+baseline: 3008a6de9f178cda7cd63123a0261d75013f772d
+source_manifest:
+  acceptance/real-client-e2e.md: 28c50660017d87cb8d18db0e9245c1e39cabb64a066a09b0ddd5f9237be2381f
+  specs/assistant-access-control/spec.md: 87adafcad0a4ec035290c46b78a8f430d0d3f47a4db1d23a11627e6ee340ef9f
+  specs/assistant-cli/spec.md: 3ca2dc19c114680c109a4689ce0624c42f743d955e9baf87eed7fe190c7a4ec5
+  specs/assistant-event-stream/spec.md: 244c5b85e1dbecc1203af7c598ee1b3605acc5e62a6c23b6aa67bf375cfc4b2f
+  specs/assistant-model-context-memory/spec.md: dd50b55c24dd1275048619a7158733efbae2924e18816c86f99489b8a5190f6a
+  specs/assistant-observability-delivery/spec.md: 66030380b51e9da5d15e21d322fd688f2508f550c9eaaf501a81c8cc92534eef
+  specs/assistant-session-runtime/spec.md: d74978d9d0d5d62ee3d9e349d84c5da6033443423abbceb93e1e963a31dbc8c3
+  specs/assistant-tools-and-collaboration/spec.md: 9899293854f4ae783d897353e150f6997127ff596bf62443c0f4e4e659aaf690
+assertion_rule: 'Each atomic case must prove the exact THEN clause through its type-resolved driver plus closed read-only oracles; every product-e2e case must include packaged CLI/PTY observation, and suite success requires every required case.'
+execution_contract:
+  case_identity: 'Each entries[].id is the stable atomic case ID; suite is only its execution grouping.'
+  action_source: 'The exact WHEN clause of the referenced spec Scenario.'
+  assertion_source: 'The exact THEN clause of the referenced spec Scenario; suite prose may add but never replace it.'
+  fixture_resolution: 'Compose every fixture listed for entries[].suite in suite_contracts before the case; composition is ordered left-to-right and later overlays may only add deterministic fault capability.'
+  driver_resolution: 'Resolve entries[].type through driver_registry; product-e2e always starts through the packaged CLI in a real PTY.'
+  cleanup_resolution: 'Resolve entries[].type through cleanup_registry; cleanup failure invalidates the case.'
+  receipt_resolution: 'receipts/{baseline}/{case_id}.json; one canonical receipt per case ID and frozen source/test manifest.'
+suite_contracts:
+  E2E-001-AUTH: { fixtures: [F0, F1, F6] }
+  E2E-002-OWNER: { fixtures: [F0, F3, F6] }
+  E2E-003-SESSION: { fixtures: [F0, F4, F5] }
+  E2E-004-RUN: { fixtures: [F0, F4] }
+  E2E-005-HISTORY: { fixtures: [F0, F4, F5] }
+  E2E-006-SSE: { fixtures: [F0, F2] }
+  E2E-007-CONTINUE-RETRY: { fixtures: [F0, F2] }
+  E2E-008-STEER: { fixtures: [F0, F2, F4] }
+  E2E-009-STOP: { fixtures: [F0, F2, F3, F4] }
+  E2E-010-MODEL: { fixtures: [F0, F6] }
+  E2E-011-REMOTE-MCP: { fixtures: [F0, F2, F6] }
+  E2E-012-LOCAL-GATEWAY: { fixtures: [F0, F3, F4] }
+  E2E-013-PROCESS: { fixtures: [F0, F3, F4] }
+  E2E-014-CODING-TOOLS: { fixtures: [F0, F3] }
+  E2E-015-HITL: { fixtures: [F0, F4] }
+  E2E-016-SUBAGENT: { fixtures: [F0, F4] }
+  E2E-017-RECOVERY: { fixtures: [F0, F4] }
+  E2E-018-COMPACT: { fixtures: [F0, F4, F5] }
+  E2E-019-FORK: { fixtures: [F0, F4, F5] }
+  E2E-020-SETTINGS: { fixtures: [F0, F4] }
+  E2E-021-CONTEXT: { fixtures: [F0, F3, F4] }
+  E2E-022-PG-REDIS: { fixtures: [F0, F4] }
+  E2E-023-MEM0: { fixtures: [F0, F4, F6] }
+  E2E-024-HOOKS: { fixtures: [F0, F3, F4] }
+  E2E-025-ARTIFACTS: { fixtures: [F0, F3, F6] }
+  E2E-026-INK-HISTORY: { fixtures: [F0, F5] }
+  E2E-027-INK-OPERATIONS: { fixtures: [F0, F3, F5] }
+  E2E-028-USAGE: { fixtures: [F0, F2, F5] }
+  E2E-029-OBSERVABILITY: { fixtures: [F0, F3, F6] }
+  E2E-030-MULTI-REPLICA: { fixtures: [F0, F4] }
+  E2E-031-SECURITY-DELETION: { fixtures: [F0, F6] }
+  E2E-032-DELIVERY: { fixtures: [F8] }
+driver_registry:
+  product-e2e: { driver: product-pty-v1, entrypoint: packaged-assistant-cli }
+  operational-acceptance:
+    {
+      driver: product-pty-plus-fault-v1,
+      entrypoint: packaged-cli-or-declared-startup-command,
+    }
+  live-smoke: { driver: product-pty-live-v1, entrypoint: packaged-assistant-cli }
+  release-governance: { driver: release-gate-v1, entrypoint: frozen-release-manifest }
+cleanup_registry:
+  product-e2e: hermetic-reset-v1
+  operational-acceptance: hermetic-reset-and-dependency-health-v1
+  live-smoke: live-test-tenant-cleanup-v1
+  release-governance: release-worktree-and-fixture-cleanup-v1
+oracle_registry:
+  cli: 'Packaged CLI/real PTY screen, exit, and interaction transcript with secret redaction.'
+  audit: 'Read-only security-audit query by safe correlation identifiers.'
+  capability-ledger: 'Frozen ledger status and evidence-link validator.'
+  clock: 'Controlled clock observation and expiry assertion.'
+  events: 'Read-only committed event projection by sequence and event ID.'
+  filesystem: 'Post-action workspace hash/path inventory confined to the temporary root.'
+  health: 'Declared liveness/dependency health response.'
+  local-config: 'Sanitized CLI preference inventory; secrets are forbidden.'
+  logs: 'Structured allowlisted log query plus protected-sentinel scan.'
+  mapping-manifest: 'Frozen baseline-tool and target-scope mapping validator.'
+  mcp: 'Contract-faithful MCP request/catalog/result recorder.'
+  mem0: 'Contract-faithful Mem0 scope/provenance operation recorder.'
+  migration-receipts: 'Signed forward/restore/rollback evidence set.'
+  network: 'DNS/redirect/socket-connect recorder proving blocked endpoints received no request or credential.'
+  object-store: 'Read-only object metadata, reference, and hash inventory.'
+  pg: 'Read-only PostgreSQL query against public test evidence views.'
+  process: 'Scoped local process-tree, stream, stdin, and exit observation.'
+  provider: 'Scripted provider request/response recorder with credential fields redacted.'
+  readiness: 'Production-admission readiness decision and named failed control.'
+  receipts: 'Canonical case-receipt index for the frozen manifest.'
+  redis: 'Namespace-limited key/projection inventory; never a durable truth oracle.'
+  secret-scan: 'Sentinel scan across permitted captures; never prints the protected value.'
+  startup: 'Process exit and sanitized startup diagnostic.'
+  telemetry: 'Read-only bounded trace/metric query with cardinality checks.'
+entries:
+  - {
+      id: E2E-001-S01,
+      cap: CAP-001,
+      spec: assistant-access-control,
+      requirement: 'Assistant admission',
+      scenario: 'Google identity is not allowlisted',
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-001-S02,
+      cap: CAP-001,
+      spec: assistant-access-control,
+      requirement: 'Assistant admission',
+      scenario: 'Allowlisted identity signs in',
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-001-S03,
+      cap: CAP-001,
+      spec: assistant-access-control,
+      requirement: 'Service token boundary',
+      scenario: 'Runtime receives a valid Assistant token',
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      oracle: cli+audit,
+      required: true,
+    }
+  - {
+      id: E2E-001-S04,
+      cap: CAP-001,
+      spec: assistant-access-control,
+      requirement: 'Service token boundary',
+      scenario: 'Runtime receives a token for another service',
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      oracle: cli+audit,
+      required: true,
+    }
+  - {
+      id: E2E-001-S05,
+      cap: CAP-001,
+      spec: assistant-access-control,
+      requirement: 'Token revocation',
+      scenario: 'User is disabled after login',
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      oracle: cli+clock+audit,
+      required: true,
+    }
+  - {
+      id: E2E-001-S06,
+      cap: CAP-001,
+      spec: assistant-access-control,
+      requirement: 'Service token boundary',
+      scenario: 'Production CLI attempts a cleartext service connection',
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      oracle: cli+network,
+      required: true,
+    }
+  - {
+      id: E2E-001-S07,
+      cap: CAP-001,
+      spec: assistant-access-control,
+      requirement: 'Service token boundary',
+      scenario: 'Developer runs all Assistant applications from the monorepo',
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      oracle: cli+network,
+      required: true,
+    }
+  - {
+      id: E2E-002-S01,
+      cap: CAP-002,
+      spec: assistant-access-control,
+      requirement: 'Per-resource ownership',
+      scenario: "User requests another user's Session",
+      suite: E2E-002-OWNER,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-002-S02,
+      cap: CAP-002,
+      spec: assistant-access-control,
+      requirement: 'CLI and workspace binding',
+      scenario: 'Result arrives from a different CLI instance',
+      suite: E2E-002-OWNER,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-002-S03,
+      cap: CAP-002,
+      spec: assistant-access-control,
+      requirement: 'User-owned model connection',
+      scenario: 'User saves a custom model connection',
+      suite: E2E-010-MODEL,
+      type: product-e2e,
+      oracle: cli+pg+secret-scan,
+      required: true,
+    }
+  - {
+      id: E2E-002-S04,
+      cap: CAP-002,
+      spec: assistant-access-control,
+      requirement: 'User-owned model connection',
+      scenario: 'Model base URL resolves to a private destination',
+      suite: E2E-010-MODEL,
+      type: product-e2e,
+      oracle: cli+network,
+      required: true,
+    }
+  - {
+      id: E2E-002-S05,
+      cap: CAP-002,
+      spec: assistant-access-control,
+      requirement: 'User-owned model connection',
+      scenario: 'Model destination changes before the actual connection',
+      suite: E2E-010-MODEL,
+      type: product-e2e,
+      oracle: cli+network+secret-scan,
+      required: true,
+    }
+  - {
+      id: E2E-003-S01,
+      cap: CAP-003,
+      spec: assistant-session-runtime,
+      requirement: 'Session lifecycle',
+      scenario: 'Automatic title races with user rename',
+      suite: E2E-003-SESSION,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-004-S01,
+      cap: CAP-004,
+      spec: assistant-session-runtime,
+      requirement: 'Backend-owned Run',
+      scenario: 'Stream subscriber disconnects',
+      suite: E2E-004-RUN,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-004-S02,
+      cap: CAP-004,
+      spec: assistant-session-runtime,
+      requirement: 'Backend-owned Run',
+      scenario: 'Concurrent Run is requested',
+      suite: E2E-004-RUN,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-004-S03,
+      cap: CAP-004,
+      spec: assistant-session-runtime,
+      requirement: 'Backend-owned Run',
+      scenario: 'Local tool result resumes the matching wait',
+      suite: E2E-004-RUN,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-004-S04,
+      cap: CAP-004,
+      spec: assistant-session-runtime,
+      requirement: 'Backend-owned Run',
+      scenario: 'Wrong actor attempts to resume a wait',
+      suite: E2E-004-RUN,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-004-S05,
+      cap: CAP-004,
+      spec: assistant-session-runtime,
+      requirement: 'Backend-owned Run',
+      scenario: 'Stop races with successful completion',
+      suite: E2E-004-RUN,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-004-S06,
+      cap: CAP-004,
+      spec: assistant-session-runtime,
+      requirement: 'Backend-owned Run',
+      scenario: 'Terminal Run receives another transition',
+      suite: E2E-004-RUN,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-005-S01,
+      cap: CAP-005,
+      spec: assistant-event-stream,
+      requirement: 'Ordered durable events',
+      scenario: 'Parallel tools complete out of order',
+      suite: E2E-005-HISTORY,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-005-S02,
+      cap: CAP-005,
+      spec: assistant-event-stream,
+      requirement: 'Bounded history queries',
+      scenario: 'Client pages older history',
+      suite: E2E-005-HISTORY,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-006-S01,
+      cap: CAP-006,
+      spec: assistant-event-stream,
+      requirement: 'Replayable SSE',
+      scenario: 'Client reconnects after losing events',
+      suite: E2E-006-SSE,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-006-S02,
+      cap: CAP-006,
+      spec: assistant-event-stream,
+      requirement: 'Slow consumer handling',
+      scenario: 'Subscriber exceeds buffer allowance',
+      suite: E2E-006-SSE,
+      type: product-e2e,
+      oracle: cli+telemetry,
+      required: true,
+    }
+  - {
+      id: E2E-007-S01,
+      cap: CAP-007,
+      spec: assistant-session-runtime,
+      requirement: 'Continue and retry separation',
+      scenario: 'Provider requests normal continuation',
+      suite: E2E-007-CONTINUE-RETRY,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-007-S02,
+      cap: CAP-007,
+      spec: assistant-session-runtime,
+      requirement: 'Continue and retry separation',
+      scenario: 'Retry budget is exhausted',
+      suite: E2E-007-CONTINUE-RETRY,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-008-S01,
+      cap: CAP-008,
+      spec: assistant-session-runtime,
+      requirement: 'Durable steer',
+      scenario: 'Two steer commands arrive during a tool call',
+      suite: E2E-008-STEER,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-009-S01,
+      cap: CAP-009,
+      spec: assistant-session-runtime,
+      requirement: 'Explicit stop',
+      scenario: 'User stops a Run with a local process',
+      suite: E2E-009-STOP,
+      type: product-e2e,
+      oracle: cli+process+pg,
+      required: true,
+    }
+  - {
+      id: E2E-010-S01,
+      cap: CAP-010,
+      spec: assistant-model-context-memory,
+      requirement: 'Model capability catalog',
+      scenario: 'Selected model lacks required tool calling',
+      suite: E2E-010-MODEL,
+      type: product-e2e,
+      oracle: cli+provider,
+      required: true,
+    }
+  - {
+      id: E2E-011-S01,
+      cap: CAP-011,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Remote MCP lifecycle',
+      scenario: 'MCP catalog changes during a Run',
+      suite: E2E-011-REMOTE-MCP,
+      type: product-e2e,
+      oracle: cli+mcp+pg,
+      required: true,
+    }
+  - {
+      id: E2E-012-S01,
+      cap: CAP-012,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Local tool dispatch',
+      scenario: 'CLI disconnects before acknowledging request',
+      suite: E2E-012-LOCAL-GATEWAY,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-012-S02,
+      cap: CAP-012,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Local path confinement',
+      scenario: 'Patch targets a symlink outside workspace',
+      suite: E2E-012-LOCAL-GATEWAY,
+      type: product-e2e,
+      oracle: cli+filesystem,
+      required: true,
+    }
+  - {
+      id: E2E-012-S03,
+      cap: CAP-012,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Local approval policy',
+      scenario: 'Shell command uses the default policy',
+      suite: E2E-012-LOCAL-GATEWAY,
+      type: product-e2e,
+      oracle: cli+process,
+      required: true,
+    }
+  - {
+      id: E2E-012-S04,
+      cap: CAP-012,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Local approval policy',
+      scenario: 'Session enables in-workspace automatic execution',
+      suite: E2E-012-LOCAL-GATEWAY,
+      type: product-e2e,
+      oracle: cli+process+audit,
+      required: true,
+    }
+  - {
+      id: E2E-013-S01,
+      cap: CAP-013,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Interactive process sessions',
+      scenario: 'Process outlives initial command response',
+      suite: E2E-013-PROCESS,
+      type: product-e2e,
+      oracle: cli+process,
+      required: true,
+    }
+  - {
+      id: E2E-013-S02,
+      cap: CAP-013,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Interactive process sessions',
+      scenario: 'Run is stopped',
+      suite: E2E-013-PROCESS,
+      type: product-e2e,
+      oracle: cli+process,
+      required: true,
+    }
+  - {
+      id: E2E-014-S01,
+      cap: CAP-014,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Coding tool coverage',
+      scenario: 'Patch succeeds inside the bound workspace',
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      oracle: cli+filesystem+pg,
+      required: true,
+    }
+  - {
+      id: E2E-014-S02,
+      cap: CAP-014,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Coding tool coverage',
+      scenario: 'Patch target changed before execution',
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      oracle: cli+filesystem,
+      required: true,
+    }
+  - {
+      id: E2E-014-S03,
+      cap: CAP-014,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Coding tool coverage',
+      scenario: 'Tool side effect has an unknown result',
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-014-S04,
+      cap: CAP-014,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Coding tool coverage',
+      scenario: 'Capability has no implementation mapping',
+      suite: E2E-014-CODING-TOOLS,
+      type: release-governance,
+      oracle: mapping-manifest,
+      required: true,
+    }
+  - {
+      id: E2E-015-S01,
+      cap: CAP-015,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Durable HITL',
+      scenario: 'Same answer is submitted twice',
+      suite: E2E-015-HITL,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-015-S02,
+      cap: CAP-015,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'HITL rejection',
+      scenario: 'User rejects dangerous operation',
+      suite: E2E-015-HITL,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-016-S01,
+      cap: CAP-016,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Subagent isolation',
+      scenario: 'Subagent requests broader workspace access',
+      suite: E2E-016-SUBAGENT,
+      type: product-e2e,
+      oracle: cli+audit,
+      required: true,
+    }
+  - {
+      id: E2E-016-S02,
+      cap: CAP-016,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Subagent isolation',
+      scenario: 'Child Run completes',
+      suite: E2E-016-SUBAGENT,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-016-S03,
+      cap: CAP-016,
+      spec: assistant-tools-and-collaboration,
+      requirement: 'Subagent isolation',
+      scenario: 'Suggested Session workflow is absent from the approved target',
+      suite: E2E-016-SUBAGENT,
+      type: release-governance,
+      oracle: cli+mapping-manifest+receipts,
+      required: true,
+    }
+  - {
+      id: E2E-017-S01,
+      cap: CAP-017,
+      spec: assistant-session-runtime,
+      requirement: 'Durable pending recovery',
+      scenario: 'Redis is cleared during human input wait',
+      suite: E2E-017-RECOVERY,
+      type: product-e2e,
+      oracle: cli+pg+redis,
+      required: true,
+    }
+  - {
+      id: E2E-018-S01,
+      cap: CAP-018,
+      spec: assistant-session-runtime,
+      requirement: 'Context compaction',
+      scenario: 'Forced compaction succeeds',
+      suite: E2E-018-COMPACT,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-018-S02,
+      cap: CAP-018,
+      spec: assistant-session-runtime,
+      requirement: 'Context compaction',
+      scenario: 'Compaction is interrupted',
+      suite: E2E-018-COMPACT,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-019-S01,
+      cap: CAP-019,
+      spec: assistant-session-runtime,
+      requirement: 'Fork at an exact event',
+      scenario: 'Fork before a pending tool',
+      suite: E2E-019-FORK,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-019-S02,
+      cap: CAP-019,
+      spec: assistant-session-runtime,
+      requirement: 'Fork at an exact event',
+      scenario: 'Source Session is deleted after fork',
+      suite: E2E-019-FORK,
+      type: product-e2e,
+      oracle: cli+pg+object-store+mem0,
+      required: true,
+    }
+  - {
+      id: E2E-019-S03,
+      cap: CAP-019,
+      spec: assistant-session-runtime,
+      requirement: 'Revert and edit',
+      scenario: 'User reverts to a stable event',
+      suite: E2E-019-FORK,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-019-S04,
+      cap: CAP-019,
+      spec: assistant-session-runtime,
+      requirement: 'Revert and edit',
+      scenario: 'User reverts and edits a message',
+      suite: E2E-019-FORK,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-020-S01,
+      cap: CAP-020,
+      spec: assistant-session-runtime,
+      requirement: 'Versioned settings CAS',
+      scenario: 'Unrelated setting changed concurrently',
+      suite: E2E-020-SETTINGS,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-021-S01,
+      cap: CAP-021,
+      spec: assistant-model-context-memory,
+      requirement: 'Workspace context snapshot',
+      scenario: 'Explicit Skill changes after Run acceptance',
+      suite: E2E-021-CONTEXT,
+      type: product-e2e,
+      oracle: cli+pg+filesystem,
+      required: true,
+    }
+  - {
+      id: E2E-021-S02,
+      cap: CAP-021,
+      spec: assistant-model-context-memory,
+      requirement: 'Workspace context snapshot',
+      scenario: 'Context path escapes workspace',
+      suite: E2E-021-CONTEXT,
+      type: product-e2e,
+      oracle: cli+filesystem,
+      required: true,
+    }
+  - {
+      id: E2E-022-S01,
+      cap: CAP-022,
+      spec: assistant-model-context-memory,
+      requirement: 'Durable and hot state separation',
+      scenario: 'Redis working set is missing',
+      suite: E2E-022-PG-REDIS,
+      type: product-e2e,
+      oracle: cli+pg+redis,
+      required: true,
+    }
+  - {
+      id: E2E-023-S01,
+      cap: CAP-023,
+      spec: assistant-model-context-memory,
+      requirement: 'Scoped Mem0 recall',
+      scenario: 'Recalled preference is used',
+      suite: E2E-023-MEM0,
+      type: product-e2e,
+      oracle: cli+mem0+pg,
+      required: true,
+    }
+  - {
+      id: E2E-023-S02,
+      cap: CAP-023,
+      spec: assistant-model-context-memory,
+      requirement: 'Managed Mem0 boundary',
+      scenario: 'Phase 1 starts with managed memory',
+      suite: E2E-023-MEM0,
+      type: operational-acceptance,
+      oracle: startup+health,
+      required: true,
+    }
+  - {
+      id: E2E-023-S03,
+      cap: CAP-023,
+      spec: assistant-model-context-memory,
+      requirement: 'Managed Mem0 boundary',
+      scenario: 'Self-hosted configuration is requested',
+      suite: E2E-023-MEM0,
+      type: operational-acceptance,
+      oracle: startup+logs,
+      required: true,
+    }
+  - {
+      id: E2E-023-S04,
+      cap: CAP-023,
+      spec: assistant-model-context-memory,
+      requirement: 'Memory extraction lifecycle',
+      scenario: 'Turn repeats an existing fact',
+      suite: E2E-023-MEM0,
+      type: product-e2e,
+      oracle: cli+mem0,
+      required: true,
+    }
+  - {
+      id: E2E-023-S05,
+      cap: CAP-023,
+      spec: assistant-model-context-memory,
+      requirement: 'Memory extraction lifecycle',
+      scenario: 'Mem0 is unavailable',
+      suite: E2E-023-MEM0,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-023-S06,
+      cap: CAP-023,
+      spec: assistant-model-context-memory,
+      requirement: 'Memory extraction lifecycle',
+      scenario: 'Candidate memory contains a secret or raw code',
+      suite: E2E-023-MEM0,
+      type: product-e2e,
+      oracle: cli+mem0+secret-scan,
+      required: true,
+    }
+  - {
+      id: E2E-023-S07,
+      cap: CAP-023,
+      spec: assistant-model-context-memory,
+      requirement: 'Memory extraction lifecycle',
+      scenario: 'Session memory is forked',
+      suite: E2E-023-MEM0,
+      type: product-e2e,
+      oracle: cli+mem0+pg,
+      required: true,
+    }
+  - {
+      id: E2E-024-S01,
+      cap: CAP-024,
+      spec: assistant-model-context-memory,
+      requirement: 'Configured lifecycle Hooks',
+      scenario: 'PreToolUse blocks a local command',
+      suite: E2E-024-HOOKS,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-024-S02,
+      cap: CAP-024,
+      spec: assistant-model-context-memory,
+      requirement: 'Configured lifecycle Hooks',
+      scenario: 'Hook times out',
+      suite: E2E-024-HOOKS,
+      type: product-e2e,
+      oracle: cli+clock+pg,
+      required: true,
+    }
+  - {
+      id: E2E-024-S03,
+      cap: CAP-024,
+      spec: assistant-model-context-memory,
+      requirement: 'Configured lifecycle Hooks',
+      scenario: 'Run is cancelled during a Hook',
+      suite: E2E-024-HOOKS,
+      type: product-e2e,
+      oracle: cli+process+pg,
+      required: true,
+    }
+  - {
+      id: E2E-024-S04,
+      cap: CAP-024,
+      spec: assistant-model-context-memory,
+      requirement: 'Configured lifecycle Hooks',
+      scenario: 'UnhandledError notification Hook fails',
+      suite: E2E-024-HOOKS,
+      type: product-e2e,
+      oracle: cli+audit,
+      required: true,
+    }
+  - {
+      id: E2E-024-S05,
+      cap: CAP-024,
+      spec: assistant-model-context-memory,
+      requirement: 'Configured lifecycle Hooks',
+      scenario: 'Hook configuration changes during a Run',
+      suite: E2E-024-HOOKS,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-025-S01,
+      cap: CAP-025,
+      spec: assistant-event-stream,
+      requirement: 'Owned artifacts',
+      scenario: 'Generated image is committed',
+      suite: E2E-025-ARTIFACTS,
+      type: product-e2e,
+      oracle: cli+pg+object-store,
+      required: true,
+    }
+  - {
+      id: E2E-025-S02,
+      cap: CAP-025,
+      spec: assistant-event-stream,
+      requirement: 'Owned artifacts',
+      scenario: 'Artifact persistence fails',
+      suite: E2E-025-ARTIFACTS,
+      type: product-e2e,
+      oracle: cli+pg+object-store,
+      required: true,
+    }
+  - {
+      id: E2E-026-S01,
+      cap: CAP-026,
+      spec: assistant-cli,
+      requirement: 'Session navigation',
+      scenario: 'Selected Session is archived remotely',
+      suite: E2E-026-INK-HISTORY,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-026-S02,
+      cap: CAP-026,
+      spec: assistant-cli,
+      requirement: 'Bounded history UI',
+      scenario: 'Live item becomes durable',
+      suite: E2E-026-INK-HISTORY,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-027-S01,
+      cap: CAP-027,
+      spec: assistant-cli,
+      requirement: 'Composer controls',
+      scenario: 'Running status changes before UI projection updates',
+      suite: E2E-027-INK-OPERATIONS,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-027-S02,
+      cap: CAP-027,
+      spec: assistant-cli,
+      requirement: 'Workspace and settings UI',
+      scenario: 'Settings edit conflicts',
+      suite: E2E-027-INK-OPERATIONS,
+      type: product-e2e,
+      oracle: cli+pg,
+      required: true,
+    }
+  - {
+      id: E2E-027-S03,
+      cap: CAP-027,
+      spec: assistant-cli,
+      requirement: 'Complete sidebars and local preferences',
+      scenario: 'CLI restarts after layout changes',
+      suite: E2E-027-INK-OPERATIONS,
+      type: product-e2e,
+      oracle: cli+local-config,
+      required: true,
+    }
+  - {
+      id: E2E-027-S04,
+      cap: CAP-027,
+      spec: assistant-cli,
+      requirement: 'Tool and artifact UI',
+      scenario: 'User sends stdin to an old process',
+      suite: E2E-027-INK-OPERATIONS,
+      type: product-e2e,
+      oracle: cli+process,
+      required: true,
+    }
+  - {
+      id: E2E-027-S05,
+      cap: CAP-027,
+      spec: assistant-cli,
+      requirement: 'Terminal interaction quality',
+      scenario: 'Terminal becomes narrow',
+      suite: E2E-027-INK-OPERATIONS,
+      type: product-e2e,
+      oracle: cli,
+      required: true,
+    }
+  - {
+      id: E2E-028-S01,
+      cap: CAP-028,
+      spec: assistant-model-context-memory,
+      requirement: 'Usage reporting',
+      scenario: 'Provider omits cost information',
+      suite: E2E-028-USAGE,
+      type: product-e2e,
+      oracle: cli+provider+pg,
+      required: true,
+    }
+  - {
+      id: E2E-028-S02,
+      cap: CAP-028,
+      spec: assistant-model-context-memory,
+      requirement: 'Usage reporting',
+      scenario: 'Provider exposes account balance and reset time',
+      suite: E2E-028-USAGE,
+      type: product-e2e,
+      oracle: cli+provider,
+      required: true,
+    }
+  - {
+      id: E2E-028-S03,
+      cap: CAP-028,
+      spec: assistant-model-context-memory,
+      requirement: 'Usage reporting',
+      scenario: 'User opens usage without provider billing support',
+      suite: E2E-028-USAGE,
+      type: product-e2e,
+      oracle: cli+mapping-manifest,
+      required: true,
+    }
+  - {
+      id: E2E-029-S01,
+      cap: CAP-029,
+      spec: assistant-observability-delivery,
+      requirement: 'Correlated observability',
+      scenario: 'Tool execution fails across services',
+      suite: E2E-029-OBSERVABILITY,
+      type: operational-acceptance,
+      oracle: telemetry+logs,
+      required: true,
+    }
+  - {
+      id: E2E-029-S02,
+      cap: CAP-029,
+      spec: assistant-observability-delivery,
+      requirement: 'Durable audit',
+      scenario: 'Stale replica attempts commit',
+      suite: E2E-029-OBSERVABILITY,
+      type: operational-acceptance,
+      oracle: audit+pg,
+      required: true,
+    }
+  - {
+      id: E2E-030-S01,
+      cap: CAP-030,
+      spec: assistant-session-runtime,
+      requirement: 'Multi-replica fencing',
+      scenario: 'Expired owner submits late output',
+      suite: E2E-030-MULTI-REPLICA,
+      type: product-e2e,
+      oracle: cli+pg+audit,
+      required: true,
+    }
+  - {
+      id: E2E-031-S01,
+      cap: CAP-031,
+      spec: assistant-access-control,
+      requirement: 'Minimum public-exposure gate',
+      scenario: 'Production starts without an authentication guard',
+      suite: E2E-031-SECURITY-DELETION,
+      type: operational-acceptance,
+      oracle: readiness,
+      required: true,
+    }
+  - {
+      id: E2E-031-S02,
+      cap: CAP-031,
+      spec: assistant-access-control,
+      requirement: 'Minimum public-exposure gate',
+      scenario: 'A required public-exposure control is absent',
+      suite: E2E-031-SECURITY-DELETION,
+      type: operational-acceptance,
+      oracle: readiness,
+      required: true,
+    }
+  - {
+      id: E2E-031-S03,
+      cap: CAP-031,
+      spec: assistant-access-control,
+      requirement: 'Minimum public-exposure gate',
+      scenario: 'Every required public-exposure control is active',
+      suite: E2E-031-SECURITY-DELETION,
+      type: operational-acceptance,
+      oracle: readiness,
+      required: true,
+    }
+  - {
+      id: E2E-031-S04,
+      cap: CAP-031,
+      spec: assistant-access-control,
+      requirement: 'Minimum public-exposure gate',
+      scenario: 'User configures a private-network MCP target',
+      suite: E2E-031-SECURITY-DELETION,
+      type: product-e2e,
+      oracle: cli+network,
+      required: true,
+    }
+  - {
+      id: E2E-031-S05,
+      cap: CAP-031,
+      spec: assistant-access-control,
+      requirement: 'Minimum public-exposure gate',
+      scenario: 'A remote MCP redirect resolves to a blocked address',
+      suite: E2E-031-SECURITY-DELETION,
+      type: product-e2e,
+      oracle: cli+network,
+      required: true,
+    }
+  - {
+      id: E2E-031-S06,
+      cap: CAP-031,
+      spec: assistant-access-control,
+      requirement: 'Secret protection',
+      scenario: 'Tool arguments contain a configured secret',
+      suite: E2E-031-SECURITY-DELETION,
+      type: product-e2e,
+      oracle: cli+logs+events+secret-scan,
+      required: true,
+    }
+  - {
+      id: E2E-031-S07,
+      cap: CAP-031,
+      spec: assistant-access-control,
+      requirement: 'Deletion and retention',
+      scenario: 'Mem0 deletion fails after Session data deletion',
+      suite: E2E-031-SECURITY-DELETION,
+      type: product-e2e,
+      oracle: cli+pg+mem0,
+      required: true,
+    }
+  - {
+      id: E2E-032-S01,
+      cap: CAP-032,
+      spec: assistant-observability-delivery,
+      requirement: 'Capability ledger gates',
+      scenario: 'Code compiles without behavior test',
+      suite: E2E-032-DELIVERY,
+      type: release-governance,
+      oracle: receipts,
+      required: true,
+    }
+  - {
+      id: E2E-032-S02,
+      cap: CAP-032,
+      spec: assistant-observability-delivery,
+      requirement: 'Independent coding-session audit',
+      scenario: 'Implementing agent claims completion',
+      suite: E2E-032-DELIVERY,
+      type: release-governance,
+      oracle: receipts,
+      required: true,
+    }
+  - {
+      id: E2E-032-S03,
+      cap: CAP-032,
+      spec: assistant-observability-delivery,
+      requirement: 'Migration and rollback evidence',
+      scenario: 'Database migration lacks recovery evidence',
+      suite: E2E-032-DELIVERY,
+      type: release-governance,
+      oracle: migration-receipts,
+      required: true,
+    }
+  - {
+      id: E2E-032-S04,
+      cap: CAP-032,
+      spec: assistant-observability-delivery,
+      requirement: 'Approved-target acceptance',
+      scenario: 'One required target capability is blocked',
+      suite: E2E-032-DELIVERY,
+      type: release-governance,
+      oracle: capability-ledger+receipts,
+      required: true,
+    }
+
+supplemental_cases:
+  - {
+      id: LIVE-GOOGLE-001,
+      suite: E2E-001-AUTH,
+      type: live-smoke,
+      fixtures: [F7],
+      driver: product-pty-live-v1,
+      action: 'Complete packaged-CLI loopback login and logout against real Google OAuth.',
+      assertion: 'Subject mapping works and no token appears in commands, PTY captures, logs, or receipt.',
+      oracle: cli+audit+secret-scan,
+      cleanup: live-test-tenant-cleanup-v1,
+      receipt: 'receipts/{baseline}/LIVE-GOOGLE-001.json',
+      required_for_public_release: true,
+    }
+  - {
+      id: LIVE-MODEL-001,
+      suite: E2E-010-MODEL,
+      type: live-smoke,
+      fixtures: [F7],
+      driver: product-pty-live-v1,
+      action: 'Enter a real provider connection in the packaged CLI and complete stream, tool, and usage flow.',
+      assertion: 'Provider compatibility is visible and no credential or private prompt content enters the receipt.',
+      oracle: cli+provider+secret-scan,
+      cleanup: live-test-tenant-cleanup-v1,
+      receipt: 'receipts/{baseline}/LIVE-MODEL-001.json',
+      required_for_public_release: true,
+    }
+  - {
+      id: LIVE-MEM0-001,
+      suite: E2E-023-MEM0,
+      type: live-smoke,
+      fixtures: [F7],
+      driver: product-pty-live-v1,
+      action: 'Use managed Mem0 through packaged CLI flows for write, recall, correct, delete, and owner isolation.',
+      assertion: 'The managed service obeys scope and deletion contracts without protected content in evidence.',
+      oracle: cli+mem0+secret-scan,
+      cleanup: live-test-tenant-cleanup-v1,
+      receipt: 'receipts/{baseline}/LIVE-MEM0-001.json',
+      required_for_public_release: true,
+    }
+  - {
+      id: E2E-001-R01,
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      fixtures: [F1],
+      driver: product-pty-v1,
+      action: 'Submit a forged OAuth state.',
+      assertion: 'Login is rejected and no Assistant token is issued.',
+      oracle: cli+audit,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-001-R01.json',
+      required: true,
+    }
+  - {
+      id: E2E-001-R02,
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      fixtures: [F1],
+      driver: product-pty-v1,
+      action: 'Replay a consumed OAuth state or authorization code.',
+      assertion: 'Replay is rejected and no second token is issued.',
+      oracle: cli+audit,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-001-R02.json',
+      required: true,
+    }
+  - {
+      id: E2E-001-R03,
+      suite: E2E-001-AUTH,
+      type: product-e2e,
+      fixtures: [F1],
+      driver: product-pty-v1,
+      action: 'Complete callback with an incorrect PKCE verifier.',
+      assertion: 'Login is rejected and no token is issued.',
+      oracle: cli+audit,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-001-R03.json',
+      required: true,
+    }
+  - {
+      id: E2E-004-R01,
+      suite: E2E-004-RUN,
+      type: product-e2e,
+      fixtures: [F4],
+      driver: product-pty-v1,
+      action: 'Submit the wrong authority to each LocalTool, McpTool, and Human wait.',
+      assertion: 'Each wait remains unchanged until its matching authority resolves it.',
+      oracle: cli+pg+audit,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-004-R01.json',
+      required: true,
+    }
+  - {
+      id: E2E-004-R02,
+      suite: E2E-004-RUN,
+      type: product-e2e,
+      fixtures: [F4],
+      driver: product-pty-v1,
+      action: 'Race stop with successful completion and then attempt a terminal transition.',
+      assertion: 'Exactly one legal terminal state/event commits and later transitions are rejected.',
+      oracle: cli+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-004-R02.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R01,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Invoke apply_patch through the packaged CLI flow.',
+      assertion: 'Patch result, approval evidence, and ToolExecution are durable.',
+      oracle: cli+filesystem+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R01.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R02,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Invoke clock.curr_time.',
+      assertion: 'The tool produces its own typed result and receipt.',
+      oracle: cli+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R02.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R03,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Invoke get_context_remaining.',
+      assertion: 'The tool produces its own bounded typed result and receipt.',
+      oracle: cli+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R03.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R04,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Invoke update_plan.',
+      assertion: 'The durable plan changes without workspace side effects.',
+      oracle: cli+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R04.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R05,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Invoke exec_command.',
+      assertion: 'The command has an independent handle, output, exit, and ToolExecution receipt.',
+      oracle: cli+process+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R05.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R06,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Invoke write_stdin against an exact process handle.',
+      assertion: 'Input reaches only the named process and has its own typed result.',
+      oracle: cli+process+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R06.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R07,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Invoke web.run.',
+      assertion: 'The remote result is bounded and stored under the correct tool identity.',
+      oracle: cli+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R07.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R08,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Discover and invoke view_image.',
+      assertion: 'The image result has an independent artifact receipt.',
+      oracle: cli+object-store+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R08.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R09,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Discover and invoke image_gen.imagegen.',
+      assertion: 'The generated image has an independent artifact receipt.',
+      oracle: cli+object-store+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R09.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R10,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Discover with tool_search and invoke one HTTPS MCP deferred tool.',
+      assertion: 'Discovery and execution retain exact MCP and ToolExecution identity.',
+      oracle: cli+mcp+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R10.json',
+      required: true,
+    }
+  - {
+      id: E2E-014-R11,
+      suite: E2E-014-CODING-TOOLS,
+      type: product-e2e,
+      fixtures: [F3],
+      driver: product-pty-v1,
+      action: 'Trigger request_user_input and answer through the CLI.',
+      assertion: 'The Run pauses and resumes exactly once without an extra policy switch.',
+      oracle: cli+pg,
+      cleanup: hermetic-reset-v1,
+      receipt: 'receipts/{baseline}/E2E-014-R11.json',
+      required: true,
+    }

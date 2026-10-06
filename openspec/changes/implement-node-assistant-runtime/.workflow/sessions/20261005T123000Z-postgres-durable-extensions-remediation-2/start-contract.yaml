@@ -1,0 +1,52 @@
+version: 1
+sessionId: 20261005T123000Z-postgres-durable-extensions-remediation-2
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T12:30:00Z
+coordinator: /root
+implementer: /root/postgres_extensions_migration_impl
+authorization:
+  userRequestRef: conversation request "继续"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  failedCandidate:
+    path: .workflow/sessions/20261005T121834Z-postgres-durable-extensions-remediation/end-audit.yaml
+    manifestSha256: b4f248a3088ff8e522e1cbbadccb1fc28b9b1da69b66b2d14301ad0ec92fb995
+    independentReview: failed
+    findings: { blocker: 0, high: 4, medium: 0 }
+  taskSlice: ["4.2-remediation-2"]
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  allowedPaths:
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177720000-create-assistant-runtime-extensions.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - repair only the four independently reported High findings and add real PostgreSQL regressions
+    - separate owner memory target scope from the Session and Run that supply extract provenance
+    - restore task 4.2 complete only after every self-check and independent rereview pass
+  prohibitedActions:
+    - change public contracts or expand beyond task 4.2
+    - add task-4.3 business unique or partial constraints, repositories, handlers, workers, adapters or production wiring
+    - promote a CAP, commit, push or deploy
+acceptanceContract:
+  auditor: /root/postgres_durable_extensions_acceptance
+  requiredRepairs:
+    - Conflict stores required message and optional current-content hash; Rejected stores required reason without inventing an error code requirement
+    - Interrupt question cancel and approval reject or cancel preserve every contract-valid reason through 4096 characters
+    - every deletion step attempt is a positive integer and completedAt accepts exactly contract-compatible valid ISO datetime values with offsets
+    - owner-scoped extract preserves owner target scope while relationally linking its source Run, Session and events; session-scoped extract remains same-Session
+  requiredEvidence:
+    - previous false-positive or false-negative probes are encoded as regressions and now behave correctly
+    - full legal chain, first-remediation regressions, 4.3 absence, latest-only down, full down/up and repository gates remain green
+stopConditions:
+  - A repair requires changing public contracts or adding task-4.3 behavior.
+  - The separated source lineage cannot be expressed without weakening owner or Session referential integrity.
+expectedOutputs:
+  - corrected reversible 4.2 migration
+  - expanded real PostgreSQL suite
+  - new frozen manifest, end audit and independent rereview
+handoffTarget: .workflow/sessions/20261005T123000Z-postgres-durable-extensions-remediation-2/end-audit.yaml
+acknowledgedAt: 2026-10-05T12:30:00Z
+startStatement: "Second remediation session started for exactly four High findings on manifest b4f248a3088ff8e522e1cbbadccb1fc28b9b1da69b66b2d14301ad0ec92fb995; task 4.2 remains incomplete and no 4.3 work is authorized."

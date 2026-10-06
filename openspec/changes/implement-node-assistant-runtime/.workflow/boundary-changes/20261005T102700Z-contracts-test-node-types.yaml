@@ -1,0 +1,23 @@
+version: 1
+change: implement-node-assistant-runtime
+sessionId: 20261005T101700Z-contract-compatibility-fixtures
+recordedAt: 2026-10-05T10:27:00Z
+classification: clarification-no-normative-change
+discovery:
+  summary: Static compatibility tests need Node filesystem APIs, but @repo/contracts did not declare Node test types.
+  evidence: pnpm --filter @repo/contracts check-types failed with TS2688, TS2591 and an implicit-any cascade.
+scopeAdjustment:
+  addedPaths:
+    - packages/contracts/package.json
+    - packages/contracts/tsconfig.json
+    - pnpm-lock.yaml
+  allowedActions:
+    - add @types/node as a development-only dependency
+    - enable Node and Vitest types for contracts tests
+  prohibitedActions:
+    - add Node runtime dependencies to @repo/contracts
+    - change production schema behavior beyond the already authorized v1 envelope markers
+rationale: This makes the disk-fixture test type-safe and reproducible from a frozen install; it does not change requirements, architecture, runtime code or wire behavior.
+coordinatorDecision: acknowledged
+invalidatedReviews: []
+resumeAt: task 3.8 implementation and validation

@@ -1,0 +1,122 @@
+version: 1
+sessionId: 20261005T104000Z-postgres-durable-core
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T12:00:04Z
+reason: completed
+contract:
+  startContract: .workflow/sessions/20261005T104000Z-postgres-durable-core/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["4.1"]
+reconciliation:
+  actualWrites:
+    - apps/user-platform-service/src/config/**
+    - apps/user-platform-service/src/infrastructure/database/**
+    - apps/user-platform-service/test/migrations/**
+    - apps/user-platform-service/vitest.config.migrations.mts
+    - apps/user-platform-service/package.json
+    - apps/assistant-runtime-service/src/config/**
+    - apps/assistant-runtime-service/src/infrastructure/database/**
+    - apps/assistant-runtime-service/test/migrations/**
+    - apps/assistant-runtime-service/vitest.config.migrations.mts
+    - apps/assistant-runtime-service/package.json
+    - .github/workflows/assistant-postgres-migrations.yml
+    - package.json
+    - pnpm-lock.yaml
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  outOfContractWrites: []
+  completedTasks: ["4.1"]
+  capabilityPromotions: []
+databaseScope:
+  engine: PostgreSQL 16
+  schemas:
+    user_platform:
+      historyTable: public.user_platform_migrations
+      tables: [assistant_user, assistant_access_grant]
+    assistant_runtime:
+      historyTable: public.assistant_runtime_migrations
+      tables:
+        - assistant_session
+        - assistant_settings
+        - assistant_command
+        - assistant_run
+        - assistant_turn
+        - assistant_model_attempt
+        - assistant_steer_command
+  crossSchemaForeignKeys: 0
+  startupMigrationExecution: false
+checks:
+  - check: pnpm test:assistant-postgres-migrations against disposable pgvector/pgvector:pg16
+    result: passed
+    evidence: UserPlatform 5/5 and Runtime 5/5 compiled-DataSource integration tests passed, including catalog, legal chain, invalid writes, empty second run, down and up-after-down
+  - check: compiled TypeORM migration:run/show/revert for both services
+    result: passed
+    evidence: both dist DataSources executed through the TypeORM CLI with separate schemas/history tables and reverted in reverse dependency order
+  - check: both service unit tests, check-types and lint
+    result: passed
+    evidence: UserPlatform 2 files/32 tests and Runtime 4 files/64 tests passed; both type and max-warnings-zero lint checks exited 0
+  - check: pnpm build
+    result: passed
+    evidence: Turbo root build completed 8 of 8 tasks
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: repository-pinned OpenSpec returned valid=true and issues=[]
+  - check: git diff --check and targeted Prettier check
+    result: passed
+    evidence: no whitespace defect and every task-4.1 source/test/workflow/evidence file uses repository formatting
+  - check: forbidden scope, cross-schema FK, startup migration and secret scans
+    result: passed
+    evidence: no 4.2 table, Runtime-to-UserPlatform reference, synchronize/migrationsRun true, plaintext credential column or managed-provider/private-key pattern
+  - check: independent-review regression remediation against real PostgreSQL 16
+    result: passed
+    evidence: database now rejects negative command result versions, Session-scoped settings without provider/model and revocation reasons without revoked_at; both migration suites remain 5/5
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(apps/user-platform-service/src/config apps/user-platform-service/src/infrastructure/database apps/user-platform-service/test/migrations apps/user-platform-service/vitest.config.migrations.mts apps/user-platform-service/package.json apps/assistant-runtime-service/src/config apps/assistant-runtime-service/src/infrastructure/database apps/assistant-runtime-service/test/migrations apps/assistant-runtime-service/vitest.config.migrations.mts apps/assistant-runtime-service/package.json .github/workflows/assistant-postgres-migrations.yml package.json pnpm-lock.yaml openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: 9b1911e7bf58aec24aa13f002ace1869f7c16cf40e744713f2e9dc258cada8a1
+boundaryEvents:
+  - path: .workflow/boundary-changes/20261005T105000Z-migration-vitest-config.yaml
+    classification: clarification-no-normative-change
+    outcome: dedicated migration Vitest configs avoid fake HTTP-E2E environment overrides and make real PostgreSQL tests discoverable
+residualRisks:
+  - Migrations are not connected to service startup, repositories or product handlers; deployment must invoke the explicit migration command before later production wiring.
+  - Google subject, command idempotency, active-Run and ordering uniqueness/partial constraints remain task 4.3; event and execution-support tables remain task 4.2.
+  - Down is accepted only for empty disposable-database verification; production recovery remains additive compatibility plus binary rollback/roll-forward evidence in later tasks.
+  - The disposable local PostgreSQL container is test infrastructure only and contains no production data or credentials.
+invalidatedReceipts: []
+reviewHistory:
+  - reviewer: /root/postgres_durable_core_acceptance
+    verdict: pre-implementation-contract-issued
+    evidence:
+      - Required schema ownership, nine-table boundary, safe fields, same-owner FKs, real PostgreSQL tests and explicit later-task exclusions were enumerated before Apply.
+    blockers: []
+    status: contract-consumed
+  - reviewer: /root/postgres_durable_core_acceptance
+    verdict: failed
+    evidence:
+      - The first implementation review found no blocker, but reported two High and one Medium database-invariant gaps.
+      - assistant_command.result_resource_version accepted negative values.
+      - Session-scoped assistant_settings accepted missing provider_connection_id/model.
+      - assistant_access_grant accepted a revocation reason without revoked_at because the previous CHECK could evaluate to NULL.
+    blockers: []
+    status: remediated
+  - reviewer: /root
+    verdict: remediation-self-check-passed
+    evidence:
+      - Added explicit CHECK predicates and one real-PostgreSQL rejection case for each independent-review finding.
+      - UserPlatform 5/5 and Runtime 5/5 migration tests passed on PostgreSQL 16 after remediation.
+      - Both service unit suites, check-types, lint, root build, strict OpenSpec validation, formatting, diff and forbidden-scope scans passed.
+    blockers: []
+    status: awaiting-independent-rereview
+  - reviewer: /root/postgres_durable_core_acceptance
+    verdict: passed
+    evidence:
+      - The frozen manifest reproduced exactly at the beginning and end of the independent rereview.
+      - Independent PostgreSQL 16 probes rejected all three remediated invalid writes and both migration suites passed 5/5.
+      - Compiled DataSources, separate history tables, nine-table ownership, same-owner foreign keys, reversible migration behavior and all repository gates passed.
+      - No 4.2 table, 4.3 business unique/partial constraint, cross-schema foreign key, plaintext credential field or CAP promotion was found.
+    blockers: []
+    status: accepted
+nextAction: start task 4.2 in a new bounded Apply session
+endStatement: "Apply session 20261005T104000Z-postgres-durable-core completed task 4.1 on reproducible manifest 9b1911e7bf58aec24aa13f002ace1869f7c16cf40e744713f2e9dc258cada8a1 with independent PASS, zero Blocker/High/Medium findings and no capability status promotion."

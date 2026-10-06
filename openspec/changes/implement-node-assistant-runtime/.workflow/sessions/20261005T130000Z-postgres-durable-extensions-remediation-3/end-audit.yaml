@@ -1,0 +1,57 @@
+version: 1
+sessionId: 20261005T130000Z-postgres-durable-extensions-remediation-3
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T13:01:00Z
+reason: passed-independent-rereview
+contract:
+  startContract: .workflow/sessions/20261005T130000Z-postgres-durable-extensions-remediation-3/start-contract.yaml
+  taskSlice: ["4.2-remediation-3"]
+reconciliation:
+  actualWrites:
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177720000-create-assistant-runtime-extensions.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  outOfContractWrites: []
+  completedTasks: ["4.2"]
+  capabilityPromotions: []
+repairs:
+  - finding: deletion strict contract still accepted fractional remaining references and empty cleanup identities
+    result: repaired
+    evidence: validator requires positive integer remainingArtifactReferences and public-ID-shaped per-step plus top-level cleanup identities; negative probes fail and valid partial cleanup passes
+  - finding: memory provenance event was not tied to the operation source Run
+    result: repaired
+    evidence: source_run_id participates in composite operation and event foreign keys; same-Session cross-Run event probe fails while exact Run provenance passes
+checks:
+  postgresMigrations: "passed: UserPlatform 5/5; Runtime 8/8; latest-only down and full down/up included"
+  runtimeUnit: "passed: 64/64"
+  typesAndLint: passed
+  rootBuild: "passed: 8/8"
+  openSpecStrict: "passed: valid=true, issues=[]"
+  formattingAndDiff: passed
+  task43Absence: passed
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(apps/assistant-runtime-service/src/infrastructure/database apps/assistant-runtime-service/test/migrations apps/assistant-runtime-service/vitest.config.migrations.mts apps/assistant-runtime-service/package.json .github/workflows/assistant-postgres-migrations.yml package.json pnpm-lock.yaml openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: 24d0127645b99465f2bb133da202ef5836827363ea307f810aac45b83e8bcff6
+residualRisks:
+  - Repositories, atomic transactions, workers, adapters and product handlers remain later tasks.
+  - Task 4.3 business uniqueness and partial constraints remain deliberately absent.
+invalidatedReceipts:
+  - .workflow/sessions/20261005T123000Z-postgres-durable-extensions-remediation-2/end-audit.yaml
+reviewHistory:
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: failed-prior-candidate
+    findings: { blocker: 0, high: 2, medium: 0 }
+    status: remediated
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: passed
+    findings: { blocker: 0, high: 0, medium: 0 }
+    evidence:
+      - Frozen manifest remained stable before and after review.
+      - Real PostgreSQL accepted valid cleanup and exact source-Run provenance while rejecting fractional references, empty cleanup identity and same-Session cross-Run provenance.
+      - All accumulated migration, rollback, static and 4.3-absence gates remained green.
+    status: accepted
+nextAction: task 4.2 is accepted; begin a separately contracted task 4.3 session
+endStatement: "Task 4.2 passed independent review on frozen manifest 24d0127645b99465f2bb133da202ef5836827363ea307f810aac45b83e8bcff6 with zero findings; no capability status was promoted."

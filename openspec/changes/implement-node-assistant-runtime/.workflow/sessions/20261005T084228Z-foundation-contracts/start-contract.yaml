@@ -1,0 +1,84 @@
+version: 1
+sessionId: 20261005T084228Z-foundation-contracts
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T08:42:28Z
+coordinator: /root
+implementer: /root
+
+authorization:
+  userRequestRef: conversation request "一切好了就开始 apply"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  specificationAudit:
+    path: openspec/changes/implement-node-assistant-runtime/spec-audit.md
+    sha256: 13018aa8e87729f5fbeab0df49bfc6c59272214dd36802a6b8ebe38755e16689
+    verdict: passed
+  taskSlice: ["2.3", "2.4", "2.5", "2.6", "3.2"]
+
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  baselineRevision: 896e79cc784c53b46e75ed87dbfc040b998feeb8
+  allowedPaths:
+    - apps/assistant-runtime-service/**
+    - apps/assistant-cli/**
+    - apps/user-platform-service/**
+    - packages/contracts/**
+    - docs/guides/assistant-runtime-environment.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+    - package.json
+    - pnpm-lock.yaml
+    - turbo.json
+  allowedActions:
+    - refactor the Runtime scaffold into feature/application/domain/infrastructure boundaries without changing diagnostic behavior
+    - refactor the CLI scaffold into transport/projection/credential/local-capability/presentation boundaries while retaining diagnostic behavior
+    - complete and test redacted environment validation for the three Assistant deployables and managed-only Mem0
+    - add correlation and version metadata to diagnostic boundaries
+    - define and test UserPlatform OAuth, allowlist and five-minute token wire contracts
+    - install only dependencies required by this task slice
+    - update task, ledger and workflow evidence only when supported by current checks
+  prohibitedActions:
+    - implement OAuth network exchange, token signing, database persistence, model execution, MCP execution, local tool side effects, or Ink product UI
+    - add self-hosted Mem0 support, stdio MCP, Suggested Sessions, Studio, Nest TCP, or real credentials
+    - change frozen normative planning semantics
+    - commit, push, deploy, or mark any CAP Implemented or Verified
+  separatelyAuthorizedActions: []
+
+validationPlan:
+  - check: pnpm --filter @repo/contracts test && pnpm --filter @repo/contracts check-types && pnpm --filter @repo/contracts build
+    ownerRole: Implementer
+    passCondition: all contract fixtures and compilation pass
+  - check: pnpm --filter assistant-runtime-service test && pnpm --filter assistant-runtime-service check-types && pnpm --filter assistant-runtime-service lint && pnpm --filter assistant-runtime-service build
+    ownerRole: Implementer
+    passCondition: diagnostic behavior and new boundary tests pass
+  - check: pnpm --filter assistant-cli test && pnpm --filter assistant-cli check-types && pnpm --filter assistant-cli lint && pnpm --filter assistant-cli build
+    ownerRole: Implementer
+    passCondition: TTY and non-TTY diagnostic paths plus new boundary tests pass
+  - check: pnpm --filter user-platform-service test && pnpm --filter user-platform-service check-types && pnpm --filter user-platform-service lint && pnpm --filter user-platform-service build
+    ownerRole: Implementer
+    passCondition: environment/correlation integration remains green
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    ownerRole: Implementer
+    passCondition: valid=true with no issues
+  - check: git diff --check and protected-secret scan
+    ownerRole: Implementer
+    passCondition: no whitespace defect and no real secret in the worktree
+
+stopConditions:
+  - Planning artifacts conflict with repository reality or require normative revision.
+  - Work requires a path, dependency, action, external credential, or permission outside this contract.
+  - Existing user changes overlap in a way that cannot be preserved.
+  - A required validation cannot run or produces conflicting evidence.
+  - The session is handed off, interrupted, or ends.
+
+expectedOutputs:
+  - refactored Runtime and CLI scaffold boundaries with unchanged diagnostic behavior
+  - complete managed-only environment schemas and redaction tests for the three Assistant deployables
+  - correlation/version metadata across diagnostic calls
+  - UserPlatform OAuth/allowlist/five-minute-token Zod contracts and compatibility fixtures
+  - completed task checkboxes only where every stated condition passes
+  - openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T084228Z-foundation-contracts/end-audit.yaml
+handoffTarget: openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T084228Z-foundation-contracts/end-audit.yaml
+acknowledgedAt: 2026-10-05T08:42:28Z
+startStatement: "Apply session 20261005T084228Z-foundation-contracts started for planning revision 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a, tasks 2.3, 2.4, 2.5, 2.6 and 3.2, with writes limited to the three Assistant deployables, shared contracts, environment guide, task/ledger/workflow evidence and required workspace metadata; stop on boundary conflict or failed evidence; expected evidence is the session end audit."

@@ -1,0 +1,36 @@
+version: 1
+sessionId: 20261005T130000Z-postgres-durable-extensions-remediation-3
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T13:00:00Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "continue"
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  failedCandidate:
+    manifestSha256: 90b76f37f633bc74ca579859374d8eebfe2442ea0763b108332282b6a2ca5c02
+    findings: { blocker: 0, high: 2, medium: 0 }
+  taskSlice: ["4.2-remediation-3"]
+scope:
+  allowedPaths:
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177720000-create-assistant-runtime-extensions.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  allowedActions:
+    - require integer positive artifact remaining-reference counts and valid nonempty cleanup identities
+    - bind every memory provenance event to the operation source Run as well as owner and Session
+    - add exact real PostgreSQL regressions for both findings
+  prohibitedActions:
+    - change public contracts or add task-4.3 behavior
+    - add repositories, handlers, workers, adapters or production wiring
+    - promote a CAP, commit, push or deploy
+acceptanceContract:
+  auditor: /root/postgres_durable_extensions_acceptance
+  requiredEvidence:
+    - fractional remainingArtifactReferences and empty cleanup identities fail while contract-valid values pass
+    - source event from a different Run in the same Session fails while exact source Run event passes
+    - all prior migrations, probes, rollback paths and 4.3-absence checks remain green
+handoffTarget: .workflow/sessions/20261005T130000Z-postgres-durable-extensions-remediation-3/end-audit.yaml
+startStatement: "Third remediation started for exactly two remaining High findings; task 4.2 remains incomplete and no 4.3 work is authorized."

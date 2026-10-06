@@ -1,0 +1,58 @@
+version: 1
+receiptId: spec-audit-cap001-20261005T065302Z
+change: implement-node-assistant-runtime
+gate: independent-specification-audit
+checkType: spec-audit
+producer:
+  role: Spec Auditor
+  identity: /root/cap001_spec_audit
+  independentOf:
+    - planning author
+    - implementation coordinator
+createdAt: 2026-10-05T06:53:02Z
+verdict: passed
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  branch: main
+  planningRevision: 0aa6b70b688c5ce4027c8276fb4fbe1dcf1d8853aa82a6de19769de20004ef36
+  sourceRevision: null
+  testRevision: null
+inputs:
+  - path: openspec/changes/implement-node-assistant-runtime/specs/assistant-access-control/spec.md
+    sha256: 69c47f65c61a9a17bbdf40009f08c010119a73e949ddd679de242a4c62e5fd51
+  - path: openspec/changes/implement-node-assistant-runtime/design.md
+    sha256: c5addb086e0dc10f58266aca532016364a974fd8d0b12a6b75dd6abbd7255502
+  - path: openspec/changes/implement-node-assistant-runtime/tasks.md
+    sha256: 784be6ed9057822eb667035fccad92f8fda611fc2d09c2bc66c3f2786c1648b9
+  - path: docs/architecture/decisions/0018-separate-user-platform-assistant-runtime-and-cli.md
+    sha256: 754247e91ebeec1ef36aec25c126f7b1f38c2a59fdb8078c90d16a1a6ce7345f
+claims:
+  - id: CAP-001-REVOCATION-BOUNDARY
+    result: supports
+    evidence:
+      - expiry-only revocation is consistent across spec, design, task and ADR
+  - id: CAP-031-PUBLIC-EXPOSURE-GATE
+    result: supports
+    evidence:
+      - every required control has negative readiness coverage and all controls have a positive gate case
+  - id: CAP-031-MCP-SSRF
+    result: supports
+    evidence:
+      - initial, redirect and actual connection resolution are checked with no bypass
+  - id: CAP-032-REAL-CLIENT-E2E
+    result: supports
+    evidence:
+      - task 16.2 requires packaged assistant-cli execution and sanitized receipts
+commands:
+  - command: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    environment: local repository; no credentials
+    exitCode: 0
+    outputRef: valid=true; issues=[]
+findings: []
+limitations:
+  - This is a specification audit, not production implementation evidence.
+degradedSubstitutions: []
+waivers: []
+supersedes: []
+writes: []

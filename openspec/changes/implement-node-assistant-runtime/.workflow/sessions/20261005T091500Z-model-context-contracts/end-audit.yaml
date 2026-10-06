@@ -1,0 +1,75 @@
+version: 1
+sessionId: 20261005T091500Z-model-context-contracts
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T09:29:00Z
+reason: completed
+contract:
+  startContract: .workflow/sessions/20261005T091500Z-model-context-contracts/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["3.5"]
+reconciliation:
+  actualWrites:
+    - packages/contracts/src/assistant-runtime/model-context-memory.ts
+    - packages/contracts/src/assistant-runtime/model-context-memory.spec.ts
+    - packages/contracts/src/index.ts
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  separatelyAuthorizedWrites:
+    - path: apps/assistant-runtime-service/.env.dev
+      evidence: prepared all Runtime variables for user completion, preserved existing Mem0 API key without reading or emitting it, and confirmed the file remains gitignored
+  outOfContractWrites: []
+  completedTasks: ["3.5"]
+  capabilityPromotions: []
+checks:
+  - check: pnpm --filter @repo/contracts test
+    result: passed
+    evidence: Vitest 10 files and 55 tests passed after independent-review remediation
+  - check: pnpm --filter @repo/contracts check-types && lint && build
+    result: passed
+    evidence: TypeScript, ESLint max-warnings 0 and package build exited 0
+  - check: pnpm build
+    result: passed
+    evidence: Turbo root build completed 8 of 8 tasks
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: valid=true and issues=[]
+  - check: git diff --check
+    result: passed
+    evidence: exit 0
+  - check: protected-secret scan
+    result: passed
+    evidence: no managed-memory key pattern outside the ignored local Runtime environment file
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(packages/contracts/src/assistant-runtime packages/contracts/src/index.ts openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: eaf2c7ea4f8d96844f029fe19b94877829d2a8578c3978dc2ca90601566d82f5
+residualRisks:
+  - Provider destination DNS/redirect/actual-connect checks, encryption and exact-model probing are later implementation tasks.
+  - Context path schemas do not replace CLI real-path and symlink confinement.
+  - Mem0 filtering, Hook execution and usage aggregation are contracts only; no external call or billing behavior exists.
+invalidatedReceipts: []
+reviewHistory:
+  - reviewer: /root/model_context_contract_review
+    verdict: failed
+    blockers:
+      - Public HTTPS/capability schemas lacked derived types and several aggregates lacked key-invalid tests.
+      - Provider references admitted credential-bearing URLs and unmasked key hints.
+      - Hook type, fail policy and outcome control semantics were not bound.
+      - Windows absolute and traversal context paths were accepted.
+    remediation:
+      - Added and root-exported derived leaf types plus aggregate invalid fixtures.
+      - Rejected URL userinfo, enforced masked key hints and added leakage regression tests.
+      - Bound controlling/notification Hook policies and outcomes, with ordered finite configurations.
+      - Normalized slash checks and rejected POSIX/Windows absolute or parent traversal paths.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/model_context_contract_review
+    verdict: passed
+    evidence:
+      - Manifest eaf2c7ea4f8d96844f029fe19b94877829d2a8578c3978dc2ca90601566d82f5 reproduced exactly.
+      - All derived-type, credential-reference, Hook semantic, path and negative-test blockers were closed.
+      - Contracts 10 files and 55 tests, root build, strict validation, diff and secret scan passed.
+    blockers: []
+    status: accepted
+nextAction: open bounded Apply contract for task 3.6
+endStatement: "Apply session 20261005T091500Z-model-context-contracts completed on reproducible manifest eaf2c7ea4f8d96844f029fe19b94877829d2a8578c3978dc2ca90601566d82f5 after independent-review remediation; checks passed, no capability status changed, and independent re-review is required."

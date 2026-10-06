@@ -1,0 +1,40 @@
+version: 1
+sessionId: 20261005T131000Z-postgres-product-uniqueness
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T13:10:00Z
+coordinator: /root
+implementer: /root
+authorization:
+  userRequestRef: conversation request "continue"
+  taskSlice: ["4.3"]
+scope:
+  allowedActions:
+    - add one UserPlatform and one Runtime forward migration for the eight named product uniqueness rules
+    - register both migrations and replace temporary duplicate-allowed tests with precise conflict probes
+    - add catalog assertions, latest-only rollback and complete down/up verification
+  prohibitedActions:
+    - alter accepted 4.1 or 4.2 migrations
+    - add unrelated ordinal, outbox, settings or query indexes
+    - add repositories, CAS handlers, workers, adapters, startup migration wiring or production behavior
+    - claim uniqueness alone proves gap-free allocation, stale-CAS rejection or fencing monotonicity
+acceptanceContract:
+  reviewer: /root/postgres_durable_extensions_acceptance
+  ordinaryConstraints:
+    - assistant_user UNIQUE google_subject, case-sensitive, disabled rows retain identity
+    - assistant_command UNIQUE owner_id and command_id only
+    - assistant_event UNIQUE session_id and sequence only
+    - assistant_event UNIQUE event_id globally
+  partialUniqueIndexes:
+    - one active Run per session across exactly seven nonterminal states
+    - one terminal tool row per owner_id, execution_id and attempt across exactly six terminal states
+    - terminal interrupt resolution command and idempotency key unique per owner
+    - one current client binding per owner, cli_instance and workspace across Active and Offline
+  rollback:
+    - latest-only down removes only 4.3 product constraints and preserves the accepted 4.2 22-table shape
+  evidence:
+    - pg_constraint and pg_indexes prove exact keys and predicates
+    - representative valid history, Fork, retry, owner and workspace cases pass
+    - every representative conflict fails on real PostgreSQL 16
+    - full down/up, empty second run, types, lint, build and OpenSpec strict remain green
+handoffTarget: .workflow/sessions/20261005T131000Z-postgres-product-uniqueness/end-audit.yaml
+startStatement: "Task 4.3 Apply started with eight exact product uniqueness rules; no repository, worker, CAS or query-index scope is authorized."

@@ -1,0 +1,53 @@
+version: 1
+sessionId: 20261005T135542Z-atomic-session-commit-remediation
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T14:00:39Z
+reason: failed-independent-review-superseded-by-remediation-2
+contract:
+  startContract: .workflow/sessions/20261005T135542Z-atomic-session-commit-remediation/start-contract.yaml
+  taskSlice: ["4.5-remediation"]
+reconciliation:
+  completedTasks: []
+  implementationCandidates: ["4.5"]
+  capabilityPromotions: []
+  outOfContractWrites: []
+findingsAddressed:
+  - Ready checkpoint validation now holds a shared row lock through commit
+  - omitted checkpointId preserves the current Run pointer
+  - a concurrent quarantine race proves no Event, Run change or sequence is committed
+  - concurrent evidence joins every committed Event to one Outbox row per Session
+  - migration tests prove continuous backfill, exact composite keys, Outbox conflict and complete 4.5 down cleanup
+verification:
+  postgresMigrations: "passed: 10/10"
+  postgresTransactions: "passed: 7/7"
+  repositoryRegression: "passed: 6/6"
+  runtimeUnit: "passed: 64/64"
+  runtimeTypesLintBuild: passed
+  rootBuild: "passed: 8/8"
+  openSpecStrict: "passed: valid=true, issues=[]"
+  diffCheck: passed
+sourceState:
+  manifestFiles:
+    - apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-atomic-commit.port.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/postgres/postgres-assistant-runtime-persistence.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177900000-add-atomic-session-commit-state.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/assistant-runtime-migration-data-source.ts
+    - apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+    - apps/assistant-runtime-service/test/repositories/owner-scoped-repositories.e2e-spec.ts
+    - apps/assistant-runtime-service/test/transactions/atomic-session-commit.e2e-spec.ts
+    - apps/assistant-runtime-service/vitest.config.transactions.mts
+    - apps/assistant-runtime-service/package.json
+  manifestCommand: >-
+    SOURCE_FILES=(apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-atomic-commit.port.ts apps/assistant-runtime-service/src/infrastructure/database/postgres/postgres-assistant-runtime-persistence.ts apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177900000-add-atomic-session-commit-state.ts apps/assistant-runtime-service/src/infrastructure/database/assistant-runtime-migration-data-source.ts apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts apps/assistant-runtime-service/test/repositories/owner-scoped-repositories.e2e-spec.ts apps/assistant-runtime-service/test/transactions/atomic-session-commit.e2e-spec.ts apps/assistant-runtime-service/vitest.config.transactions.mts apps/assistant-runtime-service/package.json); printf '%s\0' "${SOURCE_FILES[@]}" | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: efd1a1988ae4a3676dfed67cf61a41075236b352902d0eb8804ed957453df6e3
+residualRisks:
+  - Unknown commit outcomes remain unsafe to replay until task 4.6.
+  - Checkpoint lifecycle mutation is outside this port; cooperating writers must update checkpoint state transactionally.
+  - Run transition legality, fencing and checkpoint creation remain later tasks.
+reviewer: /root/repository_boundary_review
+reviewResult:
+  verdict: failed
+  findings: { blocker: 0, high: 0, medium: 1 }
+  medium: checkpoint race used a timing sleep instead of proving the target backend reached the lock wait
+nextAction: .workflow/sessions/20261005T140310Z-atomic-session-commit-remediation-2/end-audit.yaml
+endStatement: "Task 4.5 remediation ended on reproducible manifest efd1a1988ae4a3676dfed67cf61a41075236b352902d0eb8804ed957453df6e3; promotion awaits independent review."

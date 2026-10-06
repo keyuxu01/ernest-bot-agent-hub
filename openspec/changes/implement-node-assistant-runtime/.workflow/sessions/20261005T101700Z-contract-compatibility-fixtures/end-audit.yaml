@@ -1,0 +1,106 @@
+version: 1
+sessionId: 20261005T101700Z-contract-compatibility-fixtures
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T10:31:00Z
+reason: completed
+contract:
+  startContract: .workflow/sessions/20261005T101700Z-contract-compatibility-fixtures/start-contract.yaml
+  planningRevision: 7bc1415f6595165ef3ff355f8efeca5a6788e01bd5c07542ba24b84a657d6d2a
+  taskSlice: ["3.8"]
+reconciliation:
+  actualWrites:
+    - packages/contracts/fixtures/assistant/v1/**
+    - packages/contracts/src/assistant-runtime/compatibility-fixtures.spec.ts
+    - packages/contracts/src/user-platform/access-control.ts
+    - packages/contracts/src/user-platform/access-control.spec.ts
+    - packages/contracts/package.json
+    - packages/contracts/tsconfig.json
+    - apps/assistant-cli/src/compatibility/**
+    - apps/assistant-runtime-service/src/compatibility/**
+    - apps/user-platform-service/src/compatibility/**
+    - apps/assistant-cli/package.json
+    - apps/assistant-runtime-service/package.json
+    - apps/user-platform-service/package.json
+    - package.json
+    - pnpm-lock.yaml
+    - .github/workflows/assistant-contract-compatibility.yml
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+  outOfContractWrites: []
+  completedTasks: ["3.8"]
+  capabilityPromotions: []
+fixtureClosure:
+  fixtureSetVersion: 1
+  readCompatibility: [1]
+  writeVersion: 1
+  cases: 34
+  positiveCases: 28
+  negativeCases: 6
+  protocolFamilies: 16
+  assignedCases:
+    assistant-cli: 32
+    assistant-runtime-service: 30
+    user-platform-service: 8
+checks:
+  - check: pnpm test:assistant-contract-compatibility
+    result: passed
+    evidence: contracts 13 files/114 tests; dist-bound CLI 34, Runtime 32 and UserPlatform 10 compatibility tests passed after independent package builds
+  - check: affected package lint, check-types and complete tests
+    result: passed
+    evidence: contracts 114, CLI 57, Runtime 61 and UserPlatform 29 tests passed; all four lint and type checks exited 0
+  - check: pnpm build
+    result: passed
+    evidence: Turbo root build completed 8 of 8 tasks
+  - check: pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+    result: passed
+    evidence: repository-pinned @fission-ai/openspec 1.12.0 resolved from node_modules/.bin; valid=true and issues=[]
+  - check: git diff --check and targeted Prettier check
+    result: passed
+    evidence: no whitespace defect and every task-3.8 source/fixture/workflow file uses repository formatting
+  - check: fixture credential and source-fallback scans
+    result: passed
+    evidence: no managed-memory/provider/private-key pattern and no contracts source import in any app compatibility test
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(packages/contracts/fixtures/assistant/v1 packages/contracts/src/assistant-runtime/compatibility-fixtures.spec.ts packages/contracts/src/user-platform/access-control.ts packages/contracts/src/user-platform/access-control.spec.ts packages/contracts/package.json packages/contracts/tsconfig.json apps/assistant-cli/src/compatibility apps/assistant-runtime-service/src/compatibility apps/user-platform-service/src/compatibility apps/assistant-cli/package.json apps/assistant-runtime-service/package.json apps/user-platform-service/package.json package.json pnpm-lock.yaml .github/workflows/assistant-contract-compatibility.yml openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: 36ce7e592bf39cb28c2e22233c23ed2603418be52d515b368dfc96548c661d23
+boundaryEvents:
+  - path: .workflow/boundary-changes/20261005T102700Z-contracts-test-node-types.yaml
+    classification: clarification-no-normative-change
+    outcome: added development-only Node types so the contracts disk-fixture test is reproducible under typecheck and frozen install
+residualRisks:
+  - This slice proves v1 wire parsing only; it does not implement any HTTP handler, SSE transport, database migration, adapter or product workflow.
+  - Standard JWT header/claims and diagnostic ping/health shapes are explicitly classified as unversioned exceptions; first-party UserPlatform request/result envelopes now carry schemaVersion 1.
+  - GitHub Actions configuration was statically formatted and its commands were reproduced locally, but no hosted Actions runner was invoked from this local session.
+  - The 34 golden cases are representative cross-package compatibility coverage, not an exhaustive golden fixture for every branch of every public union; exhaustive shape behavior remains covered by contracts unit tests and later product E2E tasks.
+invalidatedReceipts: []
+reviewHistory:
+  - reviewer: /root/compatibility_fixtures_acceptance
+    verdict: pre-implementation-contract-issued
+    evidence:
+      - Required static fixture closure, dist resolution, application role coverage, unknown-version rejection, CI and secret scan gates were enumerated before Apply.
+    blockers: []
+    status: contract-consumed
+  - reviewer: /root/compatibility_fixtures_acceptance
+    verdict: failed
+    blockers:
+      - CI invoked a globally installed OpenSpec binary that would not exist on a fresh GitHub runner.
+    mediumFindings:
+      - Push path filters omitted root package/lock and the workflow itself.
+      - Golden fixtures are representative rather than exhaustive for every union branch.
+    remediation:
+      - Pinned @fission-ai/openspec 1.12.0 in the root development dependencies and lockfile, then proved pnpm exec resolves node_modules/.bin/openspec.
+      - Aligned push path filters with the compatibility command, lockfile and workflow inputs.
+      - Made the representative, non-exhaustive golden-fixture boundary explicit in the ledger and residual risks; contracts unit tests retain exhaustive shape checks.
+    status: remediated-awaiting-rereview
+  - reviewer: /root/compatibility_fixtures_acceptance
+    verdict: passed
+    evidence:
+      - Manifest 36ce7e592bf39cb28c2e22233c23ed2603418be52d515b368dfc96548c661d23 reproduced before and after review.
+      - Repository-pinned OpenSpec 1.12.0, frozen-install resolution, aligned push and pull-request triggers, fixture closure, dist-only consumers and all automated gates passed.
+      - Representative golden coverage was accepted as the exact task 3.8 boundary; exhaustive schema shape and later product E2E responsibilities remain separately stated.
+    blockers: []
+    status: accepted
+nextAction: open a new bounded Apply contract for task 4.1 before adding PostgreSQL migrations
+endStatement: "Apply session 20261005T101700Z-contract-compatibility-fixtures completed on reproducible manifest 36ce7e592bf39cb28c2e22233c23ed2603418be52d515b368dfc96548c661d23 after CI remediation and final independent PASS; task 3.8 is complete and capability status remains Specified."

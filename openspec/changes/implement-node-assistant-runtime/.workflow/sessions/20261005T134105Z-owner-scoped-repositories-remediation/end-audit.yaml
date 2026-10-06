@@ -1,0 +1,50 @@
+version: 1
+sessionId: 20261005T134105Z-owner-scoped-repositories-remediation
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T13:43:19Z
+reason: passed-independent-review
+contract:
+  startContract: .workflow/sessions/20261005T134105Z-owner-scoped-repositories-remediation/start-contract.yaml
+  taskSlice: ["4.4-remediation"]
+reconciliation:
+  completedTasks: ["4.4"]
+  implementationCandidates: []
+  capabilityPromotions: []
+  outOfContractWrites: []
+findingsAddressed:
+  - added a valid deletion receipt for each owner
+  - added owner A positive and owner B guessed-ID negative deletion-receipt reads
+  - recorded a deterministic null-delimited sorted manifest command
+verification:
+  repositoryPostgres: "passed: 6/6 against a fresh disposable PostgreSQL 16"
+  readCoverage: "passed: every one of 20 exposed find methods has owner-hit and foreign-owner-null evidence"
+  runtimeUnit: "passed: 64/64"
+  runtimeTypesLintBuild: passed
+  rootBuild: "passed: 8/8"
+  openSpecStrict: "passed: valid=true, issues=[]"
+  diffCheck: passed
+sourceState:
+  manifestFiles:
+    - apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-repository.port.ts
+    - apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-transaction.port.ts
+    - apps/assistant-runtime-service/src/infrastructure/database/postgres/postgres-assistant-runtime-persistence.ts
+    - apps/assistant-runtime-service/test/repositories/owner-scoped-repositories.e2e-spec.ts
+    - apps/assistant-runtime-service/vitest.config.repositories.mts
+    - apps/assistant-runtime-service/package.json
+  manifestCommand: >-
+    SOURCE_FILES=(apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-repository.port.ts apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-transaction.port.ts apps/assistant-runtime-service/src/infrastructure/database/postgres/postgres-assistant-runtime-persistence.ts apps/assistant-runtime-service/test/repositories/owner-scoped-repositories.e2e-spec.ts apps/assistant-runtime-service/vitest.config.repositories.mts apps/assistant-runtime-service/package.json); printf '%s\0' "${SOURCE_FILES[@]}" | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: 5ea9f9028510ef904ba9909bd92a7c2921a55dea5d9fcb4cbc82f2b12641ffab
+residualRisks:
+  - DatabaseModule and production connection lifecycle wiring remain deferred until a consuming use case is implemented.
+  - Authenticated API and CLI cross-owner E2E remains task 5.5 and release acceptance scope.
+reviewer: /root/repository_boundary_review
+reviewResult:
+  verdict: passed
+  findings: { blocker: 0, high: 0, medium: 0 }
+  evidence:
+    - independent manifest recomputation matched exactly
+    - independent PostgreSQL 16 repository integration passed 6/6
+    - all 20 public find methods have owner-hit and foreign-owner-null evidence
+    - independent types, lint, build, OpenSpec, diff and frozen-file secret checks passed
+nextAction: task 4.4 is accepted; task 4.5 requires a new bounded Apply session
+endStatement: "Task 4.4 passed independent review on reproducible manifest 5ea9f9028510ef904ba9909bd92a7c2921a55dea5d9fcb4cbc82f2b12641ffab with zero remaining findings."

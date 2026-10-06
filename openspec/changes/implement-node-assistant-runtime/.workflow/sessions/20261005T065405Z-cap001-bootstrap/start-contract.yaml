@@ -1,0 +1,72 @@
+version: 1
+sessionId: 20261005T065405Z-cap001-bootstrap
+change: implement-node-assistant-runtime
+createdAt: 2026-10-05T06:54:05Z
+coordinator: /root
+implementer: /root
+
+authorization:
+  userRequestRef: conversation request to begin implementation and self-test after implementation
+  planningRevision: 0aa6b70b688c5ce4027c8276fb4fbe1dcf1d8853aa82a6de19769de20004ef36
+  specificationAuditReceipt: .workflow/receipts/spec-audit-cap001-20261005T065302Z.yaml
+  taskSlice: ["2.1", "2.2"]
+
+scope:
+  repository: ernest-bot-agent-pub
+  worktree: /Users/temptrip/Desktop/Project/ernest-bot-agent-pub
+  baselineRevision: 896e79cc784c53b46e75ed87dbfc040b998feeb8
+  allowedPaths:
+    - apps/user-platform-service/**
+    - docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+    - openspec/changes/implement-node-assistant-runtime/tasks.md
+    - openspec/changes/implement-node-assistant-runtime/.workflow/**
+    - pnpm-lock.yaml
+    - turbo.json
+  allowedActions:
+    - record the existing scaffold and dirty-worktree inventory
+    - scaffold the UserPlatform NestJS service with configuration validation and health endpoints
+    - install only dependencies required by the scaffold
+    - run build, typecheck, lint, unit and bootstrap/E2E checks for the new app
+  prohibitedActions:
+    - implement OAuth, token issuance, persistence or authorization behavior in this bootstrap slice
+    - modify existing Runtime or CLI production code
+    - commit, push, deploy or write real credentials
+  separatelyAuthorizedActions: []
+
+validationPlan:
+  - check: pnpm --filter user-platform-service build
+    ownerRole: Implementer
+    passCondition: exits 0
+    evidencePath: .workflow/sessions/20261005T065405Z-cap001-bootstrap/end-audit.yaml
+  - check: pnpm --filter user-platform-service check-types
+    ownerRole: Implementer
+    passCondition: exits 0
+    evidencePath: .workflow/sessions/20261005T065405Z-cap001-bootstrap/end-audit.yaml
+  - check: pnpm --filter user-platform-service lint
+    ownerRole: Implementer
+    passCondition: exits 0 with no warnings
+    evidencePath: .workflow/sessions/20261005T065405Z-cap001-bootstrap/end-audit.yaml
+  - check: pnpm --filter user-platform-service test
+    ownerRole: Implementer
+    passCondition: all tests pass
+    evidencePath: .workflow/sessions/20261005T065405Z-cap001-bootstrap/end-audit.yaml
+  - check: pnpm --filter user-platform-service test:e2e
+    ownerRole: Implementer
+    passCondition: bootstrap and health request pass
+    evidencePath: .workflow/sessions/20261005T065405Z-cap001-bootstrap/end-audit.yaml
+
+stopConditions:
+  - Planning artifacts conflict with repository reality.
+  - Work requires a path, action, dependency, or permission outside this contract.
+  - A normative requirement or design decision must change.
+  - A required validation cannot run or produces conflicting evidence.
+  - The session is handed off, interrupted, or ends.
+
+expectedOutputs:
+  - apps/user-platform-service
+  - updated implementation inventory
+  - completed task 2.1 and 2.2 checkboxes only if their full checks pass
+  - .workflow/sessions/20261005T065405Z-cap001-bootstrap/end-audit.yaml
+handoffTarget: .workflow/sessions/20261005T065405Z-cap001-bootstrap/end-audit.yaml
+acknowledgedAt: 2026-10-05T06:54:05Z
+startStatement: "Apply session 20261005T065405Z-cap001-bootstrap started for planning revision 0aa6b70b688c5ce4027c8276fb4fbe1dcf1d8853aa82a6de19769de20004ef36, tasks 2.1 and 2.2, allowed paths apps/user-platform-service, capability ledger, tasks, workflow evidence, pnpm lock and turbo config; stop on contract boundary or conflicting evidence; expected evidence is the session end audit."

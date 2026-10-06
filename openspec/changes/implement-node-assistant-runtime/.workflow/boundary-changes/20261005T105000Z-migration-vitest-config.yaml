@@ -1,0 +1,20 @@
+version: 1
+change: implement-node-assistant-runtime
+sessionId: 20261005T104000Z-postgres-durable-core
+recordedAt: 2026-10-05T10:50:00Z
+classification: clarification-no-normative-change
+discovery:
+  summary: Default UserPlatform Vitest excludes test/migrations, while the existing HTTP E2E config overwrites PostgreSQL settings with fake bootstrap values.
+  evidence: First PostgreSQL run reported no test files found because include was src/**/*.spec.ts.
+scopeAdjustment:
+  addedPaths:
+    - apps/user-platform-service/vitest.config.migrations.mts
+    - apps/assistant-runtime-service/vitest.config.migrations.mts
+  allowedActions:
+    - add dedicated migration-test discovery without setup-environment overrides
+  prohibitedActions:
+    - alter ordinary unit or HTTP E2E test configuration
+rationale: The dedicated configs make the authorized real PostgreSQL test executable without changing product code or existing test semantics.
+coordinatorDecision: acknowledged
+invalidatedReviews: []
+resumeAt: task 4.1 PostgreSQL integration validation

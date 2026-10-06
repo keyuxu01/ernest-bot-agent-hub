@@ -1,0 +1,58 @@
+version: 1
+sessionId: 20261005T131000Z-postgres-product-uniqueness
+change: implement-node-assistant-runtime
+endedAt: 2026-10-05T13:15:00Z
+reason: passed-independent-review
+contract:
+  startContract: .workflow/sessions/20261005T131000Z-postgres-product-uniqueness/start-contract.yaml
+  taskSlice: ["4.3"]
+reconciliation:
+  completedTasks: ["4.3"]
+  capabilityPromotions: []
+  outOfContractWrites: []
+databaseScope:
+  userPlatformMigration: 1791177780000-add-assistant-user-product-uniqueness.ts
+  runtimeMigration: 1791177840000-add-assistant-runtime-product-uniqueness.ts
+  ordinaryUniqueConstraints: 4
+  partialUniqueIndexes: 5
+  addedTables: 0
+  startupMigrationExecution: false
+rules:
+  - unique Google subject, including disabled users
+  - unique owner and command ID
+  - unique Session and sequence
+  - globally unique event ID
+  - one active Run per Session across seven nonterminal states
+  - one terminal tool row per owner, execution ID and attempt across six terminal states
+  - unique terminal interrupt resolution command and idempotency key per owner
+  - one Active or Offline binding per owner, CLI instance and workspace
+checks:
+  postgresMigrations: "passed: UserPlatform 5/5; Runtime 8/8; 4.3-only down and full down/up included"
+  userPlatformUnit: "passed: 32/32"
+  runtimeUnit: "passed: 64/64"
+  typesAndLint: passed
+  rootBuild: "passed: 8/8"
+  openSpecStrict: "passed: valid=true, issues=[]"
+  formattingAndDiff: passed
+sourceState:
+  manifestCommand: >-
+    SOURCE_ROOTS=(apps/user-platform-service/src/infrastructure/database apps/user-platform-service/test/migrations apps/user-platform-service/vitest.config.migrations.mts apps/user-platform-service/package.json apps/assistant-runtime-service/src/infrastructure/database apps/assistant-runtime-service/test/migrations apps/assistant-runtime-service/vitest.config.migrations.mts apps/assistant-runtime-service/package.json .github/workflows/assistant-postgres-migrations.yml package.json pnpm-lock.yaml openspec/changes/implement-node-assistant-runtime/tasks.md docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md); find ${SOURCE_ROOTS[@]} -type f ! -path '*/dist/*' ! -path '*/.turbo/*' ! -path '*/coverage/*' ! -path '*/node_modules/*' -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256
+  manifestSha256: ba3950c52ee91410e86a1bcced0903f42d5d9de413f172f0164985764b193fc9
+residualRisks:
+  - Sequence continuity, interrupt terminal CAS and fencing monotonicity remain transaction and repository responsibilities in later tasks.
+  - The migration intentionally adds no query-performance, ordinal, outbox or settings uniqueness beyond task 4.3.
+reviewHistory:
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: pre-implementation-contract-issued
+    findings: { blocker: 0 }
+    status: contract-consumed
+  - reviewer: /root/postgres_durable_extensions_acceptance
+    verdict: passed
+    findings: { blocker: 0, high: 0, medium: 0 }
+    evidence:
+      - Frozen manifest remained stable and all eight catalog keys and predicates matched the start contract.
+      - Positive, conflict, Fork, owner, retry, history, current-lease and conflicting-data rollback probes passed on PostgreSQL 16.
+      - The initial audit-only timestamp inversion was corrected without changing the frozen source manifest.
+    status: accepted
+nextAction: task 4.3 is accepted; task 4.4 requires a new bounded repository Apply session
+endStatement: "Task 4.3 passed independent review on frozen manifest ba3950c52ee91410e86a1bcced0903f42d5d9de413f172f0164985764b193fc9 with zero remaining findings; no capability status was promoted."
