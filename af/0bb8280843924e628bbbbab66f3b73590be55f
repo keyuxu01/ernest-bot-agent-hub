@@ -1,0 +1,463 @@
+apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177960000-add-runtime-query-indexes.ts
+  s_28445b1cbab356::t_9d0f2b9bd9ee3f 1-72
+packages/contracts/package.json
+  s_28445b1cbab356::t_de63ffc8d3d4e9 34
+packages/contracts/src/assistant-runtime/tools-collaboration.spec.ts
+  s_28445b1cbab356::t_d1918283c4aa44 11,69-70,80,103,113,118-119,121-126,142
+  s_28445b1cbab356::t_ea30553e376ca3 10,100
+  s_28445b1cbab356::t_f8a9cf48c03e8c 109
+  s_28445b1cbab356::t_dd43423c01bdc9 1-9,12-68,71-79,81-99,101-102,104-108,110-112,114-117,120,127-141,143-146
+apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-atomic-commit.port.ts
+  s_28445b1cbab356::t_c2d6823a602c88 44-46,72
+  s_28445b1cbab356::t_b00f97485c9eb4 1-43,47-71,73-79
+apps/assistant-cli/src/compatibility/assistant-contract-fixtures.spec.ts
+  s_28445b1cbab356::t_0e011bd4778479 3,8,29-30,36,42,57-58,60,64-67
+  s_28445b1cbab356::t_4069cefd2c52de 40,56
+  s_28445b1cbab356::t_610dbe1a66cc5b 1-2,4-7,9-28,31-35,37-39,41,43-55,59,61-63,68-79
+packages/contracts/src/assistant-runtime/artifact-observability.ts
+  s_28445b1cbab356::t_f6314fa889966e 134-142,162-163,167-168,174,178,183
+  s_28445b1cbab356::t_c757bad9f74425 60,68-72,170-173,177,180
+  s_28445b1cbab356::t_f17aa9c5def858 44-45,59,82,98,115,117
+  s_28445b1cbab356::t_a5e8fae6ef8e5e 114,116,124,126-129,133,148-150,157-158
+  s_28445b1cbab356::t_dad8fd3c6bc76c 1-43,46-58,61-67,73-81,83,96-97,99-102,104-106,110,118,120-123,125,130-132,143-147,151-156,159-161,164-166,169,175,179,181-182,184-212
+  s_28445b1cbab356::t_4897955412a5e8 84-95,103,107-109,111-113,119,176
+apps/user-platform-service/tsconfig.json
+  s_28445b1cbab356::t_7be0a35cc64de7 1-15
+apps/assistant-cli/src/transport/runtime-client.ts
+  s_28445b1cbab356::t_106653490dab48 7-8,29,31-38,40
+  s_28445b1cbab356::t_a56a10a41366f3 1-6,9-28,30,39,41-106
+apps/assistant-cli/src/credential/credential-store.ts
+  s_28445b1cbab356::t_f0d3dfcaae26af 1-11
+apps/assistant-runtime-service/src/modules/assistant/assistant.service.spec.ts
+  s_28445b1cbab356::t_69aa910b2643a8 1-32
+apps/user-platform-service/src/infrastructure/database/user-platform-migration-data-source.ts
+  s_28445b1cbab356::t_2807e7941e33d4 3,21-24
+  s_28445b1cbab356::t_a25237c56b7ef6 1-2,4-20,25-28
+apps/assistant-runtime-service/test/app.e2e-spec.ts
+  s_28445b1cbab356::t_02f0d67192f2b0 1-4,6,8-25,28-39,49-62
+  s_28445b1cbab356::t_3c2aa3ab35e72b 5,7,26-27,40-48
+apps/assistant-cli/src/projection/sse-projection.ts
+  s_28445b1cbab356::t_f0d3dfcaae26af 1-23
+apps/user-platform-service/src/app.module.ts
+  s_28445b1cbab356::t_6728045b0d71f9 1,4,19-23
+  s_28445b1cbab356::t_7be0a35cc64de7 2-3,6-14,16-18
+  s_28445b1cbab356::t_f136f5112d8fed 5,15
+apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177720000-create-assistant-runtime-extensions.ts
+  s_28445b1cbab356::t_7ec6aecf80e20c 39,44,53-57,76,88,118,120,129,160-161,190,204-207
+  s_28445b1cbab356::t_52a564fb54db61 13,19,21-29,80-82,93-94,101,110-111,124-126,130-139,164,197,202,216,236-238,271
+  s_28445b1cbab356::t_2a7898c19c2e04 269,669
+  s_28445b1cbab356::t_75e87860b4fcc8 763,765
+  s_28445b1cbab356::t_3e13a2d1d42fd1 501,519-520,525-528,548
+  s_28445b1cbab356::t_a0d2ec7c220173 162,517,549,552-554,615-621,624-628,633-638,704
+  s_28445b1cbab356::t_6f4b9b4dda8ac8 260,272,278,280-282,298,317-318,331,337,340,342
+  s_28445b1cbab356::t_e5faf64ac0b5ca 476,488,490-492,494-496,539-547,550-551
+  s_28445b1cbab356::t_c1952e13d7d190 313-316,344-350,376
+  s_28445b1cbab356::t_0b1dbc1da4b92f 324,326-327,339,368-370,373-375,385-388,392,407,440,442-443,466,468,472,478,480-481,483-484
+  s_28445b1cbab356::t_5a77b54b3a5590 688-694,701,703
+  s_28445b1cbab356::t_23b9280d3c5a8b 674,676-686,700,705,725-729,745-747,749,785-792
+  s_28445b1cbab356::t_285ddca7936212 1-12,14-18,20,30-38,40-43,45-52,58-75,77-79,83-87,89-92,102-109,112-117,119,121-123,127-128,140-158,163,165-180,182-189,191-196,199,201,203,208-215,217-221,224-235,240-255,257-259,261-268,270,273-274,276-277,279,283-297,299-312,320-323,325,328-330,332-336,338,341,343,351-367,371-372,377-384,389-391,404,406,408,412-439,441,444-465,467,469-471,473-474,477,482,485-487,489,497-500,502-516,518,521-524,529-530,532-533,555-557,559,655-661,664-668,670,672-673,702,706-724,730-744,750-762,764,766-778,793-794
+  s_28445b1cbab356::t_8a6f4b97f2ee7b 393-396,405,410
+  s_28445b1cbab356::t_c2a24e30b0ce6e 95-100,159,198,397-403,479
+  s_28445b1cbab356::t_fb8fd57fc45184 409,411,748
+  s_28445b1cbab356::t_f5c811f7c5f4c9 558,560-614,622-623,629-632,639-654,675,687
+  s_28445b1cbab356::t_028c7f27b600d5 695-697
+  s_28445b1cbab356::t_c9fe6045fbc4e2 779-784
+  s_28445b1cbab356::t_7bf93b325606b4 181,200,222-223,239,256,275,534-538,662-663,671,698-699
+  s_28445b1cbab356::t_0e866c3c229e6f 319,475,493,531
+apps/assistant-runtime-service/src/infrastructure/database/postgres-migration-environment.ts
+  s_28445b1cbab356::t_f948704100f3d8 1-48
+apps/user-platform-service/eslint.config.mjs
+  s_28445b1cbab356::t_7be0a35cc64de7 1-4
+apps/assistant-runtime-service/test/transactions/outbox-worker.e2e-spec.ts
+  s_28445b1cbab356::t_22e95930cf6ab3 1-6,8-32,34-228
+  s_28445b1cbab356::t_9d0f2b9bd9ee3f 7,33
+apps/user-platform-service/src/modules/health/health.controller.ts
+  s_28445b1cbab356::t_6728045b0d71f9 14,23-26,62-63
+  s_28445b1cbab356::t_c6b19e02b0e824 5,7,45,53,65
+  s_28445b1cbab356::t_7be0a35cc64de7 1-4,6,8-13,15-22,27-44,46-52,54-61,64,66-69
+package.json
+  s_28445b1cbab356::t_1263ea0f58f80c 26
+  s_28445b1cbab356::t_60504dc3fc9dfe 10
+  s_28445b1cbab356::t_e9bd42cbfb4444 11
+apps/assistant-runtime-service/src/infrastructure/database/postgres/postgres-assistant-runtime-persistence.ts
+  s_28445b1cbab356::t_a9e20641f5ceda 370,394-395
+  s_28445b1cbab356::t_629efbb46553c0 17-24,81-119,273,298-358
+  s_28445b1cbab356::t_724b92795a8d12 78-80,259,477,604,606
+  s_28445b1cbab356::t_b00f97485c9eb4 12-16,270-272,475-476,478-487,489-505,508-514,517-534,539,544-547,551-556,558-590,593-601,603,607-629,632-635
+  s_28445b1cbab356::t_507b032e7335b1 536-538,540-543,548-550,557,605
+  s_28445b1cbab356::t_2985c6a9a3d6d8 506-507
+  s_28445b1cbab356::t_e2fb0297f953b3 515-516,535
+  s_28445b1cbab356::t_22e95930cf6ab3 25-35,120-153,274-275,359-369,371-393,396-474
+  s_28445b1cbab356::t_262a6e51ccb22c 591-592,630-631
+  s_28445b1cbab356::t_7c418432a396a4 65,154,159,163,166-167,171,181,200,215,250,256-258,262
+  s_28445b1cbab356::t_7457c5a03c312d 1-11,36-64,66-77,155-158,160-162,164-165,168-170,172-180,182-199,201-214,216-249,251-255,260-261,263-269,276-297,636-650
+  s_28445b1cbab356::t_e4993457f9da0e 488,602
+apps/assistant-runtime-service/test/migrations/assistant-runtime-migrations.e2e-spec.ts
+  s_28445b1cbab356::t_e1d8236f005a89 1353-1354,1369
+  s_28445b1cbab356::t_dd359c3b3a4ae5 194,196-197,212-217,333-343,345-357,364,376-385,389-400
+  s_28445b1cbab356::t_035783705ca684 27,37-49,51-56,1357,1364-1367,1371
+  s_28445b1cbab356::t_7f1828fa964ee6 1313,1315-1344,1346-1347
+  s_28445b1cbab356::t_5ce991b589536c 108-113,117
+  s_28445b1cbab356::t_07c48df4a196e3 650-655,694-695,737-772
+  s_28445b1cbab356::t_89e0e7c8a1fea9 866-873,875-906
+  s_28445b1cbab356::t_2544a546a88006 1-6,8-24,26,28-36,57-107,304-319,321-329,331-332,365-375,446-458,487-497,506-508,516-581,943-944,1210-1211,1349-1350,1358-1362,1373-1375
+  s_28445b1cbab356::t_437b8732aa1505 498-505,509-515
+  s_28445b1cbab356::t_ee763add97fdc9 163-164,221-222
+  s_28445b1cbab356::t_891ad5c70fdf19 118-133,142-162,165-191,193,198-211,218-220,223-267,277-278,291-303
+  s_28445b1cbab356::t_6f1f69b58a2832 414-417,420-422
+  s_28445b1cbab356::t_c1804ecd5b3bfd 115-116,274-275,286-287,423-424,429,606-607,610-630,645-646,656-679,683-693,874
+  s_28445b1cbab356::t_4a1ca667d35631 586,711-716,723-736,781-788,805-812,817-820,824-832,838-849,852,854-865
+  s_28445b1cbab356::t_c0aaad47dd91c5 947-983,986-1039,1043-1048,1213,1228,1280,1310,1314,1345,1348,1355-1356,1363,1370,1372
+  s_28445b1cbab356::t_7d6c80b8b86ff2 268-269,279-285,288-290,821-823,833-837
+  s_28445b1cbab356::t_f8bb515774c810 984-985,1040-1042
+  s_28445b1cbab356::t_13b0d3f024c98e 114,134-141,320,401-413,418-419,425-428,430-445,596-605,631-644,647-649,853
+  s_28445b1cbab356::t_deadc2f3d094e2 680-682,696,700-710
+  s_28445b1cbab356::t_023591a2c2db61 7,25,330
+  s_28445b1cbab356::t_8f5db7f50400c4 50,192,195,270-273,276,344,358-363,386-388
+  s_28445b1cbab356::t_d39537f88f7e9e 459-486,582-585,587-595,717-722,773-780,789-790,803-804,813-816,850-851,907-942,945-946,1116-1117,1121,1147-1148,1151,1161-1162,1166-1167
+  s_28445b1cbab356::t_53200fa9fa1c47 1064-1076,1092-1106
+  s_28445b1cbab356::t_6f88c08f45a54d 1212,1214-1227,1229-1279,1281-1309,1311-1312
+  s_28445b1cbab356::t_6fed0c67cba778 608-609,697-699,1049-1063,1077-1091,1107-1115,1118-1120,1122-1146,1149-1150,1152-1160,1163-1165,1168-1209,1351-1352,1368
+  s_28445b1cbab356::t_ce38141e2f748e 791-802
+apps/assistant-runtime-service/src/infrastructure/observability/correlation-context.ts
+  s_28445b1cbab356::t_825238a7307c00 1-19
+apps/user-platform-service/tsconfig.build.json
+  s_28445b1cbab356::t_7be0a35cc64de7 1-8
+apps/assistant-cli/src/local-capability/local-capability-host.ts
+  s_28445b1cbab356::t_f0d3dfcaae26af 1-12
+packages/contracts/src/assistant-runtime/events.ts
+  s_28445b1cbab356::t_d8e2edf8885762 38
+  s_28445b1cbab356::t_1ede8c19dca1ed 31,43-61
+  s_28445b1cbab356::t_9dcef19aad4277 21-24
+  s_28445b1cbab356::t_3938a14daf4ffa 11,25
+  s_28445b1cbab356::t_69511846023e2a 29
+  s_28445b1cbab356::t_cb65c3c64a8abf 1-10,12-20,26-28,30,32-37,40-42,62-81
+  s_28445b1cbab356::t_19e2c76935c1ad 39
+apps/user-platform-service/package.json
+  s_28445b1cbab356::t_60504dc3fc9dfe 17
+  s_28445b1cbab356::t_2b89bbc689d956 19-23
+  s_28445b1cbab356::t_7be0a35cc64de7 1-16,18,24-31,33,36-41,43,45-53
+  s_28445b1cbab356::t_20721f6ba45825 32,34-35,44
+  s_28445b1cbab356::t_280d84042d11a9 42
+apps/assistant-cli/README.md
+  s_28445b1cbab356::t_4fb5e05a498fbf 3-4,22
+  s_28445b1cbab356::t_c6b19e02b0e824 1-2,5-21,23-29
+apps/assistant-cli/src/presentation/diagnostic-presenter.spec.ts
+  s_28445b1cbab356::t_f0d3dfcaae26af 1-29
+apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-transaction.port.ts
+  s_28445b1cbab356::t_7457c5a03c312d 1-15
+apps/user-platform-service/src/modules/health/health.module.ts
+  s_28445b1cbab356::t_7be0a35cc64de7 1-11
+apps/assistant-runtime-service/src/infrastructure/database/assistant-runtime-migration-data-source.ts
+  s_28445b1cbab356::t_9d0f2b9bd9ee3f 6,29
+  s_28445b1cbab356::t_2807e7941e33d4 4,27
+  s_28445b1cbab356::t_f7dbb24187d8d9 5,28
+  s_28445b1cbab356::t_f948704100f3d8 1-2,7-23,31-34
+  s_28445b1cbab356::t_285ddca7936212 3,24-26,30
+apps/assistant-runtime-service/test/transactions/atomic-session-commit.e2e-spec.ts
+  s_28445b1cbab356::t_218a7e28d2a988 326-340,345-374,376-388
+  s_28445b1cbab356::t_2985c6a9a3d6d8 87-101,375
+  s_28445b1cbab356::t_9d0f2b9bd9ee3f 8,34
+  s_28445b1cbab356::t_161ea5c46471f3 1-7,9-33,35-59,102-210,223,258-263,270-276,280-294,307-311,324-325,341-344,389-405,412-414,418-425,433,441-444,449-455,461-462
+  s_28445b1cbab356::t_804c5e4d3d498c 60-86,211-222,264-269,277-279,295-306,312-323,406-411,415-417,426-432,434-440,445-448,456-460
+  s_28445b1cbab356::t_33769916dc4fa0 224-257
+apps/assistant-runtime-service/test/setup-environment.ts
+  s_28445b1cbab356::t_02f0d67192f2b0 1,3-4,6-22
+  s_28445b1cbab356::t_4fb5e05a498fbf 2,5
+packages/contracts/src/assistant-runtime/events.spec.ts
+  s_28445b1cbab356::t_9dcef19aad4277 21-26,28-29,31-35,37
+  s_28445b1cbab356::t_cb65c3c64a8abf 1-3,6-20,38-39,44-49
+  s_28445b1cbab356::t_d8e2edf8885762 4,30,36
+  s_28445b1cbab356::t_1ede8c19dca1ed 40-43
+  s_28445b1cbab356::t_3938a14daf4ffa 5,27
+packages/contracts/src/assistant-runtime/ping.ts
+  s_28445b1cbab356::t_dcad403edc2ee5 1-21
+apps/user-platform-service/.env.example
+  s_28445b1cbab356::t_9be070d6f64a42 1,3-33
+  s_28445b1cbab356::t_7be0a35cc64de7 2
+apps/assistant-cli/src/application/run-ping-diagnostic.spec.ts
+  s_28445b1cbab356::t_d773f3a0ca6b5d 1-29
+packages/contracts/src/index.ts
+  s_28445b1cbab356::t_84c8df4e93f623 57-61,63-91
+  s_28445b1cbab356::t_f8604ccb1c5b93 244-245,247-257,259-261,263-266,268
+  s_cb926ad6c1a0a7::t_131a42b6e807bb 1-2
+  s_28445b1cbab356::t_2419f22cdc383a 246,258,262
+  s_28445b1cbab356::t_3fe0d53550e585 3,198-234
+  s_28445b1cbab356::t_d7d0fc47b265f8 4-55
+  s_28445b1cbab356::t_5293b366bc5d3f 56,62
+  s_28445b1cbab356::t_8f0e122c33786d 117,119,151,153
+  s_28445b1cbab356::t_841461fef769b0 160,162,164-167,171-174,176,178-181,183-197
+  s_28445b1cbab356::t_c5b4acba3b3015 95,97,100,106,112-115,118,129,131-132,140,146-149,152
+  s_28445b1cbab356::t_69511846023e2a 169-170
+  s_28445b1cbab356::t_281d2284e02b60 267
+  s_28445b1cbab356::t_19e2c76935c1ad 161,163,168,175,177,182
+  s_28445b1cbab356::t_2ebd6092c8d732 92-94,96,98-99,101-105,107-111,116,120-128,130,133-139,141-145,150,154-159
+apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-repository.port.ts
+  s_28445b1cbab356::t_7457c5a03c312d 1-97
+apps/user-platform-service/vitest.config.e2e.mts
+  s_28445b1cbab356::t_02f0d67192f2b0 10
+  s_28445b1cbab356::t_7be0a35cc64de7 1-9,11-12
+apps/assistant-cli/src/runtime-client.spec.ts
+  s_28445b1cbab356::t_a56a10a41366f3 1-21,28-29,43-44
+  s_28445b1cbab356::t_106653490dab48 22-27,30-42
+apps/assistant-runtime-service/src/modules/assistant/domain/assistant-diagnostic.ts
+  s_28445b1cbab356::t_825238a7307c00 1-14
+apps/user-platform-service/test/migrations/user-platform-migrations.e2e-spec.ts
+  s_28445b1cbab356::t_23ba2976f76714 75,108-132,161,170-177,188
+  s_28445b1cbab356::t_023591a2c2db61 7,25,52,62,145,153,189
+  s_28445b1cbab356::t_ef6d04e4431e74 1-6,8-24,26-51,53-61,63-74,76-107,133-144,146-152,154-155,164-169,178-187,190-191
+  s_28445b1cbab356::t_437b8732aa1505 156-160,162-163
+apps/assistant-runtime-service/src/modules/assistant/application/get-assistant-diagnostic.spec.ts
+  s_28445b1cbab356::t_69aa910b2643a8 1-31
+packages/contracts/src/user-platform/access-control.spec.ts
+  s_28445b1cbab356::t_2419f22cdc383a 7-8,44-45,58-71,73-85
+  s_28445b1cbab356::t_f8604ccb1c5b93 1-6,10-36,38-43,86-109,125-132,134-141
+  s_28445b1cbab356::t_281d2284e02b60 9,110-124
+  s_28445b1cbab356::t_e0fca69128ac82 37,49,72,133
+  s_28445b1cbab356::t_3c2aa3ab35e72b 46-48,50-57
+apps/assistant-cli/src/application/resolve-cli-startup.spec.ts
+  s_28445b1cbab356::t_3c2aa3ab35e72b 1-38
+packages/contracts/src/assistant-runtime/model-context-memory.ts
+  s_28445b1cbab356::t_0f7a4981e138be 11-17,36
+  s_28445b1cbab356::t_8d48ab54e6c4cf 1-10,18-35,37-66,71-121,125-135,147-148,154-175,178-191,193
+  s_28445b1cbab356::t_11f71872c3fb45 69
+  s_28445b1cbab356::t_06ce6e05f9eaaf 136-138
+  s_28445b1cbab356::t_5293b366bc5d3f 67-68,70,122-124,139-146,149-153,176-177,192
+apps/user-platform-service/test/app.e2e-spec.ts
+  s_28445b1cbab356::t_02f0d67192f2b0 24-25,28-29,31,34,37,40-41,45-47
+  s_28445b1cbab356::t_7be0a35cc64de7 1-23,26-27,30,32-33,35-36,38-39,42-44,48-51
+apps/assistant-runtime-service/README.md
+  s_28445b1cbab356::t_695eabad79e151 1-5,7-26
+  s_28445b1cbab356::t_106653490dab48 6
+apps/assistant-runtime-service/.env.example
+  s_28445b1cbab356::t_1926de2fff83aa 1-4,6,9,14-30,32-34,36-41
+  s_28445b1cbab356::t_ce8110751d4424 5,10-11
+  s_28445b1cbab356::t_fbbe68868254c1 7-8,12-13,31,35,42-67
+apps/user-platform-service/src/infrastructure/observability/observability.module.ts
+  s_28445b1cbab356::t_f136f5112d8fed 1-12
+apps/assistant-runtime-service/src/compatibility/assistant-contract-fixtures.spec.ts
+  s_28445b1cbab356::t_0e011bd4778479 3,8,29-30,36,42,57-58,60,64-67
+  s_28445b1cbab356::t_b1952f04598150 40,56
+  s_28445b1cbab356::t_4bb4b14a12312d 1-2,4-7,9-28,31-35,37-39,41,43-55,59,61-63,68-79
+apps/assistant-cli/src/application/resolve-cli-startup.ts
+  s_28445b1cbab356::t_3c2aa3ab35e72b 1-30
+apps/assistant-runtime-service/vitest.config.e2e.mts
+  s_28445b1cbab356::t_02f0d67192f2b0 1-12
+apps/assistant-runtime-service/src/modules/assistant/assistant.module.ts
+  s_28445b1cbab356::t_825238a7307c00 1-25
+apps/assistant-runtime-service/src/config/environment.ts
+  s_28445b1cbab356::t_ce8110751d4424 50,79,140-168,187,207-211
+  s_28445b1cbab356::t_3223ef00bb254d 78,80,87-96,191,240
+  s_28445b1cbab356::t_ac165729278e77 1-49,51-77,81-86,97-139,169-186,188-190,192-206,212-239
+apps/user-platform-service/src/infrastructure/database/postgres-migration-environment.ts
+  s_28445b1cbab356::t_a25237c56b7ef6 1-48
+apps/assistant-runtime-service/test/repositories/owner-scoped-repositories.e2e-spec.ts
+  s_28445b1cbab356::t_e1d8236f005a89 7,32
+  s_28445b1cbab356::t_9d0f2b9bd9ee3f 8,33
+  s_28445b1cbab356::t_c17c579cb3743b 57,69-102,119
+  s_28445b1cbab356::t_b89814dd72c1ad 1-6,9-31,34-56,58-60,103-118,120-136,144-181,190-195,205-219,231-237,247-254,265-270,280-302,319-325,335-337,359-368,373-378,399-407,412-419,500-509,522-524,528-531,541-542,549-552,566-568,572-575,585-587,591-596
+  s_28445b1cbab356::t_fec32ae2af4d0f 61-68
+  s_28445b1cbab356::t_e48fee8c72fa81 137-143,182-189,196-204,220-230,238-246,255-264,271-279,326-334,338-356,358,369-372,379,381-398,408-411,420-492,497-499,510-521,525-527,532-540,543-548,553-565,569-571,576-584,588-590
+  s_28445b1cbab356::t_1e4b4254396f69 303-318,357
+  s_28445b1cbab356::t_aa4b9537bade97 380,493-496
+apps/assistant-runtime-service/src/infrastructure/observability/correlation.middleware.ts
+  s_28445b1cbab356::t_825238a7307c00 1-24
+packages/contracts/src/assistant-runtime/protocol.spec.ts
+  s_28445b1cbab356::t_3fe0d53550e585 1-85
+packages/contracts/src/assistant-runtime/artifact-observability.spec.ts
+  s_28445b1cbab356::t_3eb946b0435980 48-49,131
+  s_28445b1cbab356::t_0ab44160e0153f 16-17,19,21,23
+  s_28445b1cbab356::t_8aa5f53821238f 12,18,20,22,41,112,116,118-119,127-129,132-133
+  s_28445b1cbab356::t_55d7f07e37b269 67,78,82-83,90
+  s_28445b1cbab356::t_3c0e7ac015c77d 80
+  s_28445b1cbab356::t_195ca926eab65f 65,68-70,130
+  s_28445b1cbab356::t_f95db537338f08 81,123,137,152
+  s_28445b1cbab356::t_684e81018b26a0 1-11,13-14,24-28,31-40,42-47,50-64,66,71-77,79,84-89,91-111,113-115,117,120-122,124-126,134-136,138-151,153-154
+  s_28445b1cbab356::t_fc63ffa52b943a 29-30
+  s_28445b1cbab356::t_23f3fc98c99d8e 15
+apps/assistant-runtime-service/src/modules/assistant/assistant.service.ts
+  s_28445b1cbab356::t_825238a7307c00 1-20
+apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177840000-add-assistant-runtime-product-uniqueness.ts
+  s_28445b1cbab356::t_2807e7941e33d4 1-73
+.github/workflows/assistant-contract-compatibility.yml
+  s_28445b1cbab356::t_8f4623aaca5089 20-22
+  s_28445b1cbab356::t_61544b9f1915d1 1-19,23-62
+packages/contracts/src/assistant-runtime/tools-collaboration.ts
+  s_28445b1cbab356::t_72fde3b9fe3a40 2,39,62,70,72-76,116,170
+  s_28445b1cbab356::t_7437b0b1f5f806 66-69,71,77-85,94,117-120
+  s_28445b1cbab356::t_14f04b83709235 129-134,139-141,154-156,158-167
+  s_28445b1cbab356::t_4c55290af1a63a 1,3-38,40-61,63-65,86-93,95-115,121-128,135-138,142-153,157,168-169,171-198,200,202-204
+  s_28445b1cbab356::t_8f0e122c33786d 199,201,205-206
+apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177660000-create-assistant-runtime-core.ts
+  s_28445b1cbab356::t_437b8732aa1505 61-68,103
+  s_28445b1cbab356::t_f948704100f3d8 1-10,12-28,30-55,57-60,69-94,96-102,104-130,132-153,155-181,183-197,199-216,218-251
+  s_28445b1cbab356::t_d990dea0549c00 11,29,56,95,131,154,182,198,217
+apps/user-platform-service/README.md
+  s_28445b1cbab356::t_7be0a35cc64de7 1-10
+packages/contracts/src/assistant-runtime/session-runtime.spec.ts
+  s_28445b1cbab356::t_a9886f94dfaac7 2,17-39,59-62
+  s_28445b1cbab356::t_cb65c3c64a8abf 1,3-6,8-13,15-16,40-42,44-45,47-49,63-68
+  s_28445b1cbab356::t_9dcef19aad4277 7,14,43,46,50-58
+apps/user-platform-service/src/infrastructure/observability/correlation-context.ts
+  s_28445b1cbab356::t_6728045b0d71f9 1-17
+apps/user-platform-service/src/config/environment.ts
+  s_28445b1cbab356::t_9be070d6f64a42 1-39,42-47,58-120,122-165
+  s_28445b1cbab356::t_3223ef00bb254d 40-41,48-57,121,166-171
+apps/assistant-runtime-service/src/app.module.ts
+  s_28445b1cbab356::t_1926de2fff83aa 1-18
+apps/assistant-runtime-service/src/modules/assistant/application/get-assistant-diagnostic.ts
+  s_28445b1cbab356::t_825238a7307c00 1-45
+apps/user-platform-service/src/compatibility/assistant-contract-fixtures.spec.ts
+  s_28445b1cbab356::t_48594a68a8b73c 40,56
+  s_28445b1cbab356::t_9f7456f10ed980 1-2,4-7,9-28,31-35,37-39,41,43-55,59,61-63,68-79
+  s_28445b1cbab356::t_0e011bd4778479 3,8,29-30,36,42,57-58,60,64-67
+packages/contracts/src/assistant-runtime/session-runtime.ts
+  s_28445b1cbab356::t_0423bac7049ece 86-87,89-90,92-94,109-112,116-120,124-125,128-129,168-169
+  s_28445b1cbab356::t_19e2c76935c1ad 95-104,140-154,164-166
+  s_28445b1cbab356::t_d8e2edf8885762 4,91
+  s_28445b1cbab356::t_ad2d33153fb999 1-3,5-85,88,105-108,113-115,121-123,126-127,130-139,155-163,167
+apps/assistant-runtime-service/src/infrastructure/database/migrations/1791177900000-add-atomic-session-commit-state.ts
+  s_28445b1cbab356::t_1e4459a9f42a11 11,63-67,70-72,108-111
+  s_28445b1cbab356::t_e4993457f9da0e 16-27,68-69,73-75,104
+  s_28445b1cbab356::t_f7dbb24187d8d9 1-10,12-15,28-62,76-103,105-107,112-114
+packages/contracts/src/user-platform/access-control.ts
+  s_28445b1cbab356::t_e0fca69128ac82 56,69,81,89
+  s_28445b1cbab356::t_f8604ccb1c5b93 1-13,28-55,63-68,70-71,78-80,82-88,90-102,104-116,129-130,132-142,144-146,148-151,153
+  s_28445b1cbab356::t_2419f22cdc383a 14-27,57-62,72-77,103,131,143,147
+  s_28445b1cbab356::t_281d2284e02b60 117-128,152
+apps/assistant-cli/.env.example
+  s_28445b1cbab356::t_ce8110751d4424 1-4
+  s_28445b1cbab356::t_e67252b05d1d30 5-15
+apps/user-platform-service/src/main.ts
+  s_28445b1cbab356::t_7be0a35cc64de7 1-11
+apps/user-platform-service/test/setup-environment.ts
+  s_28445b1cbab356::t_02f0d67192f2b0 1-17
+packages/contracts/tsconfig.json
+  s_28445b1cbab356::t_de63ffc8d3d4e9 4-5
+apps/assistant-runtime-service/src/config/environment.spec.ts
+  s_28445b1cbab356::t_c17bf5cee02d75 41-44,46-47,49-51,53,55,57,61
+  s_28445b1cbab356::t_ac165729278e77 1-4,6-7,9-40,45,48,52,54,56,58-60,62-78,86-88,90,100,102-113,123-133
+  s_28445b1cbab356::t_0b39ae7c2f917d 114-122
+  s_28445b1cbab356::t_ce8110751d4424 5,8,79-85,89,91-99,101
+packages/contracts/src/assistant-runtime/model-context-memory.spec.ts
+  s_28445b1cbab356::t_8719178813bb20 45-46,56-57,61-64,93-104
+  s_28445b1cbab356::t_06ce6e05f9eaaf 3-4,8-9,11-12,60,65-79
+  s_28445b1cbab356::t_11f71872c3fb45 44
+  s_28445b1cbab356::t_0f7a4981e138be 33
+  s_28445b1cbab356::t_84c8df4e93f623 1-2,5-7,10,13-32,34-43,47-55,58-59,80-92,105-106
+packages/contracts/fixtures/assistant/v1/positive.json
+  s_28445b1cbab356::t_8ab7c88cda4684 1-310
+apps/assistant-cli/src/presentation/diagnostic-presenter.ts
+  s_28445b1cbab356::t_f0d3dfcaae26af 1-29
+apps/assistant-cli/src/config/environment.spec.ts
+  s_28445b1cbab356::t_c17bf5cee02d75 28-39,42
+  s_28445b1cbab356::t_86cee3966489ea 48-53,56
+  s_28445b1cbab356::t_ce8110751d4424 5-7,19,21-22,46,55,57-71
+  s_28445b1cbab356::t_f0d3dfcaae26af 1-4,8-18,20,23-27,40-41,43-45,47,54,72-74
+turbo.json
+  s_28445b1cbab356::t_05cca36f46cce2 16-17,29-36,38-43
+  s_28445b1cbab356::t_03a1e101f0ccec 18-28,37,44-75
+  s_28445b1cbab356::t_8fe9283bfd7687 5
+apps/assistant-cli/src/runtime-client.ts
+  s_28445b1cbab356::t_a56a10a41366f3 1-9
+apps/assistant-cli/src/config/environment.ts
+  s_28445b1cbab356::t_f0d3dfcaae26af 1-23,28,30,32,48-69,72-83
+  s_28445b1cbab356::t_ce8110751d4424 24-27,29,31,33-47,70-71
+apps/assistant-runtime-service/vitest.config.transactions.mts
+  s_28445b1cbab356::t_161ea5c46471f3 1-10
+apps/assistant-cli/src/cli.ts
+  s_28445b1cbab356::t_d773f3a0ca6b5d 8,59-63
+  s_28445b1cbab356::t_3c2aa3ab35e72b 9,46-51
+  s_28445b1cbab356::t_a56a10a41366f3 1-7,10-45,52-58,64-91
+apps/assistant-runtime-service/vitest.config.repositories.mts
+  s_28445b1cbab356::t_b89814dd72c1ad 1-10
+packages/contracts/fixtures/assistant/v1/compatibility-manifest.json
+  s_28445b1cbab356::t_a86e5f29c2045a 363-374
+  s_28445b1cbab356::t_8ab7c88cda4684 1-362,375-388
+packages/contracts/src/assistant-runtime/protocol.ts
+  s_28445b1cbab356::t_3fe0d53550e585 1-151
+apps/user-platform-service/vitest.config.mts
+  s_28445b1cbab356::t_7be0a35cc64de7 1-11
+.gitignore
+  s_28445b1cbab356::t_4662dfcebf0eea 16-17
+apps/user-platform-service/src/infrastructure/database/migrations/1791177780000-add-assistant-user-product-uniqueness.ts
+  s_28445b1cbab356::t_2807e7941e33d4 1-26
+apps/assistant-runtime-service/test/transactions/idempotent-command.e2e-spec.ts
+  s_28445b1cbab356::t_b96368be1f544f 106,110
+  s_28445b1cbab356::t_629efbb46553c0 1-6,8-33,35-105,107-109,111-166
+  s_28445b1cbab356::t_9d0f2b9bd9ee3f 7,34
+apps/user-platform-service/src/infrastructure/database/migrations/1791177600000-create-user-platform-identity.ts
+  s_28445b1cbab356::t_437b8732aa1505 57-60
+  s_28445b1cbab356::t_d990dea0549c00 11,27-28,48-49,67-68
+  s_28445b1cbab356::t_a25237c56b7ef6 1-10,12-26,29-47,50-56,61-66,69-70
+apps/assistant-runtime-service/package.json
+  s_28445b1cbab356::t_2b89bbc689d956 23-24,27-29
+  s_28445b1cbab356::t_b89814dd72c1ad 25
+  s_28445b1cbab356::t_60504dc3fc9dfe 1-22,30-37,39,42-50,52-62
+  s_28445b1cbab356::t_161ea5c46471f3 26
+  s_28445b1cbab356::t_20721f6ba45825 38,40-41,51
+apps/assistant-runtime-service/src/infrastructure/observability/structured-diagnostic-logger.ts
+  s_28445b1cbab356::t_825238a7307c00 1-22
+apps/user-platform-service/src/infrastructure/observability/correlation.middleware.ts
+  s_28445b1cbab356::t_6728045b0d71f9 1-23
+apps/assistant-cli/package.json
+  s_28445b1cbab356::t_60504dc3fc9dfe 1-33
+packages/contracts/src/assistant-runtime/compatibility-fixtures.spec.ts
+  s_28445b1cbab356::t_ad80d4139f783c 3,5-8,10-35,37-41,43,45-100
+  s_28445b1cbab356::t_e647b1afc3c699 42
+  s_28445b1cbab356::t_0e011bd4778479 1-2,4,9,36,44
+apps/assistant-cli/src/application/run-ping-diagnostic.ts
+  s_28445b1cbab356::t_d773f3a0ca6b5d 1-23
+apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-outbox.port.ts
+  s_28445b1cbab356::t_22e95930cf6ab3 1-71
+apps/user-platform-service/vitest.config.migrations.mts
+  s_28445b1cbab356::t_2b89bbc689d956 1-10
+packages/contracts/src/shared/health.ts
+  s_cb926ad6c1a0a7::t_dc537a338f92c6 20
+  s_28445b1cbab356::t_c6b19e02b0e824 22,34-35
+apps/user-platform-service/nest-cli.json
+  s_28445b1cbab356::t_7be0a35cc64de7 1-8
+apps/assistant-runtime-service/src/modules/assistant/application/ports/assistant-runtime-command.port.ts
+  s_28445b1cbab356::t_629efbb46553c0 1-68
+apps/assistant-runtime-service/vitest.config.migrations.mts
+  s_28445b1cbab356::t_2b89bbc689d956 1-10
+.github/workflows/assistant-postgres-migrations.yml
+  s_28445b1cbab356::t_f75f0a31f506ed 1-72
+packages/contracts/fixtures/assistant/v1/negative.json
+  s_28445b1cbab356::t_8ab7c88cda4684 1-55
+apps/user-platform-service/src/modules/health/health.constants.ts
+  s_28445b1cbab356::t_7be0a35cc64de7 1-5
+apps/user-platform-service/src/config/environment.spec.ts
+  s_28445b1cbab356::t_9be070d6f64a42 1-38,42,45,48,52-83,93
+  s_28445b1cbab356::t_0b39ae7c2f917d 84-92
+  s_28445b1cbab356::t_c17bf5cee02d75 39-41,43-44,46-47,49-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "af0bb8280843924e628bbbbab66f3b73590be55f",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_28445b1cbab356": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10a38-3fcd-7f60-811f-79839968c297",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    },
+    "s_cb926ad6c1a0a7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ad437a7f-ec0a-40fb-a897-01bbd8499cdd",
+        "model": "grok-4.6"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
