@@ -7,6 +7,8 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
+    "test:assistant-contract-compatibility": "pnpm --filter @repo/contracts build && pnpm --filter @repo/contracts test && pnpm --filter assistant-cli build && pnpm --filter assistant-cli test:compatibility && pnpm --filter assistant-runtime-service build && pnpm --filter assistant-runtime-service test:compatibility && pnpm --filter user-platform-service build && pnpm --filter user-platform-service test:compatibility",
+    "test:assistant-postgres-migrations": "POSTGRES_SCHEMA=user_platform_test pnpm --filter user-platform-service test:migrations && POSTGRES_SCHEMA=assistant_runtime_test pnpm --filter assistant-runtime-service test:migrations",
     "cz": "git-cz",
     "agent:sync": "rulesync install --frozen && rulesync generate",
     "agent:update": "rulesync install --update && rulesync generate",
@@ -21,6 +23,7 @@
     "docker:clean": "podman compose --env-file .env.dev down -v && rm -rf ./volumes"
   },
   "devDependencies": {
+    "@fission-ai/openspec": "1.12.0",
     "commitizen": "^4.3.1",
     "cz-emoji": "1.3.2-canary.2",
     "prettier": "3.9.6",

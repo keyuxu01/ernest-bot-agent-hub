@@ -17,7 +17,9 @@ const SharedHealthProbeResponseSchema = z.object({
 
 const SharedKnownServiceNameSchema = z.enum([
   'agentic-rag-business-service',
+  'assistant-runtime-service',
   'mcp-app-collections',
+  'user-platform-service',
 ]);
 
 /**
@@ -29,6 +31,8 @@ const SharedServiceIdentityResponseSchema = z.object({
   instanceId: z.string().min(1),
   deploymentId: z.string().min(1).nullable(),
   version: z.string().min(1),
+  buildId: z.string().min(1).optional(),
+  correlationId: z.string().min(1).max(128).optional(),
   uptimeSeconds: z.number().int().nonnegative(),
 });
 

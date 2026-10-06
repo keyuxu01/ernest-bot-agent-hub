@@ -1,0 +1,17 @@
+Object.assign(process.env, {
+  SERVICE_VERSION: 'e2e-test',
+  SERVICE_BUILD_ID: 'e2e-build',
+  POSTGRES_HOST: 'localhost',
+  POSTGRES_USER: 'test-user',
+  POSTGRES_PASSWORD: 'test-password',
+  POSTGRES_DB: 'test-db',
+  GOOGLE_CLIENT_ID: 'test-client-id',
+  GOOGLE_CLIENT_SECRET: 'test-client-secret',
+  OAUTH_ALLOWED_REDIRECT_URIS: 'http://127.0.0.1:49152/callback',
+  SIGNING_KEY_ID: 'test-key-id',
+  SIGNING_PRIVATE_KEY: 'test-private-key',
+  SIGNING_PUBLIC_KEY: 'test-public-key',
+  TOKEN_ISSUER: 'https://identity.example.test',
+  ENCRYPTION_KEY_ID: 'test-encryption-key',
+  ENCRYPTION_MASTER_KEY: 'test-encryption-material',
+});

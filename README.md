@@ -1,23 +1,30 @@
 # Ernest Bot Agent
 
-基于 pnpm 与 Turborepo 的 TypeScript monorepo，包含两个 Next.js 应用、两个 NestJS 服务以及共享配置、契约和 UI 包。
+基于 pnpm 与 Turborepo 的 TypeScript monorepo，包含 Next.js 应用、NestJS 服务、助手 Runtime / CLI，
+以及共享配置、契约和 UI 包。
 
 ## 应用与端口
 
-当前共有 **4 个应用**：
+当前共有 **6 个应用**：
 
-| 应用                           | 技术栈  | 本地开发默认端口 | 用途                     |
-| ------------------------------ | ------- | ---------------: | ------------------------ |
-| `agentic-rag-client`           | Next.js |           `3000` | Agentic RAG 前端         |
-| `docs`                         | Next.js |           `3001` | 项目文档站点             |
-| `agentic-rag-business-service` | NestJS  |           `9020` | Agentic RAG 业务服务     |
-| `mcp-app-collections`          | NestJS  |           `9021` | MCP App Collections 服务 |
+| 应用                           | 技术栈     | 本地开发默认端口 | 用途                                      |
+| ------------------------------ | ---------- | ---------------: | ----------------------------------------- |
+| `agentic-rag-client`           | Next.js    |           `3000` | Agentic RAG 前端                          |
+| `docs`                         | Next.js    |           `3001` | 项目文档站点                              |
+| `agentic-rag-business-service` | NestJS     |           `9020` | Agentic RAG 业务服务                      |
+| `mcp-app-collections`          | NestJS     |           `9021` | 公共 MCP Tool 抽象（RAG / 助手共用）      |
+| `assistant-runtime-service`    | NestJS     |           `9030` | 助手 Agent Runtime（非 RAG）              |
+| `assistant-cli`                | Node CLI   |              —   | 助手本地控制台，默认连 `localhost:9030`   |
 
-两个 NestJS 服务支持通过 `PORT` 环境变量覆盖默认端口。前端默认通过
-`http://localhost:9020` 访问业务服务；Server Component 可使用 `API_BASE_URL`，浏览器 query
+NestJS 服务支持通过 `PORT` 环境变量覆盖默认端口。前端默认通过
+`http://localhost:9020` 访问 RAG 业务服务；Server Component 可使用 `API_BASE_URL`，浏览器 query
 使用 `NEXT_PUBLIC_API_BASE_URL`。浏览器直接请求业务 API Origin，不经过 Vercel 同源代理。
 
-两个 NestJS 服务以 CommonJS 产物运行，但使用 TypeScript `NodeNext` 解析，并要求 Node.js 24 或
+助手控制台默认 `ASSISTANT_RUNTIME_URL=http://localhost:9030`，工具侧通过 Runtime 配置的
+`MCP_COLLECTIONS_URL` 指向 `mcp-app-collections`。方案见
+[Assistant Runtime 提案](docs/architecture/proposals/2026-10-05-node-agent-runtime-plan.md)。
+
+NestJS 服务以 CommonJS 产物运行，但使用 TypeScript `NodeNext` 解析，并要求 Node.js 24 或
 更高版本，以同步加载 oRPC 等 ESM-only 依赖。共享 `@repo/contracts` 由 Turbo 先行构建，所有运行时
 入口都指向 `dist`；详见 [ADR-0012](docs/architecture/decisions/0012-use-commonjs-nestjs.md)。
 
@@ -33,12 +40,16 @@
 │   ├── docs/                            # Next.js 文档站点，端口 3001
 │   │   ├── app/
 │   │   └── public/
-│   ├── agentic-rag-business-service/   # NestJS 业务服务，端口 9020
+│   ├── agentic-rag-business-service/   # NestJS RAG 业务服务，端口 9020
 │   │   ├── src/                         # 模块、控制器和服务
 │   │   └── test/                        # e2e 测试
-│   └── mcp-app-collections/             # NestJS MCP 服务，端口 9021
-│       ├── src/                         # 模块、控制器和服务
-│       └── test/                        # e2e 测试
+│   ├── mcp-app-collections/             # 公共 MCP Tool 服务，端口 9021
+│   │   ├── src/                         # 模块、控制器和服务
+│   │   └── test/                        # e2e 测试
+│   ├── assistant-runtime-service/       # 助手 Runtime，端口 9030
+│   │   └── src/
+│   └── assistant-cli/                   # 助手本地控制台
+│       └── src/
 ├── packages/
 │   ├── eslint-config/                   # 共享 ESLint 配置
 │   ├── contracts/                       # Zod 运行时契约及推导类型

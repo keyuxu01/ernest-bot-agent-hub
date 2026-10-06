@@ -1,0 +1,55 @@
+{
+  "cases": {
+    "up-oauth-authorization-unknown-version": {
+      "schemaVersion": 2,
+      "redirectUri": "http://127.0.0.1:49152/callback",
+      "codeChallenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "codeChallengeMethod": "S256",
+      "state": "TEST_ONLY_STATE_0000000000000000",
+      "nonce": "TEST_ONLY_NONCE_0000000000000000"
+    },
+    "up-admission-unknown-discriminator": {
+      "schemaVersion": 1,
+      "status": "pending",
+      "message": "fixture only"
+    },
+    "runtime-command-missing-version": {
+      "metadata": { "schemaVersion": 1, "commandId": "command-create-1" },
+      "type": "create_session",
+      "title": "Fixture session"
+    },
+    "runtime-command-unknown-discriminator": {
+      "schemaVersion": 1,
+      "metadata": { "schemaVersion": 1, "commandId": "command-unknown-1" },
+      "sessionId": "session-1",
+      "type": "suggest_session"
+    },
+    "runtime-event-unknown-payload-version": {
+      "schemaVersion": 1,
+      "frameType": "event",
+      "eventId": "event-2",
+      "sessionId": "session-1",
+      "runId": "run-1",
+      "sequence": 10,
+      "occurredAt": "2026-10-05T10:01:02Z",
+      "type": "message",
+      "payloadVersion": 2,
+      "payload": {
+        "type": "message",
+        "role": "assistant",
+        "text": "unsupported fixture version"
+      }
+    },
+    "runtime-mcp-non-https": {
+      "schemaVersion": 1,
+      "connectionId": "mcp-1",
+      "resourceVersion": 1,
+      "ownerId": "owner-1",
+      "displayName": "Fixture MCP",
+      "transport": "https",
+      "endpoint": "http://mcp.example.test/api",
+      "enabled": true,
+      "authReference": "secret://fixture/mcp-1"
+    }
+  }
+}

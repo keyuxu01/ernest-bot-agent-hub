@@ -1,0 +1,53 @@
+{
+  "name": "user-platform-service",
+  "version": "0.0.1",
+  "description": "Assistant identity and access platform service",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "dev": "nest start --watch",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:compatibility": "vitest run src/compatibility/assistant-contract-fixtures.spec.ts",
+    "test:watch": "vitest",
+    "test:e2e": "vitest run --config ./vitest.config.e2e.mts",
+    "test:migrations": "pnpm build && vitest run --config ./vitest.config.migrations.mts",
+    "migration:run": "pnpm build && typeorm migration:run -d dist/infrastructure/database/user-platform-migration-data-source.js",
+    "migration:revert": "pnpm build && typeorm migration:revert -d dist/infrastructure/database/user-platform-migration-data-source.js",
+    "migration:show": "pnpm build && typeorm migration:show -d dist/infrastructure/database/user-platform-migration-data-source.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^12.0.1",
+    "@nestjs/config": "^12.0.1",
+    "@nestjs/core": "^12.0.1",
+    "@nestjs/platform-express": "^12.0.1",
+    "@nestjs/terminus": "12.1.0",
+    "@repo/contracts": "workspace:*",
+    "pg": "^8.23.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "typeorm": "^1.1.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^12.0.0",
+    "@nestjs/testing": "^12.0.1",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/express": "^5.0.0",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.23.1",
+    "@types/supertest": "^7.0.0",
+    "eslint": "10.9.1",
+    "prettier": "^3.4.2",
+    "supertest": "^7.0.0",
+    "typescript": "^6.0.2",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.1.2"
+  }
+}

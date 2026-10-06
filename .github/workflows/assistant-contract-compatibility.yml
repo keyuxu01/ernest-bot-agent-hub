@@ -1,0 +1,62 @@
+name: Assistant contract compatibility
+
+on:
+  pull_request:
+    paths:
+      - 'packages/contracts/**'
+      - 'apps/assistant-cli/**'
+      - 'apps/assistant-runtime-service/**'
+      - 'apps/user-platform-service/**'
+      - '.github/workflows/assistant-contract-compatibility.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/contracts/**'
+      - 'apps/assistant-cli/**'
+      - 'apps/assistant-runtime-service/**'
+      - 'apps/user-platform-service/**'
+      - '.github/workflows/assistant-contract-compatibility.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.23.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install the frozen workspace
+        run: pnpm install --frozen-lockfile
+      - name: Verify static producer and consumer compatibility
+        run: pnpm test:assistant-contract-compatibility
+      - name: Verify affected lint and types
+        run: |
+          pnpm --filter @repo/contracts lint
+          pnpm --filter @repo/contracts check-types
+          pnpm --filter assistant-cli lint
+          pnpm --filter assistant-cli check-types
+          pnpm --filter assistant-runtime-service lint
+          pnpm --filter assistant-runtime-service check-types
+          pnpm --filter user-platform-service lint
+          pnpm --filter user-platform-service check-types
+      - name: Verify the monorepo build and OpenSpec change
+        run: |
+          pnpm build
+          pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+          git diff --check
+      - name: Reject credential material in compatibility fixtures
+        shell: bash
+        run: |
+          if grep -RInE --include='*.json' '(m0-[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' packages/contracts/fixtures/assistant; then
+            echo 'Credential-like material found in Assistant compatibility fixtures.' >&2
+            exit 1
+          fi

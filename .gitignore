@@ -13,6 +13,8 @@ node_modules
 .env.prod
 apps/agentic-rag-business-service/.env.dev
 apps/agentic-rag-business-service/.env.prod
+apps/assistant-runtime-service/.env.dev
+apps/assistant-runtime-service/.env.prod
 .env.development.local
 .env.test.local
 .env.production.local

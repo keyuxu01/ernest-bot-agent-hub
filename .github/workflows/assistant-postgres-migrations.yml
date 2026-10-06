@@ -1,0 +1,72 @@
+name: Assistant PostgreSQL migrations
+
+on:
+  pull_request:
+    paths:
+      - 'apps/assistant-runtime-service/**'
+      - 'apps/user-platform-service/**'
+      - '.github/workflows/assistant-postgres-migrations.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/assistant-runtime-service/**'
+      - 'apps/user-platform-service/**'
+      - '.github/workflows/assistant-postgres-migrations.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+jobs:
+  migrations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: assistant_test
+          POSTGRES_PASSWORD: TEST_ONLY_NOT_A_REAL_PASSWORD
+          POSTGRES_DB: assistant_migration_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U assistant_test -d assistant_migration_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: assistant_test
+      POSTGRES_PASSWORD: TEST_ONLY_NOT_A_REAL_PASSWORD
+      POSTGRES_DB: assistant_migration_test
+      POSTGRES_SSL: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.23.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install the frozen workspace
+        run: pnpm install --frozen-lockfile
+      - name: Run UserPlatform migrations against PostgreSQL 16
+        env:
+          POSTGRES_SCHEMA: user_platform_ci_test
+        run: pnpm --filter user-platform-service test:migrations
+      - name: Run AssistantRuntime migrations against PostgreSQL 16
+        env:
+          POSTGRES_SCHEMA: assistant_runtime_ci_test
+        run: pnpm --filter assistant-runtime-service test:migrations
+      - name: Verify affected packages and OpenSpec
+        run: |
+          pnpm --filter user-platform-service lint
+          pnpm --filter user-platform-service check-types
+          pnpm --filter assistant-runtime-service lint
+          pnpm --filter assistant-runtime-service check-types
+          pnpm build
+          pnpm exec openspec validate implement-node-assistant-runtime --type change --strict --json
+          git diff --check

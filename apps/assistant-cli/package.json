@@ -1,0 +1,33 @@
+{
+  "name": "assistant-cli",
+  "version": "0.0.1",
+  "description": "Local console client for assistant-runtime-service",
+  "private": true,
+  "license": "UNLICENSED",
+  "bin": {
+    "assistant-cli": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:compatibility": "vitest run src/compatibility/assistant-contract-fixtures.spec.ts",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@repo/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^24.0.0",
+    "eslint": "10.9.1",
+    "tsx": "^4.20.5",
+    "typescript": "^6.0.2",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.1.2"
+  }
+}

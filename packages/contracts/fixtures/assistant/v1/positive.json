@@ -1,0 +1,310 @@
+{
+  "cases": {
+    "up-oauth-authorization-v1": {
+      "schemaVersion": 1,
+      "redirectUri": "http://127.0.0.1:49152/callback",
+      "codeChallenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "codeChallengeMethod": "S256",
+      "state": "TEST_ONLY_STATE_0000000000000000",
+      "nonce": "TEST_ONLY_NONCE_0000000000000000"
+    },
+    "up-oauth-callback-v1": {
+      "schemaVersion": 1,
+      "code": "TEST_ONLY_AUTHORIZATION_CODE",
+      "state": "TEST_ONLY_STATE_0000000000000000",
+      "codeVerifier": "TEST_ONLY_VERIFIER_0000000000000000000000000",
+      "redirectUri": "http://localhost:49152/callback"
+    },
+    "up-admission-v1": {
+      "schemaVersion": 1,
+      "status": "admitted",
+      "accessToken": "TEST_ONLY_NOT_A_REAL_SIGNED_TOKEN",
+      "tokenType": "Bearer",
+      "expiresInSeconds": 300
+    },
+    "up-user-v1": {
+      "schemaVersion": 1,
+      "subject": "fixture-subject-1",
+      "normalizedEmail": "fixture@example.test",
+      "enabled": true,
+      "resourceVersion": 1
+    },
+    "up-token-claims-standard": {
+      "iss": "https://identity.example.test",
+      "aud": "assistant-runtime",
+      "sub": "fixture-subject-1",
+      "iat": 1800000000,
+      "exp": 1800000300
+    },
+    "runtime-create-session-v1": {
+      "schemaVersion": 1,
+      "metadata": { "schemaVersion": 1, "commandId": "command-create-1" },
+      "type": "create_session",
+      "title": "Fixture session"
+    },
+    "runtime-update-settings-v1": {
+      "schemaVersion": 1,
+      "metadata": {
+        "schemaVersion": 1,
+        "commandId": "command-settings-1",
+        "expectedVersion": 2
+      },
+      "sessionId": "session-1",
+      "type": "update_settings",
+      "patch": {
+        "providerConnectionId": "connection-1",
+        "model": "fixture/model-v1",
+        "reasoningEffort": "high",
+        "serviceTier": "priority"
+      }
+    },
+    "runtime-fork-v1": {
+      "schemaVersion": 1,
+      "metadata": { "schemaVersion": 1, "commandId": "command-fork-1" },
+      "sessionId": "session-1",
+      "type": "fork",
+      "atSequence": 9
+    },
+    "runtime-session-v1": {
+      "schemaVersion": 1,
+      "sessionId": "session-1",
+      "resourceVersion": 2,
+      "title": "Fixture session",
+      "archived": false,
+      "activeHeadSequence": 9,
+      "activeRunId": "run-1",
+      "createdAt": "2026-10-05T10:00:00Z",
+      "updatedAt": "2026-10-05T10:01:00Z"
+    },
+    "runtime-command-accepted-v1": {
+      "schemaVersion": 1,
+      "commandId": "command-create-1",
+      "correlationId": "correlation-1",
+      "acceptedAt": "2026-10-05T10:00:00Z",
+      "resource": { "schemaVersion": 1, "resourceId": "session-1", "resourceVersion": 1 }
+    },
+    "runtime-error-v1": {
+      "schemaVersion": 1,
+      "code": "VERSION_CONFLICT",
+      "message": "The resource changed; refetch before retrying.",
+      "retry": "not_retryable",
+      "correlationId": "correlation-1",
+      "details": { "currentVersion": 3 }
+    },
+    "runtime-sse-event-v1": {
+      "schemaVersion": 1,
+      "frameType": "event",
+      "eventId": "event-1",
+      "sessionId": "session-1",
+      "runId": "run-1",
+      "sequence": 9,
+      "occurredAt": "2026-10-05T10:01:00Z",
+      "type": "tool",
+      "payloadVersion": 1,
+      "payload": { "type": "tool", "toolExecutionId": "tool-1", "phase": "completed" }
+    },
+    "runtime-sse-heartbeat-v1": {
+      "schemaVersion": 1,
+      "frameType": "heartbeat",
+      "emittedAt": "2026-10-05T10:01:01Z"
+    },
+    "runtime-sse-close-v1": {
+      "schemaVersion": 1,
+      "frameType": "resumable_close",
+      "sessionId": "session-1",
+      "afterSequence": 9,
+      "reason": "token_expired"
+    },
+    "runtime-model-selection-v1": {
+      "schemaVersion": 1,
+      "connectionId": "connection-1",
+      "model": "fixture/model-v1",
+      "reasoningEffort": "high",
+      "serviceTier": "priority"
+    },
+    "runtime-provider-reference-v1": {
+      "schemaVersion": 1,
+      "connectionId": "connection-1",
+      "resourceVersion": 1,
+      "baseUrl": "https://models.example.test/v1",
+      "keyHint": "…TST1",
+      "revoked": false
+    },
+    "runtime-memory-operation-v1": {
+      "schemaVersion": 1,
+      "operationId": "memory-op-1",
+      "memoryProvider": "mem0_platform",
+      "memoryScope": { "scope": "session", "sessionId": "session-1" },
+      "operation": "recall",
+      "query": "fixture preferences",
+      "topK": 5
+    },
+    "runtime-mcp-configuration-v1": {
+      "schemaVersion": 1,
+      "connectionId": "mcp-1",
+      "resourceVersion": 1,
+      "ownerId": "owner-1",
+      "displayName": "Fixture MCP",
+      "transport": "https",
+      "endpoint": "https://mcp.example.test/api",
+      "enabled": true,
+      "authReference": "secret://fixture/mcp-1"
+    },
+    "runtime-local-tool-request-v1": {
+      "schemaVersion": 1,
+      "executionId": "execution-1",
+      "attempt": 1,
+      "bindingId": "binding-1",
+      "requestHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "fencingToken": 7,
+      "runId": "run-1",
+      "sessionId": "session-1",
+      "workspaceId": "workspace-1",
+      "approvalPolicyVersion": 1,
+      "idempotency": "safe_retry",
+      "tool": {
+        "schemaVersion": 1,
+        "toolVersion": 1,
+        "toolName": "read_file",
+        "relativePath": "README.md",
+        "offset": 0,
+        "limit": 100
+      },
+      "createdAt": "2026-10-05T10:02:00Z"
+    },
+    "runtime-local-tool-result-v1": {
+      "schemaVersion": 1,
+      "executionId": "execution-1",
+      "attempt": 1,
+      "bindingId": "binding-1",
+      "requestHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "fencingToken": 7,
+      "commandId": "command-result-1",
+      "idempotencyKey": "fixture-result-1",
+      "expectedExecutionVersion": 2,
+      "completedAt": "2026-10-05T10:02:01Z",
+      "status": "completed",
+      "result": {
+        "schemaVersion": 1,
+        "toolVersion": 1,
+        "toolName": "read_file",
+        "status": "completed",
+        "content": "fixture content",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    "runtime-process-command-v1": {
+      "schemaVersion": 1,
+      "executionId": "execution-2",
+      "attempt": 1,
+      "bindingId": "binding-1",
+      "requestHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "fencingToken": 7,
+      "operationId": "operation-1",
+      "idempotencyKey": "fixture-process-1",
+      "command": "start",
+      "executable": "pnpm",
+      "arguments": ["test"],
+      "workingDirectory": {
+        "workspaceId": "workspace-1",
+        "workspaceFingerprint": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "requestedRelativePath": ".",
+        "canonicalRelativePath": ".",
+        "containment": "inside_workspace",
+        "symbolicLinkEscape": false
+      },
+      "terminal": false
+    },
+    "runtime-interrupt-v1": {
+      "schemaVersion": 1,
+      "interruptId": "interrupt-1",
+      "runId": "run-1",
+      "checkpointId": "checkpoint-1",
+      "resourceVersion": 1,
+      "allowedResponders": { "ownerId": "owner-1", "bindingIds": ["binding-1"] },
+      "kind": "question",
+      "prompt": "Choose a fixture mode",
+      "answerFormat": "single_choice",
+      "displayPolicy": "plain",
+      "choiceSetHash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "choices": [
+        { "choiceId": "safe", "label": "Safe" },
+        { "choiceId": "fast", "label": "Fast" }
+      ]
+    },
+    "runtime-interrupt-resolution-v1": {
+      "schemaVersion": 1,
+      "interruptId": "interrupt-1",
+      "runId": "run-1",
+      "checkpointId": "checkpoint-1",
+      "resourceVersion": 1,
+      "responderOwnerId": "owner-1",
+      "responderBindingId": "binding-1",
+      "commandId": "command-answer-1",
+      "idempotencyKey": "fixture-answer-1",
+      "interruptKind": "question",
+      "answerFormat": "single_choice",
+      "resolution": "answered",
+      "choiceSetHash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "selectedChoiceId": "safe"
+    },
+    "runtime-subagent-request-v1": {
+      "schemaVersion": 1,
+      "parentRunId": "run-parent",
+      "childRunId": "run-child",
+      "lineage": ["run-root", "run-parent"],
+      "objective": "Review the fixture",
+      "isolatedContextSnapshotId": "snapshot-child-1",
+      "parentSnapshotReference": {
+        "parentRunId": "run-parent",
+        "snapshotId": "snapshot-parent-1",
+        "resourceVersion": 3,
+        "snapshotHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "budgetLedgerVersion": 4
+      },
+      "childPermissions": {
+        "ownerId": "owner-1",
+        "workspaceId": "workspace-1",
+        "toolNames": ["read_file"],
+        "memoryScopes": ["owner"]
+      },
+      "childBudget": {
+        "maxTokens": 2000,
+        "maxToolExecutions": 5,
+        "deadlineAt": "2026-10-05T10:10:00Z"
+      },
+      "budgetReservationId": "reservation-1",
+      "returnMode": "automatic_to_parent"
+    },
+    "runtime-artifact-reference-v1": {
+      "schemaVersion": 1,
+      "artifactId": "artifact-1",
+      "referenceId": "reference-1",
+      "resourceVersion": 1,
+      "contentSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "mimeType": "text/plain",
+      "byteSize": 15
+    },
+    "runtime-liveness-v1": {
+      "schemaVersion": 1,
+      "status": "alive",
+      "service": "assistant-runtime-service",
+      "instanceId": "runtime-fixture-1",
+      "checkedAt": "2026-10-05T10:03:00Z"
+    },
+    "runtime-ping-diagnostic": {
+      "status": "ok",
+      "service": "assistant-runtime-service",
+      "message": "fixture pong",
+      "mcpCollectionsUrl": null,
+      "correlationId": "correlation-ping-1",
+      "version": "0.0.1",
+      "buildId": "fixture-build"
+    },
+    "user-platform-health-diagnostic": {
+      "status": "ok",
+      "info": { "service": { "status": "up" } },
+      "details": { "service": { "status": "up" } }
+    }
+  }
+}

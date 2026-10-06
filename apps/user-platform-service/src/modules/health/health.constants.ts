@@ -1,0 +1,5 @@
+const USER_PLATFORM_SERVICE_NAME = 'user-platform-service' as const;
+const LOCAL_INSTANCE_ID = 'local';
+const UNKNOWN_SERVICE_VERSION = 'development';
+
+export { LOCAL_INSTANCE_ID, UNKNOWN_SERVICE_VERSION, USER_PLATFORM_SERVICE_NAME };
