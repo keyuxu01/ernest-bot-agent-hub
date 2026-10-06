@@ -1,0 +1,368 @@
+openspec/changes/implement-node-assistant-runtime/acceptance/real-client-e2e.md
+  s_28445b1cbab356::t_64b1d29acfd92e 74
+  s_28445b1cbab356::t_d3b59894326d28 1,5,48,56,78,218,234
+  s_28445b1cbab356::t_c21e679dfdac67 41,95-98,108
+  s_28445b1cbab356::t_408b394fcf3b6e 21-22,37,47,57-58,60,62,65,69,72-73
+  s_28445b1cbab356::t_95d17ff03f4927 84-93
+  s_28445b1cbab356::t_5fbd7f42d1964b 13,23-24,50,70,77
+  s_28445b1cbab356::t_39f103aeda6ab2 2-4,6-12,14-20,25-36,38-40,42-45,49,51-55,59,61,63-64,66-68,71,75-76,79,221-233
+  s_28445b1cbab356::t_771eb443c50155 80-83,94,99,101-107,109-115,122-125,127-134,136-141,149,151-152,155-159,161-162,165-168,172-177,179-182,187-192,194-195,199-201,204-211,213-214,216,219-220
+  s_28445b1cbab356::t_106653490dab48 148
+  s_28445b1cbab356::t_bb6f03b0b3dd9f 154
+  s_28445b1cbab356::t_72ccd9f85721ee 117-118,142-144,146-147,150,163,169-171,183,196-198
+  s_28445b1cbab356::t_47c9c502c3751e 119,121,126,153,215,217
+  s_28445b1cbab356::t_3bc51d8de2fcd5 120,145,164,184-186,202-203
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T095500Z-artifact-observability-contracts/start-contract.yaml
+  s_28445b1cbab356::t_55ef928b8216de 1-61
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T123000Z-postgres-durable-extensions-remediation-2/start-contract.yaml
+  s_28445b1cbab356::t_7622126e8d8607 1-52
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T133223Z-owner-scoped-repositories/end-audit.yaml
+  s_28445b1cbab356::t_a5655b724b548a 5,62-67
+  s_28445b1cbab356::t_0c9d9f66e006e4 1-4,6-61,68
+openspec/changes/implement-node-assistant-runtime/tasks.md
+  s_28445b1cbab356::t_3b0bdbf0365dbc 45,56-58,60,86,100-101,119,127,132-133,140,142-143,162
+  s_28445b1cbab356::t_a8e08628e092c2 24
+  s_28445b1cbab356::t_6ddf49560a5bce 1-2,8-10,17-19,28-30,39-42,44,47-48,50-55,59,61-84,87-99,104-106,108-112,114-118,121-126,128-131,134-139,141,144-153,155-158,163,165-167,169-170,172-179
+  s_28445b1cbab356::t_f88bd9c4cbf926 102
+  s_28445b1cbab356::t_c5f6a4da15a6a9 43,46,154
+  s_28445b1cbab356::t_eaa1d0a61449f5 31
+  s_28445b1cbab356::t_df1dc5c1c2b75c 11-12
+  s_28445b1cbab356::t_0b112a8d739717 26
+  s_28445b1cbab356::t_ee3b0dd1555b8b 27
+  s_28445b1cbab356::t_33de3598f0e217 32
+  s_28445b1cbab356::t_12725efc231894 36
+  s_28445b1cbab356::t_d416235e89d36e 38
+  s_28445b1cbab356::t_b2383b43254442 103,159,164,168
+  s_28445b1cbab356::t_1791ce18b88c4b 107,113
+  s_28445b1cbab356::t_0dc720b9025277 5-7
+  s_28445b1cbab356::t_9eb8223d1aad03 25
+  s_28445b1cbab356::t_223ed0a1c58a49 37
+  s_28445b1cbab356::t_d15f8e2a51ddd7 35
+  s_28445b1cbab356::t_72c5a1292da1ad 13-16,21
+  s_28445b1cbab356::t_a0cb4d2210a8f7 22-23
+  s_28445b1cbab356::t_e44d87e23285ef 4,20
+  s_28445b1cbab356::t_4a5ce08f749714 3
+  s_28445b1cbab356::t_53200fa9fa1c47 33
+  s_28445b1cbab356::t_d5b853325ec5f9 34
+  s_28445b1cbab356::t_6c442e7d448ff6 85,171
+  s_28445b1cbab356::t_65a1f272c9fcab 120,161
+  s_28445b1cbab356::t_d8cbec9b393f30 49
+  s_28445b1cbab356::t_898342e2e60f86 160
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T121834Z-postgres-durable-extensions-remediation/end-audit.yaml
+  s_28445b1cbab356::t_270e78b51b8f37 1-4,6-100
+  s_28445b1cbab356::t_7622126e8d8607 5,101-112
+openspec/changes/implement-node-assistant-runtime/design.md
+  s_28445b1cbab356::t_c5f6a4da15a6a9 69-70,265,309
+  s_28445b1cbab356::t_d8cbec9b393f30 38,264
+  s_28445b1cbab356::t_1791ce18b88c4b 181
+  s_28445b1cbab356::t_8fe9283bfd7687 37,163
+  s_28445b1cbab356::t_6c442e7d448ff6 7,18,29,222,300
+  s_28445b1cbab356::t_05cca36f46cce2 67,71-88,114
+  s_28445b1cbab356::t_898342e2e60f86 115,198-199,205
+  s_28445b1cbab356::t_7e7c6f2a503970 171-172,179,196,207,210-211,213,219-221,224,235,239,250,267,310
+  s_28445b1cbab356::t_fc0bdf908cb212 1-6,8-17,19-28,30-36,39-66,89-113,116-162,164-170,173-178,180,182-195,197,200-204,206,208-209,212,214-218,223,225-234,236-238,240-249,251-263,266,268-286,288-299,301-308,311-325
+  s_28445b1cbab356::t_39f103aeda6ab2 287
+docs/architecture/decisions/0018-separate-user-platform-assistant-runtime-and-cli.md
+  s_28445b1cbab356::t_d8cbec9b393f30 15,32
+  s_28445b1cbab356::t_e5fc2520291571 1-13,16-25,27-31,33
+  s_28445b1cbab356::t_1791ce18b88c4b 14,26
+docs/architecture/proposals/2026-10-05-node-agent-runtime-capability-ledger.md
+  s_28445b1cbab356::t_d7738b9f81f4e6 416
+  s_28445b1cbab356::t_0b112a8d739717 613,615-616
+  s_28445b1cbab356::t_1791ce18b88c4b 169
+  s_28445b1cbab356::t_e48cbc251bae94 78
+  s_28445b1cbab356::t_8e69aed90a4d14 488-489,491,493-494,512-519
+  s_28445b1cbab356::t_b3b858d7ed09fb 160
+  s_28445b1cbab356::t_c6448f6b2fb4c5 423,429,441
+  s_28445b1cbab356::t_af56307cfc2beb 374
+  s_28445b1cbab356::t_53200fa9fa1c47 83
+  s_28445b1cbab356::t_75f38f072201de 628
+  s_28445b1cbab356::t_28b35595a91a72 440
+  s_28445b1cbab356::t_ccd25362e5a195 411,419,421-422,424-425,434-439,442-445
+  s_28445b1cbab356::t_f6aeced0f245b0 554,557,568,574,579,586,594
+  s_28445b1cbab356::t_898342e2e60f86 567,588
+  s_28445b1cbab356::t_9eb8223d1aad03 597-598,606-608
+  s_28445b1cbab356::t_3cd9ce7d39c56e 609-612,614,617-618
+  s_28445b1cbab356::t_d5e02f85ddf95b 81
+  s_28445b1cbab356::t_d2605b4f480a5d 76
+  s_28445b1cbab356::t_b53c6dbae09cb1 79
+  s_28445b1cbab356::t_102277ffb70403 490,542-553,555-556,558-566,569-573,575-578,580-585,587,589-593,595
+  s_28445b1cbab356::t_72c5a1292da1ad 73-75,77,84
+  s_28445b1cbab356::t_d4f14d8001d652 181,190,199,208,226,235,244,253,262,271,280,298,307,316,324-325,333-334,342-343,351-352,361
+  s_28445b1cbab356::t_789a56f7aa358b 3-5,378
+  s_28445b1cbab356::t_8f4623aaca5089 80
+  s_28445b1cbab356::t_eaa1d0a61449f5 376-377,379-409
+  s_28445b1cbab356::t_734dbcb4ea3c9f 599-603,605
+  s_28445b1cbab356::t_651a8610964b87 604
+  s_28445b1cbab356::t_85491635143403 32-37,45-51,71,92,101,119,128,137,146,155,164,173,182,191,209,227,236,245,254,263,272,281,299,308,317,326,335,344,353
+  s_28445b1cbab356::t_ce797afde56e61 492,495-511,520-541
+  s_28445b1cbab356::t_b395a8c4fba9b0 82
+  s_28445b1cbab356::t_8e5e15df18abc9 270,279
+  s_28445b1cbab356::t_76230155e2233d 1-2,6-19,27,29-31,38-44,52-66,69-70,72,85-91,93-100,102-109,111-118,120-127,129-136,138-145,147-154,156-159,162-163,165-168,170-172,174-177,180,183-189,192-196,198,201-207,210-212,219-225,228-234,237,239-240,243,246-252,255-261,264-269,273-276,282-284,291-294,296-297,300-303,305-306,309-312,314-315,318-323,327-332,336-341,345-348,350,354-360,363-371,447-480,596,619-627
+  s_28445b1cbab356::t_7cacbd5454a008 26
+  s_28445b1cbab356::t_df1dc5c1c2b75c 481-487
+  s_28445b1cbab356::t_17a44048a1ab91 20-25,28,110,197,200,218,285-290,362
+  s_28445b1cbab356::t_8ec25563e97fb1 67-68,161,178-179,213-217,238,241-242,277-278,295,304,313,349
+  s_28445b1cbab356::t_146ab8b133f9d0 372-373,375,410,412-415,417-418,420,426-428,430-433,446
+openspec/changes/implement-node-assistant-runtime/solution-architecture-review.md
+  s_28445b1cbab356::t_72e7029f637181 1,10-11,23-29,98,107
+  s_28445b1cbab356::t_f76ed12d10428b 2-9,12-22,30-97,99-106
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T091500Z-model-context-contracts/end-audit.yaml
+  s_28445b1cbab356::t_f0ddf774b3625d 1-26,28-45,47-51
+  s_28445b1cbab356::t_7bf806febb79f2 46,75
+  s_28445b1cbab356::t_b53c6dbae09cb1 27,52-65
+  s_28445b1cbab356::t_dfd4eb02a7bca5 66-74
+openspec/changes/implement-node-assistant-runtime/.workflow/boundary-changes/20261005T102700Z-contracts-test-node-types.yaml
+  s_28445b1cbab356::t_de63ffc8d3d4e9 1-23
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T084228Z-foundation-contracts/start-contract.yaml
+  s_28445b1cbab356::t_e4633027ad4885 1-84
+openspec/changes/implement-node-assistant-runtime/.workflow/receipts/spec-audit-cap001-20261005T065302Z.yaml
+  s_28445b1cbab356::t_9b5d2b57d815a2 1-58
+openspec/changes/implement-node-assistant-runtime/.workflow/boundary-changes/20261005T105000Z-migration-vitest-config.yaml
+  s_28445b1cbab356::t_2b89bbc689d956 1-20
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T120319Z-postgres-durable-extensions/end-audit.yaml
+  s_28445b1cbab356::t_be7dde6b992dc7 4-5,82-92
+  s_28445b1cbab356::t_bad9ad0bbb7302 1-3,6-81
+docs/architecture/README.md
+  s_28445b1cbab356::t_05cca36f46cce2 52-53
+  s_28445b1cbab356::t_b3b858d7ed09fb 50-51
+  s_28445b1cbab356::t_1791ce18b88c4b 42-43,46-47,173-174
+  s_28445b1cbab356::t_8e69aed90a4d14 160-162,289,291-292,295-297
+  s_28445b1cbab356::t_898342e2e60f86 54-55
+  s_28445b1cbab356::t_b2b8b9df17e12a 290,293-294,298
+  s_28445b1cbab356::t_3ce1ef7f2c1271 40-41,44-45,48-49,56-60,175
+  s_28445b1cbab356::t_e5fc2520291571 35-39,61,242-246,267-280
+docs/development/openspec-workflow.md
+  s_28445b1cbab356::t_30c0f77122255e 23-42,46
+openspec/changes/implement-node-assistant-runtime/specs/assistant-tools-and-collaboration/spec.md
+  s_28445b1cbab356::t_242e290f757754 131-135
+  s_28445b1cbab356::t_f88bd9c4cbf926 8,22,27,31,36,40,59,63,68,73-88,90-92,94-95,99,103,108,112,117,121,124,126,129
+  s_28445b1cbab356::t_1791ce18b88c4b 9-19
+  s_28445b1cbab356::t_e1ef24ae787af7 1-7,20-21,23-26,29-30,32-35,37-39,41-43,58,60-62,64-67,69-72,89,93,96-98,100-102,104-107,109-111,113-116,119-120,122-123
+  s_28445b1cbab356::t_65a1f272c9fcab 28
+  s_28445b1cbab356::t_d619198cdc66a1 44-57,118,125,127-128,130
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T121834Z-postgres-durable-extensions-remediation/start-contract.yaml
+  s_28445b1cbab356::t_be7dde6b992dc7 1-55
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T134642Z-atomic-session-commit/start-contract.yaml
+  s_28445b1cbab356::t_bf12335fd239e6 1-37
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T135542Z-atomic-session-commit-remediation/end-audit.yaml
+  s_28445b1cbab356::t_55d7d40b76e033 5,48-52
+  s_28445b1cbab356::t_7af348ebf34e7f 1-4,6-47,53
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T090200Z-runtime-event-contracts/start-contract.yaml
+  s_28445b1cbab356::t_d74823f5e93541 1-61
+openspec/changes/implement-node-assistant-runtime/spec-audit.md
+  s_28445b1cbab356::t_a5b9096ff7ec48 1-73
+docs/architecture/proposals/2026-10-05-node-agent-runtime-knowledge-sharing.md
+  s_28445b1cbab356::t_b3b858d7ed09fb 145
+  s_28445b1cbab356::t_1791ce18b88c4b 48,195-196,200
+  s_28445b1cbab356::t_5208ff60005948 61-62,110,168,293
+  s_28445b1cbab356::t_2f3137839958bd 1-2,9-14,16-39,41-47,49-60,63-109,111-144,146-167,169-180,182-194,197-199,201-292,294-365,367-405
+  s_28445b1cbab356::t_10fdcbc3b7a124 3-8
+  s_28445b1cbab356::t_106653490dab48 15
+docs/architecture/decisions/0019-use-postgresql-runtime-truth-redis-coordination-and-mem0-facts.md
+  s_28445b1cbab356::t_34bcf8a66c0f10 16-18,27
+  s_28445b1cbab356::t_e5fc2520291571 1-15,21-26,29-35,37
+  s_28445b1cbab356::t_898342e2e60f86 19-20,28,36
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T093500Z-tool-collaboration-contracts/start-contract.yaml
+  s_28445b1cbab356::t_dfd4eb02a7bca5 1-52
+openspec/changes/implement-node-assistant-runtime/specs/assistant-access-control/spec.md
+  s_28445b1cbab356::t_4f7e43b389fc3d 1-7,9-11,13-16,18-20,45,48-49,51,82-83,85-87,89-92,94-96,98-101,103-105,107-109,129,132-133,135-136
+  s_28445b1cbab356::t_d8cbec9b393f30 8,12,17,22,24,30-39,46,50,52-55,57-62,73-76,84,88,93,97,102,106,130,134
+  s_28445b1cbab356::t_242e290f757754 41,43-44,112,123-127
+  s_28445b1cbab356::t_8fe9283bfd7687 21,23,25-29,40,42
+  s_28445b1cbab356::t_7e7c6f2a503970 47,56,110-111,113-122,128,131
+  s_28445b1cbab356::t_c5f6a4da15a6a9 63-72,77-81
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T140310Z-atomic-session-commit-remediation-2/end-audit.yaml
+  s_28445b1cbab356::t_d15f8e2a51ddd7 5,10-11,45-54
+  s_28445b1cbab356::t_55d7d40b76e033 1-4,6-9,12-44
+openspec/changes/implement-node-assistant-runtime/proposal.md
+  s_28445b1cbab356::t_6c442e7d448ff6 3,13
+  s_28445b1cbab356::t_8fe9283bfd7687 39
+  s_28445b1cbab356::t_898342e2e60f86 40-41
+  s_28445b1cbab356::t_7e7c6f2a503970 7,11-12,14
+  s_28445b1cbab356::t_37101cc7460ea8 1-2,4-6,8-10,15-38,42
+openspec/changes/implement-node-assistant-runtime/specs/assistant-event-stream/spec.md
+  s_28445b1cbab356::t_4f7e43b389fc3d 1-7,9-11,13-16,18-20,22-25,27-29,31-34,36-38,40-43,46-47,49-52,54-55
+  s_28445b1cbab356::t_d619198cdc66a1 8,12,17,21,26,30,35,39,44-45,48,53
+openspec/changes/implement-node-assistant-runtime/specs/assistant-session-runtime/spec.md
+  s_28445b1cbab356::t_7e7c6f2a503970 113,119-137
+  s_28445b1cbab356::t_4f7e43b389fc3d 1-7,9-11,13-16,18,21,26,28-31,33-35,56,58-60,62-65,67-70,72-74,76-79,81-83,85-88,90-92,94-97,99-101,103-106,108-111,114-115,117-118,138-139,141-143,145-148,150-152,154-155
+  s_28445b1cbab356::t_f88bd9c4cbf926 8,12,17,19-20,22-25,27,32,36-55,57,61,66,71,75,80,84,89,93,98,102,107,112,116,140,144,149,153
+docs/guides/assistant-runtime-environment.md
+  s_28445b1cbab356::t_1791ce18b88c4b 61,65
+  s_28445b1cbab356::t_03a1e101f0ccec 11,52-60,62-64,66,71-73
+  s_396e09a9ed9fa1::t_2353d8fa6640f0 5-9,15-22,28-34
+  s_28445b1cbab356::t_f1186959e41149 78-83
+  s_28445b1cbab356::t_d416235e89d36e 67-70
+  s_28445b1cbab356::t_96c77c5124d846 51
+  s_28445b1cbab356::t_1926de2fff83aa 1-4,10,12-14,23-27,35-39,48-50,75-76
+  s_28445b1cbab356::t_898342e2e60f86 40-47,74,77
+docs/architecture/proposals/2026-10-05-node-agent-runtime-plan.md
+  s_28445b1cbab356::t_d3b59894326d28 1,6,12,19,521,555,561
+  s_cb926ad6c1a0a7::t_ab59ebaf4da3e3 165-168,170,190,194,198,200-202
+  s_28445b1cbab356::t_d13608f4764f89 244,254-262,264-272
+  s_28445b1cbab356::t_7dc1bbfab6f894 23-26,61-63,539-543,554
+  s_cb926ad6c1a0a7::t_0763f824dae839 92-93,109-120
+  s_28445b1cbab356::t_898342e2e60f86 125-134,139-140
+  s_28445b1cbab356::t_28b35595a91a72 218
+  s_28445b1cbab356::t_1a899830b4dcc3 546-553
+  s_28445b1cbab356::t_3784a1b827d152 2,7-9,16,18,64-65,67,73-74,83,86-87,89,91,122-124,135,137-138,141,212,215,217,241-243,245,253,273,276,278,291-293,295
+  s_28445b1cbab356::t_6264a3a766d68e 3,5,213-214,279-290
+  s_cb926ad6c1a0a7::t_af17aa74726b25 75-78,82,90
+  s_28445b1cbab356::t_342fbf8363b572 21-22,66,79-81,84-85,88,153,173
+  s_28445b1cbab356::t_a765556e138ed2 4,38-39,47,51,106,148,197,206-207,209-210,228,231,238,250-251,263,350,352,354-355,373-374,395,400,402-403,420-421,453,467-468,486,496,503,510-511
+  s_cb926ad6c1a0a7::t_43df0687a29fc9 17,20,121,136,211,216,219,239-240,274-275,277
+  s_cb926ad6c1a0a7::t_6472c1bd1f1f1c 169,171-172,174-178,186-189,193,195-196,199
+  s_28445b1cbab356::t_b2b8b9df17e12a 294,296-297,310-329,338-349,351,353,356-372,375-394,396-399,401,404-419,422-452,455-466,469-485,487-494,497,499-502,504-509,512-520,522-538,556-560
+  s_28445b1cbab356::t_f88bd9c4cbf926 10-11,13-15,27-37,40-46,48-50,52-60,68-72,94-105,107-108,146-147,149-151,159-163,179-185,191-192,203-205,220-227,229-230,232-237,246-249,252,298-309,330-337,495,498,544-545
+  s_28445b1cbab356::t_b3b858d7ed09fb 454
+  s_cb926ad6c1a0a7::t_56be6a4d49fd63 142-145,152,154-158,164,208
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T090200Z-runtime-event-contracts/end-audit.yaml
+  s_28445b1cbab356::t_2b6b47af0a45d5 1-25,27-38,45-47,49-52
+  s_28445b1cbab356::t_04a47df1245d0b 48
+  s_28445b1cbab356::t_81dc6d5ee18f9e 81-88
+  s_28445b1cbab356::t_1f034bc576d0d4 39-44,53-61,80
+  s_28445b1cbab356::t_7df6d6df84a17a 89-90
+  s_28445b1cbab356::t_e48cbc251bae94 26,62-68
+  s_28445b1cbab356::t_3793b97a009ed4 69-79
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T120319Z-postgres-durable-extensions/start-contract.yaml
+  s_28445b1cbab356::t_bd0d3c0dbb3ac8 1-86
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T140310Z-atomic-session-commit-remediation-2/start-contract.yaml
+  s_28445b1cbab356::t_b14456b52ddaed 1-20
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T104000Z-postgres-durable-core/end-audit.yaml
+  s_28445b1cbab356::t_2324d0622767da 1-3,6-70,74-76,78-94
+  s_28445b1cbab356::t_91537421e608af 4-5,112-122
+  s_28445b1cbab356::t_a2566b40d2de89 71-73,77,95-111
+openspec/changes/implement-node-assistant-runtime/specs/assistant-model-context-memory/spec.md
+  s_28445b1cbab356::t_e1ef24ae787af7 1-7,9-10,13,15-18,20-22,24-27,29-32,34-36,38-41,43-45,47-49,64,67-68,70-73,75-76,82,89,91,119,121-123,125-126
+  s_28445b1cbab356::t_898342e2e60f86 50-63
+  s_28445b1cbab356::t_d619198cdc66a1 11-12,66,77-81,83-87,127-128
+  s_28445b1cbab356::t_242e290f757754 129-138
+  s_28445b1cbab356::t_f88bd9c4cbf926 8,14,19,23,28,33,37,42,46,65,69,74,88,90,92-118,120,124
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T130000Z-postgres-durable-extensions-remediation-3/end-audit.yaml
+  s_28445b1cbab356::t_276a70dd3ac247 5,47-57
+  s_28445b1cbab356::t_4f8e9568b05b0a 1-4,6-46
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T091500Z-model-context-contracts/start-contract.yaml
+  s_28445b1cbab356::t_3295d8b10c39e7 33-36
+  s_28445b1cbab356::t_7df6d6df84a17a 1-32,37-56
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T101700Z-contract-compatibility-fixtures/end-audit.yaml
+  s_28445b1cbab356::t_b6e7a2ebd383f4 57,67,76,85-96
+  s_28445b1cbab356::t_ce95bf54229066 1-4,6-56,58-66,68-75,77-84
+  s_28445b1cbab356::t_c0edbb89f64e02 5,97-106
+openspec/changes/implement-node-assistant-runtime/specs/assistant-cli/spec.md
+  s_28445b1cbab356::t_e1ef24ae787af7 1-7,10-11,13-16,18-20,22-25,27-29,31-34,37-38,40-41,51-52,54-56,58-61,63-65,67-68
+  s_28445b1cbab356::t_d619198cdc66a1 8-9,12,17,21,26,30,35-36,39,42-50,53,57,62,66
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T131000Z-postgres-product-uniqueness/end-audit.yaml
+  s_28445b1cbab356::t_325d90ca4a6938 4-5,49-58
+  s_28445b1cbab356::t_65e37c63db20cb 1-3,6-48
+openspec/schemas/evidence-gated/templates/requirements-e2e-review.md
+  s_28445b1cbab356::t_5e9930e0084265 1-34
+openspec/changes/implement-node-assistant-runtime/acceptance/scenario-trace.yaml
+  s_28445b1cbab356::t_117f1294a2e08e 1236-1241,1244-1245,1248-1254,1257-1258,1261-1267,1270-1271,1274-1280,1283-1284,1287-1293,1296-1297,1300-1306,1309-1310,1313-1319,1322-1323,1326-1332,1335-1336,1339-1345,1348-1349,1352-1358,1361-1362,1365
+  s_28445b1cbab356::t_4fb5e05a498fbf 116-119,122-124,126-130,133-135,137,149-152,155-157,159-163,166-168,170
+  s_28445b1cbab356::t_c2788391192036 215-218,221-223,225,567-570,573-575,577,941-944,947-949,951-955,958-960,962,1051-1054,1057-1059,1061,1106-1109,1112-1114,1116-1124,1127-1128,1131-1137,1140-1141,1144-1150,1153-1154,1157-1163,1166-1167,1170-1176,1179-1180,1183-1189,1192-1193,1196-1202,1205-1206,1209-1215,1218-1219,1222-1228,1231-1232,1235
+  s_28445b1cbab356::t_f14a9c95bd48bc 3-11
+  s_28445b1cbab356::t_1e0f67b558cc29 2,93-97,100-102,104-108,111-113,115,138-141,144-146,148,171-174,176-179,181-185,188-190,192-196,199-201,203-207,210-212,214,226-229,232-234,236-240,243-245,247-251,254-256,258-262,265-267,269-273,276-278,280-284,287-289,291-295,298-300,302-306,309-311,313-317,320-322,324-328,331-333,335-339,342-344,346-350,353-355,357-361,364-366,368-372,375-377,379-383,386-388,390-394,397-399,401-405,408-410,412-416,419-421,423-427,430-432,434-438,441-443,445-449,452-454,456-460,463-465,467-471,474-476,478-482,485-487,489-493,496-498,500-504,507-509,511-515,518-520,522-526,529-531,533-537,540-542,544-548,551-553,555-559,562-564,566,578-581,584-586,588-592,595-597,599-603,606-608,610-614,617-619,621-625,628-630,632-636,639-641,643-647,650-652,654-658,661-663,665-669,672-674,676-680,683-685,687-691,694-696,698-702,705-707,709-713,716-718,720-724,727-729,731-735,738-740,742-746,749-751,753-757,760-762,764-768,771-773,775-779,782-784,786-790,793-795,797-801,804-806,808-812,815-817,819-823,826-828,830-834,837-839,841-845,848-850,852-856,859-861,863-867,870-872,874-878,881-883,885-889,892-894,896-900,903-905,907-911,914-916,918-922,925-927,929-933,936-938,940,963-966,969-971,973-977,980-982,984-988,991-993,995-999,1002-1004,1006-1010,1013-1015,1017-1021,1024-1026,1028-1032,1035-1037,1039-1043,1046-1048,1050,1062-1065,1068-1070,1072-1076,1079-1081,1083-1087,1090-1092,1094-1098,1101-1103,1105
+  s_28445b1cbab356::t_dd2752b32c4be9 1,13,21-58,60-68
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T095500Z-artifact-observability-contracts/end-audit.yaml
+  s_28445b1cbab356::t_5fd3d5b83fc50e 60-77
+  s_28445b1cbab356::t_3ef9a56079a0a4 1-3,6-46,48-59
+  s_28445b1cbab356::t_bab663fe636e81 4,47,78-86
+  s_28445b1cbab356::t_7e967faf07348d 5,87-96
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T104000Z-postgres-durable-core/start-contract.yaml
+  s_28445b1cbab356::t_5a8641a7092cdd 1-73
+openspec/schemas/evidence-gated/templates/test-case-review.md
+  s_28445b1cbab356::t_5e9930e0084265 1-42
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T130000Z-postgres-durable-extensions-remediation-3/start-contract.yaml
+  s_28445b1cbab356::t_504a803df9f5b1 1-36
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T123000Z-postgres-durable-extensions-remediation-2/end-audit.yaml
+  s_28445b1cbab356::t_504a803df9f5b1 5,81-90
+  s_28445b1cbab356::t_8583bcf5e3c48c 1-4,6-80
+openspec/schemas/evidence-gated/schema.yaml
+  s_28445b1cbab356::t_5e9930e0084265 2-3,65-82,95-154,161-165,172,174-176,186-187
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T134105Z-owner-scoped-repositories-remediation/end-audit.yaml
+  s_28445b1cbab356::t_d5b853325ec5f9 5,10-11,41-50
+  s_28445b1cbab356::t_a5655b724b548a 1-4,6-9,12-40
+docs/architecture/decisions/0020-use-deep-agents-local-tool-gateway-and-ink.md
+  s_28445b1cbab356::t_e5fc2520291571 1-13,17,20,22-25,27-34,36
+  s_28445b1cbab356::t_b3b858d7ed09fb 21
+  s_28445b1cbab356::t_34bcf8a66c0f10 14-16,18-19,26,35
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T101700Z-contract-compatibility-fixtures/start-contract.yaml
+  s_28445b1cbab356::t_c07f44d7638998 1-74
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T065405Z-cap001-bootstrap/start-contract.yaml
+  s_28445b1cbab356::t_9b5d2b57d815a2 1-72
+openspec/changes/implement-node-assistant-runtime/specs/assistant-observability-delivery/spec.md
+  s_28445b1cbab356::t_242e290f757754 52,54,56,59
+  s_28445b1cbab356::t_f88bd9c4cbf926 8,12,17,21,26,30,32,35,39,44,48,53,57
+  s_28445b1cbab356::t_e1ef24ae787af7 1-7,9-11,13-16,18-20,22-25,27-29,31,33-34,36-38,40-43,45-47,49-51,55,58
+openspec/changes/implement-node-assistant-runtime/test-case-review.md
+  s_28445b1cbab356::t_feab5766c0cb30 1-8,11-30,32-62,64-82
+  s_28445b1cbab356::t_bee6186d2e21e7 9-10,31,63
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T065405Z-cap001-bootstrap/end-audit.yaml
+  s_28445b1cbab356::t_9fcb23e4b564ae 1-71
+openspec/schemas/evidence-gated/templates/solution-architecture-review.md
+  s_28445b1cbab356::t_5e9930e0084265 1-34
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T093500Z-tool-collaboration-contracts/end-audit.yaml
+  s_28445b1cbab356::t_d399f53a0be526 1-3,6-48,50-54
+  s_28445b1cbab356::t_6320abbc9bd720 55-70
+  s_28445b1cbab356::t_9a169a133803ee 4,49,71-81
+  s_28445b1cbab356::t_e79a48eeafa9f4 5,82-91
+openspec/changes/implement-node-assistant-runtime/requirements-e2e-review.md
+  s_28445b1cbab356::t_0dfe86e67658f6 1-68
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T134105Z-owner-scoped-repositories-remediation/start-contract.yaml
+  s_28445b1cbab356::t_b452aeef8f04ad 1-23
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T131000Z-postgres-product-uniqueness/start-contract.yaml
+  s_28445b1cbab356::t_2fefe4d4ea2c33 1-40
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T134642Z-atomic-session-commit/end-audit.yaml
+  s_28445b1cbab356::t_7af348ebf34e7f 5,67-76
+  s_28445b1cbab356::t_f71a2270a578c9 1-4,6-66,77
+openspec/schemas/evidence-gated/templates/client-e2e-plan.md
+  s_28445b1cbab356::t_5e9930e0084265 1-48
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T084228Z-foundation-contracts/end-audit.yaml
+  s_28445b1cbab356::t_15661c44a3376d 108-117
+  s_28445b1cbab356::t_16ef029a3c486e 84,118
+  s_28445b1cbab356::t_bb6bee526971de 1-38,40-47,49-53,58-81,85-97
+  s_28445b1cbab356::t_d2605b4f480a5d 39,48,54-57,98-107
+  s_28445b1cbab356::t_4e45a02863c272 82-83
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T133223Z-owner-scoped-repositories/start-contract.yaml
+  s_28445b1cbab356::t_91012782f6ffff 1-8,10-38
+openspec/changes/implement-node-assistant-runtime/.workflow/sessions/20261005T135542Z-atomic-session-commit-remediation/start-contract.yaml
+  s_28445b1cbab356::t_56bdd3d52d1dd8 1-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.45-trip",
+  "base_commit_sha": "7bf19d8ce625a49556653f60de37594b315ffc8b",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_28445b1cbab356": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10a38-3fcd-7f60-811f-79839968c297",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    },
+    "s_396e09a9ed9fa1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6c2075ef-33f4-4f46-a8d5-b02399d72dc7",
+        "model": "grok-4.6"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    },
+    "s_cb926ad6c1a0a7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ad437a7f-ec0a-40fb-a897-01bbd8499cdd",
+        "model": "grok-4.6"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
