@@ -1,3 +1,5 @@
+import type { RagBusinessSearchIndexMessageV1 } from '@repo/contracts';
+import { SearchIndexService } from '../../infrastructure/elasticsearch/search-index.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { VectorIndexService } from '../../infrastructure/elasticsearch/vector-index.service';
 import { EmbeddingService } from '../../infrastructure/embedding/embedding.service';
@@ -25,6 +27,7 @@ class PipelineOrchestrator {
     private readonly chunkingService: ChunkingService,
     private readonly embeddingService: EmbeddingService,
     private readonly vectorIndexService: VectorIndexService,
+    private readonly searchIndexService: SearchIndexService,
   ) {}
 
   /**
@@ -32,10 +35,13 @@ class PipelineOrchestrator {
    *
    * 重建流水线（单文档）：清旧块 → Chunking → Embedding → 写入 ES kh_chunk
    */
-  async handleRagReindex(
-    type: string,
-    documentIds?: string[],
-  ): Promise<void> {
+  async handleRagReindex(type: string, documentIds?: string[]): Promise<void> {
+    if (type === 'DELETE_BY_DOC_IDS' && documentIds?.length) {
+      // 软删后不能再依赖 active 文档查询，直接按关联键清理向量块。
+      for (const id of documentIds)
+        await this.vectorIndexService.deleteByDocId(id);
+      return;
+    }
     if (type !== 'BY_DOC_IDS' || !documentIds?.length) {
       this.logger.warn(`忽略未支持的 RAG 消息：type=${type}`);
       return;
@@ -51,6 +57,17 @@ class PipelineOrchestrator {
         const message = error instanceof Error ? error.message : String(error);
         this.logger.error(`RAG 索引失败：documentId=${doc.id}, ${message}`);
       }
+    }
+  }
+
+  /** Search 使用已校验快照；删除按 ES _id，异常交给 MQ 消费边界处理。 */
+  async handleSearchIndex(
+    message: RagBusinessSearchIndexMessageV1,
+  ): Promise<void> {
+    if (message.type === 'DELETE') {
+      await this.searchIndexService.deleteDocument(message.documentId);
+    } else {
+      await this.searchIndexService.indexDocument(message.document);
     }
   }
 
@@ -93,9 +110,7 @@ class PipelineOrchestrator {
   }
 
   /** 按 ID 列表加载元数据 + Mongo 正文 */
-  private async loadDocumentsByIds(
-    ids: string[],
-  ): Promise<PipelineDocument[]> {
+  private async loadDocumentsByIds(ids: string[]): Promise<PipelineDocument[]> {
     const docs = await this.documentRepo.findActiveByIds(ids);
     const result: PipelineDocument[] = [];
 

@@ -1,7 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RagBusinessReindexMessageV1Schema } from '@repo/contracts';
+import {
+  RagBusinessReindexMessageV1Schema,
+  RagBusinessSearchIndexMessageV1Schema,
+} from '@repo/contracts';
 import type { ConsumeMessage } from 'amqplib';
-import { RAG_REINDEX_QUEUE } from '../../infrastructure/rabbitmq/constants/rabbitmq.constants';
+import {
+  RAG_REINDEX_QUEUE,
+  SEARCH_INDEX_QUEUE,
+} from '../../infrastructure/rabbitmq/constants/rabbitmq.constants';
 import { RabbitMqService } from '../../infrastructure/rabbitmq/rabbitmq.service';
 import { PipelineOrchestrator } from './pipeline.orchestrator';
 
@@ -24,6 +30,20 @@ class DocumentPipelineConsumer {
     this.rabbit.registerHandler(RAG_REINDEX_QUEUE, (msg) =>
       this.handleRag(msg),
     );
+    this.rabbit.registerHandler(SEARCH_INDEX_QUEUE, (msg) =>
+      this.handleSearch(msg),
+    );
+  }
+
+  /** Search 边界校验：拒绝缺失快照、错误版本及 ID 不一致的消息，不记录正文。 */
+  private async handleSearch(msg: ConsumeMessage): Promise<void> {
+    const body = RagBusinessSearchIndexMessageV1Schema.parse(
+      JSON.parse(msg.content.toString('utf8')),
+    );
+    this.logger.log(
+      `[Search] type=${body.type}, taskId=${body.taskId}, documentId=${body.documentId}`,
+    );
+    await this.orchestrator.handleSearchIndex(body);
   }
 
   /** RAG：分块 → 向量化 → ES kh_chunk（dense_vector） */

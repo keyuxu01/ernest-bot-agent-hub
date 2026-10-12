@@ -1,3 +1,4 @@
+import { SearchIndexService } from './../src/infrastructure/elasticsearch/search-index.service';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
@@ -29,6 +30,11 @@ describe('Business service (e2e)', () => {
         registeredHandlerCount: 1,
         registerHandler: () => undefined,
         publish: async () => true,
+      })
+      .overrideProvider(SearchIndexService)
+      .useValue({
+        indexDocument: async () => undefined,
+        deleteDocument: async () => undefined,
       })
       .overrideProvider(VectorIndexService)
       .useValue({

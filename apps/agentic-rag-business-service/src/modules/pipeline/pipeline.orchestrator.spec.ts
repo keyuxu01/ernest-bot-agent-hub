@@ -1,3 +1,4 @@
+import type { SearchIndexService } from '../../infrastructure/elasticsearch/search-index.service';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { VectorIndexService } from '../../infrastructure/elasticsearch/vector-index.service';
 import type { EmbeddingService } from '../../infrastructure/embedding/embedding.service';
@@ -27,7 +28,17 @@ describe('PipelineOrchestrator', () => {
       chunkingService as unknown as ChunkingService,
       embeddingService as unknown as EmbeddingService,
       vectorIndexService as unknown as VectorIndexService,
+      {
+        indexDocument: vi.fn(),
+        deleteDocument: vi.fn(),
+      } as unknown as SearchIndexService,
     );
+  });
+
+  it('deletes vector chunks without loading soft-deleted documents', async () => {
+    await orchestrator.handleRagReindex('DELETE_BY_DOC_IDS', ['1', '2']);
+    expect(vectorIndexService.deleteByDocId.mock.calls).toEqual([['1'], ['2']]);
+    expect(documentRepo.findActiveByIds).not.toHaveBeenCalled();
   });
 
   it('ignores unsupported reindex types', async () => {

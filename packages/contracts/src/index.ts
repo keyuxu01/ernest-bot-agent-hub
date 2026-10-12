@@ -279,3 +279,12 @@ export {
   RagBusinessReindexMessageV1Schema,
   RagBusinessReindexTypeSchema,
 } from './rag-business/reindex';
+
+export {
+  RagBusinessSearchDocumentSchema,
+  RagBusinessSearchIndexMessageV1Schema,
+} from './rag-business/search-index';
+export type {
+  RagBusinessSearchDocument,
+  RagBusinessSearchIndexMessageV1,
+} from './rag-business/search-index';

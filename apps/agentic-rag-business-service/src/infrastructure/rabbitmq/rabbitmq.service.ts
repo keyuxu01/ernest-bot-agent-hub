@@ -14,6 +14,11 @@ import {
   RAG_REINDEX_EXCHANGE,
   RAG_REINDEX_QUEUE,
   RAG_RK_BY_IDS,
+  RAG_RK_DELETE,
+  SEARCH_INDEX_EXCHANGE,
+  SEARCH_INDEX_QUEUE,
+  SEARCH_RK_INDEX,
+  SEARCH_RK_DELETE,
   RABBITMQ_CONNECT_TIMEOUT_MS,
 } from './constants/rabbitmq.constants';
 import { errorMessage } from './helpers/error-message';
@@ -167,6 +172,8 @@ class RabbitMqService implements OnModuleInit, OnModuleDestroy {
     try {
       await this.channel.publish(exchange, routingKey, payload, {
         contentType: 'application/json',
+        // persistent：deliveryMode=2，消息落盘；与 durable 队列配套，broker 重启后尽量仍在
+        // 其他 Publish 选项：expiration、priority、mandatory、headers、correlationId 等见 amqplib Options.Publish
         persistent: true,
       });
       return true;
@@ -179,18 +186,56 @@ class RabbitMqService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * 声明 RAG 交换机 / 队列 / 绑定。
-   * durable：broker 重启后拓扑仍在。topic + `rag.reindex.by_ids` 方便后续加按空间重建等路由。
-   * - 要有一个叫 rag.reindex.exchange 的 topic 交换机，重启后还在（durable）。
-   * - 要有一个叫 kh.rag.reindex.queue 的队列，重启后还在。
-   * - 把上面两者用路由键 rag.reindex.by_ids 绑在一起。
+   * 声明 RAG / Search 交换机、队列与重建/删除绑定。
+   *
+   * 路由：`topic` + `rag.reindex.by_ids`，后续可按空间等加 routing key，不必改交换机类型。
+   *
+   * assertExchange 可选参数（amqplib `Options.AssertExchange`）：
+   * - `durable`：broker 重启后交换机元数据仍在（本拓扑用 true）。
+   * - `internal`：true 时客户端不能直接 publish 到该交换机，只能经其他交换机路由进来；默认 false。
+   * - `autoDelete`：最后一个 binding 解除后自动删交换机；临时拓扑用，生产任务队列一般 false（默认）。
+   * - `alternateExchange`：无法路由的消息转投的备用交换机（AE）；未设则 mandatory=false 时静默丢弃。
+   * - `arguments`：插件/扩展参数（如 alternate-exchange、自定义类型参数）。
+   *
+   * assertQueue 可选参数（`Options.AssertQueue`）：
+   * - `durable`：重启后队列定义仍在；配合 publish 的 `persistent: true` 才尽量保留未消费消息。
+   * - `exclusive`：仅声明该队列的连接可用；连接断开即删，单连接临时 reply 队列场景用。
+   * - `autoDelete`：最后一个消费者取消订阅后删队列；无消费者时仍保留则 false（默认）。
+   * - `messageTtl` / `expires`：消息 TTL（毫秒）、空闲队列过期时间。
+   * - `deadLetterExchange` / `deadLetterRoutingKey`：拒收/过期/超长时进死信交换机（DLQ 拓扑后续补）。
+   * - `maxLength` / `maxPriority` / `overflow`：队列长度、优先级上限、溢出策略（reject / drop-head 等）。
+   * - `queueMode`：如 `lazy` 大 backlog 落盘优先，默认 classic。
+   * - `arguments`：与上类似的底层 x-* 参数入口。
+   *
+   * publish 侧见 {@link publish}：`persistent: true` 对应 deliveryMode=2，消息写盘，与 durable 队列配套。
    */
   private async assertTopology(ch: ConfirmChannel): Promise<void> {
-    await ch.assertExchange(RAG_REINDEX_EXCHANGE, 'topic', { durable: true });
-    await ch.assertQueue(RAG_REINDEX_QUEUE, { durable: true });
+    await ch.assertExchange(RAG_REINDEX_EXCHANGE, 'topic', {
+      durable: true,
+      // internal / autoDelete / alternateExchange 保持默认：可直发、重启后仍在、不因解绑自删
+    });
+    await ch.assertQueue(RAG_REINDEX_QUEUE, {
+      durable: true,
+      // exclusive / autoDelete 保持默认：多连接可消费、无消费者时队列仍保留
+      // deadLetter* 未设：消费 nack(requeue=false) 时消息丢弃，待接 DLQ
+    });
     await ch.bindQueue(RAG_REINDEX_QUEUE, RAG_REINDEX_EXCHANGE, RAG_RK_BY_IDS);
+    await ch.bindQueue(RAG_REINDEX_QUEUE, RAG_REINDEX_EXCHANGE, RAG_RK_DELETE);
 
-    this.logger.log('RabbitMQ 拓扑已声明（RAG）');
+    // Search 独立队列承载快照写入/删除，沿用 durable + publisher confirm。
+    await ch.assertExchange(SEARCH_INDEX_EXCHANGE, 'topic', { durable: true });
+    await ch.assertQueue(SEARCH_INDEX_QUEUE, { durable: true });
+    await ch.bindQueue(
+      SEARCH_INDEX_QUEUE,
+      SEARCH_INDEX_EXCHANGE,
+      SEARCH_RK_INDEX,
+    );
+    await ch.bindQueue(
+      SEARCH_INDEX_QUEUE,
+      SEARCH_INDEX_EXCHANGE,
+      SEARCH_RK_DELETE,
+    );
+    this.logger.log('RabbitMQ 拓扑已声明（RAG + Search）');
   }
 
   /** 按 handlers 表给当前 channel 挂监听。启动第一次 setup 时常为空；重连由连接管理器再调 setup，不是再走 onModuleInit。 */

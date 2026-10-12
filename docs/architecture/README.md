@@ -283,6 +283,8 @@ follow-up work.
 | [ADR-0016](./decisions/0016-use-elasticsearch-for-rag-chunks.md)         | Elasticsearch + Qwen embeddings for RAG chunks      | Accepted   |
 | [ADR-0017](./decisions/0017-place-qwen-embedding-in-infrastructure.md)   | Qwen embedding client in `src/infrastructure`       | Accepted   |
 
+| [ADR-0021](./decisions/0021-document-search-index.md) | Separate document Search snapshots from RAG chunks | Accepted |
+
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.
 

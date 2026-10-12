@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 /**
- * @description RAG 重建范围：当前只支持按文档 ID 列表重建。
+ * @description RAG 重建范围：按文档 ID 列表重建或删除向量块。
  */
-const RagBusinessReindexTypeSchema = z.enum(['BY_DOC_IDS']);
+const RagBusinessReindexTypeSchema = z.enum(['BY_DOC_IDS', 'DELETE_BY_DOC_IDS']);
 
 /**
  * @description 文档发布后投递的 RAG 重建命令（v1）。
@@ -19,16 +19,12 @@ const RagBusinessReindexMessageV1Schema = z.object({
 /**
  * @description 发布侧可省略 schemaVersion，消费侧解析后一定带 1。
  */
-type RagBusinessReindexMessageV1Input = z.input<
-  typeof RagBusinessReindexMessageV1Schema
->;
+type RagBusinessReindexMessageV1Input = z.input<typeof RagBusinessReindexMessageV1Schema>;
 
 /**
  * @description 校验后的 RAG 重建命令。
  */
-type RagBusinessReindexMessageV1 = z.output<
-  typeof RagBusinessReindexMessageV1Schema
->;
+type RagBusinessReindexMessageV1 = z.output<typeof RagBusinessReindexMessageV1Schema>;
 
 export type { RagBusinessReindexMessageV1, RagBusinessReindexMessageV1Input };
 export { RagBusinessReindexMessageV1Schema, RagBusinessReindexTypeSchema };

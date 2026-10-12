@@ -1,3 +1,4 @@
+import { buildSearchIndexData } from './helpers/build-search-index-data';
 import {
   Injectable,
   Logger,
@@ -145,8 +146,7 @@ export class DocumentService {
 
     // —— Mongo：正文 / 预览（与 PG 元数据分开更新）——
     if (dto.content !== undefined) {
-      const contentSummary =
-        dto.summary ?? buildContentSummary(dto.content);
+      const contentSummary = dto.summary ?? buildContentSummary(dto.content);
       const result = await this.contentRepo.updateContent(doc.contentId, {
         content: dto.content,
         contentLength: dto.content.length,
@@ -205,10 +205,10 @@ export class DocumentService {
    * 流程：
    * 1. 校验文档存在且状态为草稿 / 已发布
    * 2. 写库：status=Published，刷新 publishTime
-   * 3. 投递 RabbitMQ（RAG 向量化）；失败只打日志，不回滚「已发布」
+   * 3. 投递 RabbitMQ（RAG 向量化 + Search 文档快照）；失败只打日志，不回滚「已发布」
    *
    * 异步消费侧见 DocumentPipelineConsumer → PipelineOrchestrator：
-   * 分块 → 嵌入 → ES(kh_chunk)
+   * RAG：分块 → 嵌入 → ES(kh_chunk)；Search：正文前缀快照 → ES(kh_document)
    */
   async publish(id: string) {
     this.logger.log(`发布文档：documentId=${id}`);
@@ -234,7 +234,9 @@ export class DocumentService {
     );
 
     try {
-      await this.pipelinePublisher.afterPublish(saved.id);
+      await this.pipelinePublisher.afterPublish(
+        buildSearchIndexData(saved, contentDoc?.content),
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(
@@ -260,6 +262,15 @@ export class DocumentService {
     await this.documentRepo.save(doc);
     // 与 PG 无跨库事务；若 Mongo 更新失败需靠补偿任务或重试（当前顺序：先 PG 后 Mongo）
     await this.contentRepo.softDelete(doc.contentId);
+    // 两侧软删完成后异步清理；投递失败不回滚，当前没有自动补偿保证。
+    try {
+      await this.pipelinePublisher.afterUnpublish(id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `删除后索引清理投递失败：documentId=${id}, error=${message}`,
+      );
+    }
     return { id, deleted: true };
   }
 }

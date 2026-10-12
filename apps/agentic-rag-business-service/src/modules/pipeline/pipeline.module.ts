@@ -8,9 +8,9 @@ import { DocumentPipelineConsumer } from './document-pipeline.consumer';
 import { PipelineOrchestrator } from './pipeline.orchestrator';
 
 /**
- * 发布后 RAG 管线
+ * 发布后 RAG / Search 管线
  *
- * 消费 RabbitMQ 命令，编排分块 / Embedding / ES 写入。
+ * 消费 RabbitMQ 命令，编排分块 / Embedding / 文档快照索引与删除。
  * 不反向依赖 DocumentModule 的 HTTP 入口，只复用其 Repository。
  */
 @Module({
@@ -20,11 +20,7 @@ import { PipelineOrchestrator } from './pipeline.orchestrator';
     EmbeddingModule,
     RabbitmqModule,
   ],
-  providers: [
-    ChunkingService,
-    PipelineOrchestrator,
-    DocumentPipelineConsumer,
-  ],
+  providers: [ChunkingService, PipelineOrchestrator, DocumentPipelineConsumer],
 })
 class PipelineModule {}
 
