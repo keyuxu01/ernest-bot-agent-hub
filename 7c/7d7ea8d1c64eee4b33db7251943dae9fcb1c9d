@@ -1,0 +1,143 @@
+apps/agentic-rag-business-service/src/infrastructure/chat-model/chat-model.module.ts
+  s_239247a92e73d4::t_b207e0f47612ba 1-11
+apps/agentic-rag-business-service/src/config/environment.spec.ts
+  s_239247a92e73d4::t_b880a708012950 57-64
+  s_239247a92e73d4::t_2397866ae3ddf5 28-32
+  s_239247a92e73d4::t_9049846f82c4a9 44
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_239247a92e73d4::t_543b96b1755c72 45-48,51-52
+  s_239247a92e73d4::t_631ac9d8cc5359 14
+  s_239247a92e73d4::t_5b20e169129c2a 49-50
+docs/architecture/README.md
+  s_239247a92e73d4::t_ebbba77eec4dd2 267-277
+  s_239247a92e73d4::t_84a3b026b081c2 27
+  s_239247a92e73d4::t_07d9b224c856f5 145
+  s_239247a92e73d4::t_e1e6e939bdd4b9 300
+apps/agentic-rag-business-service/src/modules/pipeline/pipeline.module.ts
+  s_239247a92e73d4::t_af104e9e587ad9 2,5,10-11,15,17-18,26-27,30-36
+apps/agentic-rag-business-service/.env.example
+  s_239247a92e73d4::t_a2a562b7442118 46-55
+apps/agentic-rag-business-service/src/infrastructure/rabbitmq/document-pipeline.publisher.ts
+  s_239247a92e73d4::t_f33564122f1fe6 4,7,12-14
+  s_239247a92e73d4::t_0cb825821d6a4f 27,29,38,45,49,54,58-90
+packages/contracts/src/rag-business/kg-build.spec.ts
+  s_239247a92e73d4::t_5dd9363c86dc13 1-53
+docs/architecture/decisions/0022-use-neo4j-for-knowledge-graph.md
+  s_239247a92e73d4::t_49a45d67024f3b 44-45
+  s_239247a92e73d4::t_4eb7f6700d5844 60-61
+  s_239247a92e73d4::t_91f7721f49a267 1-31,39-43,46-57,59
+  s_239247a92e73d4::t_5cdfa9a3dca175 58
+  s_239247a92e73d4::t_1d497a0e12c609 32-38
+packages/contracts/src/rag-business/kg-build.ts
+  s_239247a92e73d4::t_b589f83506efb7 1-32
+apps/agentic-rag-business-service/src/modules/pipeline/helpers/normalize-kg-extraction.ts
+  s_239247a92e73d4::t_d971c395385ca8 24-40
+  s_239247a92e73d4::t_e735d37c897c36 1-23,41-45,48,51-56,58,60-79,81-89
+  s_239247a92e73d4::t_f6977f9b4eaaa5 46-47,49-50,57,59
+  s_239247a92e73d4::t_4e9d7b29c0b598 80
+apps/agentic-rag-business-service/src/modules/pipeline/graph-build.service.spec.ts
+  s_239247a92e73d4::t_c964052e9fa085 129-131
+  s_239247a92e73d4::t_97ce106a87d9c5 14-15
+  s_239247a92e73d4::t_84bb1f9aca4772 73,79-83,85-90,94,96-100,102-111
+  s_239247a92e73d4::t_74dd3b672e76b5 1-13,16-72,74-78,84,91-93,95,101,112-128,132-137
+apps/agentic-rag-business-service/src/infrastructure/rabbitmq/constants/rabbitmq.constants.ts
+  s_239247a92e73d4::t_b26fd91ea4c455 4
+  s_239247a92e73d4::t_98948319d2c4cd 27-33,35-38
+apps/agentic-rag-business-service/src/modules/pipeline/constants/kg-extraction.constants.ts
+  s_239247a92e73d4::t_fbea5278a0bee4 1-65
+apps/agentic-rag-business-service/src/modules/pipeline/pipeline.orchestrator.ts
+  s_239247a92e73d4::t_27d04ef6a97820 9
+  s_239247a92e73d4::t_cf7c2ebf85a310 18
+  s_239247a92e73d4::t_27299140a577b3 77-87,90-92,113,116-117
+  s_bdd49b1e1fcb5d::t_309600f441d27a 88-89,93-112,114-115,118
+  s_239247a92e73d4::t_88e4b758835e54 33
+apps/agentic-rag-business-service/src/infrastructure/rabbitmq/document-pipeline.publisher.spec.ts
+  s_239247a92e73d4::t_1f2b39a4bc3a8c 9-11
+  s_239247a92e73d4::t_99c9b2f78886c3 78-88
+  s_239247a92e73d4::t_37c2013b9a32fe 42-50
+apps/agentic-rag-business-service/src/infrastructure/neo4j/graph-store.service.ts
+  s_bdd49b1e1fcb5d::t_d95cfbdfbd6d7f 221-239
+  s_bdd49b1e1fcb5d::t_3c529e518be128 21
+  s_bdd49b1e1fcb5d::t_ea86c1245f5643 184-196,203
+  s_239247a92e73d4::t_2916c09ffc074d 1-10,12,14-18,22-25,30-65,67-69,94-96,137,139,141,143-144,147,154-155,160-162,164,167-168,170-171,173-174,176,209-214,217-218,267-278
+  s_bdd49b1e1fcb5d::t_e776696e64118d 28-29
+  s_239247a92e73d4::t_56d04bee118d1a 11,13,19-20,26-27,66,70-93,97-136,138,140,142,145-146,148-153,156-159,163,165-166,169,172,175,177-183,197-202,204-208,215-216,219-220,240-266
+apps/agentic-rag-business-service/src/infrastructure/neo4j/neo4j.module.ts
+  s_239247a92e73d4::t_20141a659e2c48 1-11
+apps/agentic-rag-business-service/src/modules/pipeline/kg-extraction.service.ts
+  s_239247a92e73d4::t_e9b746c045d7ea 1-70
+apps/agentic-rag-business-service/src/config/environment.ts
+  s_239247a92e73d4::t_a29074c5897c5d 25-31,40
+apps/agentic-rag-business-service/src/modules/pipeline/pipeline.orchestrator.spec.ts
+  s_239247a92e73d4::t_e2aca7101aa9fb 8
+  s_239247a92e73d4::t_9452faec32859c 40,44-74
+  s_239247a92e73d4::t_f3a7598d71b10c 21-24
+apps/agentic-rag-business-service/src/infrastructure/rabbitmq/rabbitmq.service.ts
+  s_239247a92e73d4::t_b9639d5f6742f3 14-17
+  s_239247a92e73d4::t_d055dc1cb21fd1 242-247
+  s_239247a92e73d4::t_4141398c0ed8c4 193
+packages/contracts/src/index.ts
+  s_239247a92e73d4::t_aae7e910db4a2b 283-290
+apps/agentic-rag-business-service/src/modules/pipeline/graph-build.service.ts
+  s_239247a92e73d4::t_14c39728cfabc9 1-17,21-22,26-45,47-69,81-95,98-116
+  h_329e897ccf6193 46
+  s_239247a92e73d4::t_654321d7786f33 18-20,23-25
+  s_239247a92e73d4::t_82c0441038c40d 96-97
+  s_239247a92e73d4::t_682de3e92c2035 70-80
+apps/agentic-rag-business-service/src/modules/pipeline/helpers/normalize-kg-extraction.spec.ts
+  s_239247a92e73d4::t_cdbc9c4441e651 1-23,34-36,38-52,54-60,67-102
+  s_239247a92e73d4::t_a1129d9a721d88 24-33
+  s_239247a92e73d4::t_6c364dc90fc696 37,53
+  s_239247a92e73d4::t_313e829f6604da 61-66
+docs/guides/product-overview.md
+  s_239247a92e73d4::t_7bb05bfdb92698 61-66,68-70
+apps/agentic-rag-business-service/src/infrastructure/neo4j/constants/graph-store.constants.ts
+  s_239247a92e73d4::t_26f8e62abb0e72 1-17
+apps/agentic-rag-business-service/src/modules/pipeline/document-pipeline.consumer.ts
+  s_239247a92e73d4::t_fbd7b1119e9681 3,9
+  s_239247a92e73d4::t_04999cf68e353a 38-50
+apps/agentic-rag-business-service/src/modules/pipeline/type/kg-extraction.types.ts
+  s_239247a92e73d4::t_adce4e443a0c4a 1-17
+apps/agentic-rag-business-service/src/modules/pipeline/helpers/build-kg-extraction-prompt.ts
+  s_239247a92e73d4::t_06aa48b6122e21 1-47,55-68
+  s_bdd49b1e1fcb5d::t_20a4bd4d53cfe0 48-54
+apps/agentic-rag-business-service/src/modules/pipeline/schemas/kg-extraction.zod.ts
+  s_239247a92e73d4::t_c33ee94f1458b1 24-30,32-35
+  s_239247a92e73d4::t_04b17a9b335e93 1-23,31,45-55
+  s_bdd49b1e1fcb5d::t_574b44d4e79935 36-44
+apps/agentic-rag-business-service/src/infrastructure/neo4j/type/graph-store.types.ts
+  s_239247a92e73d4::t_819ccbd92534c0 1-17,31-35,38-39,41-45,51-52,56-59
+  s_bdd49b1e1fcb5d::t_86234d0aa4f641 46-49
+  s_239247a92e73d4::t_dab46ad3f6665f 18-30,36-37,40,50,53-55,60-66
+apps/agentic-rag-business-service/src/infrastructure/chat-model/chat-model.service.ts
+  s_239247a92e73d4::t_3e0451ff754269 1-25,27-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.51-trip",
+  "base_commit_sha": "7c7d7ea8d1c64eee4b33db7251943dae9fcb1c9d",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_239247a92e73d4": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_7feca32c-75a3-48d7-ad59-d3e56bb74c78",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    },
+    "s_bdd49b1e1fcb5d": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_fc4bc865-e1ed-4aaf-a99b-15d922033fcc",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
