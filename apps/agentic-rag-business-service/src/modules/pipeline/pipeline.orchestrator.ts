@@ -6,6 +6,7 @@ import { EmbeddingService } from '../../infrastructure/embedding/embedding.servi
 import { DocumentContentRepository } from '../document/repository/document-content.repository';
 import { DocumentRepository } from '../document/repository/document.repository';
 import { ChunkingService } from './chunking.service';
+import { GraphBuildService } from './graph-build.service';
 import { toIsoDate } from './helpers/to-iso-date';
 import { toPipelineDocument } from './helpers/to-pipeline-document';
 import type { PipelineDocument } from './type/pipeline.types';
@@ -14,6 +15,7 @@ import type { PipelineDocument } from './type/pipeline.types';
  * 发布后知识管线编排器
  *
  * RAG：分块 → Embedding → ES kh_chunk。
+ * KG：分块 → LLM 抽实体关系 → Neo4j（迁自 knowledge-hub-backend `bb867d5e`）。
  * 由 DocumentPipelineConsumer 在消费到 MQ 消息后调用；
  * 本类负责「加载文档 → 调具体服务」，不直接碰 RabbitMQ。
  */
@@ -28,6 +30,7 @@ class PipelineOrchestrator {
     private readonly embeddingService: EmbeddingService,
     private readonly vectorIndexService: VectorIndexService,
     private readonly searchIndexService: SearchIndexService,
+    private readonly graphBuildService: GraphBuildService,
   ) {}
 
   /**
@@ -68,6 +71,48 @@ class PipelineOrchestrator {
       await this.searchIndexService.deleteDocument(message.documentId);
     } else {
       await this.searchIndexService.indexDocument(message.document);
+    }
+  }
+
+  /**
+   * 处理 KG 建图消息。
+   *
+   * - BY_DOC_IDS：读元数据 + 正文 → 分块 → 抽实体关系 → 写 Neo4j
+   * - DELETE_BY_DOC_IDS：删文档节点、块与孤儿实体；软删后文档已不是 active，
+   *   所以与 RAG 删除一样直接按 ID 清理，不再查库
+   *
+   * 单篇失败只记日志，与 RAG 一致（消息仍会 ack）；删除失败向上抛，交给 MQ 边界 nack。
+   * 源提交的 BUILD_ALL 未迁入：v1 契约不包含该类型。
+   */
+  async handleKgBuild(type: string, documentIds?: string[]): Promise<void> {
+    // 两种类型都按 ID 处理，空列表与未知类型同样忽略
+    if (!documentIds?.length) {
+      this.logger.warn(`忽略未支持的 KG 消息：type=${type}`);
+      return;
+    }
+
+    switch (type) {
+      case 'DELETE_BY_DOC_IDS': {
+        for (const id of documentIds)
+          await this.graphBuildService.deleteForDocument(id);
+        return;
+      }
+      case 'BY_DOC_IDS': {
+        const docs = await this.loadDocumentsByIds(documentIds);
+        this.logger.log(`KG 开始建图：type=${type}, total=${docs.length}`);
+        for (const doc of docs) {
+          try {
+            await this.graphBuildService.buildForDocument(doc);
+          } catch (error) {
+            const message =
+              error instanceof Error ? error.message : String(error);
+            this.logger.error(`KG 构建失败：documentId=${doc.id}, ${message}`);
+          }
+        }
+        return;
+      }
+      default:
+        this.logger.warn(`忽略未支持的 KG 消息：type=${type}`);
     }
   }
 

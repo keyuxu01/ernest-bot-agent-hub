@@ -11,6 +11,10 @@ import amqp, {
 } from 'amqp-connection-manager';
 import type { ConfirmChannel } from 'amqplib';
 import {
+  KG_GRAPH_EXCHANGE,
+  KG_GRAPH_QUEUE,
+  KG_RK_BUILD_BY_IDS,
+  KG_RK_DELETE,
   RAG_REINDEX_EXCHANGE,
   RAG_REINDEX_QUEUE,
   RAG_RK_BY_IDS,
@@ -186,7 +190,7 @@ class RabbitMqService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * 声明 RAG / Search 交换机、队列与重建/删除绑定。
+   * 声明 RAG / Search / KG 交换机、队列与重建/删除绑定。
    *
    * 路由：`topic` + `rag.reindex.by_ids`，后续可按空间等加 routing key，不必改交换机类型。
    *
@@ -235,7 +239,12 @@ class RabbitMqService implements OnModuleInit, OnModuleDestroy {
       SEARCH_INDEX_EXCHANGE,
       SEARCH_RK_DELETE,
     );
-    this.logger.log('RabbitMQ 拓扑已声明（RAG + Search）');
+    // KG 独立队列（迁自 knowledge-hub-backend `bb867d5e`）：同样 durable，建图 / 删图两条绑定
+    await ch.assertExchange(KG_GRAPH_EXCHANGE, 'topic', { durable: true });
+    await ch.assertQueue(KG_GRAPH_QUEUE, { durable: true });
+    await ch.bindQueue(KG_GRAPH_QUEUE, KG_GRAPH_EXCHANGE, KG_RK_BUILD_BY_IDS);
+    await ch.bindQueue(KG_GRAPH_QUEUE, KG_GRAPH_EXCHANGE, KG_RK_DELETE);
+    this.logger.log('RabbitMQ 拓扑已声明（RAG + Search + KG）');
   }
 
   /** 按 handlers 表给当前 channel 挂监听。启动第一次 setup 时常为空；重连由连接管理器再调 setup，不是再走 onModuleInit。 */

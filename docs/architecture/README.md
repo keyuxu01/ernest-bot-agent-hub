@@ -24,6 +24,7 @@
       | PostgreSQL       |
       | MongoDB          |
       | Elasticsearch    |
+      | Neo4j graph      |
       | RustFS objects   |
       +------------------+
 
@@ -141,6 +142,7 @@ the [deployment and infrastructure guide](../guides/deployment-and-infrastructur
 | Business facts and job records  | Database                  | Yes                           |
 | Original documents              | Object storage such as R2 | Yes                           |
 | Embeddings and vector indexes   | Elasticsearch `kh_chunk`  | Yes                           |
+| Knowledge graph (rebuildable)   | Neo4j                     | Yes                           |
 | Commands and integration events | RabbitMQ                  | Yes, until acknowledged       |
 | Cache, locks and rate limits    | Redis                     | Depends on the use case       |
 | In-flight request data          | NestJS process memory     | No                            |
@@ -262,6 +264,17 @@ RabbitMQ and Elasticsearch are required at startup; a down broker or cluster fai
 also runs the consumer; splitting that onto the Railway Consumer service in ADR-0007 is
 follow-up work.
 
+## Knowledge Graph Build Boundary
+
+Publish and soft delete also send `RagBusinessKgBuildMessageV1` (document IDs only) to the dedicated
+`kg.graph.exchange` / `kh.kg.graph.queue`, so slow LLM extraction never blocks RAG or Search. The
+`PipelineModule` consumer reuses the RAG chunker (same `chunkId` as `kh_chunk`), extracts entities and
+relations per chunk with the Qwen chat model from `src/infrastructure/chat-model`, and writes
+`KnowledgeDocument` / `DocumentChunk` / `KnowledgeEntity` nodes through `GraphStoreService` in
+`src/infrastructure/neo4j`. Each build deletes the document's previous graph first. Neo4j is required at
+startup like RabbitMQ and Elasticsearch. Delivery has the same no-outbox / no-DLQ limits as RAG, and there
+is no graph query API yet. See [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md).
+
 ## Architecture Decision Records
 
 | ADR                                                                      | Decision                                            | Status     |
@@ -284,6 +297,7 @@ follow-up work.
 | [ADR-0017](./decisions/0017-place-qwen-embedding-in-infrastructure.md)   | Qwen embedding client in `src/infrastructure`       | Accepted   |
 
 | [ADR-0021](./decisions/0021-document-search-index.md) | Separate document Search snapshots from RAG chunks | Accepted |
+| [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md) | Neo4j knowledge graph built from published documents | Accepted |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

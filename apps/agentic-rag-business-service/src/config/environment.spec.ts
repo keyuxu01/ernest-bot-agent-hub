@@ -25,6 +25,11 @@ const validEnvironment = {
   EMBEDDINGS_MODEL_NAME: 'text-embedding-v4',
   EMBEDDING_DIMENSION: '1024',
   EMBEDDING_BATCH_SIZE: '10',
+  CHAT_MODEL_NAME: 'qwen-plus',
+  CHAT_MODEL_TIMEOUT_MS: '60000',
+  NEO4J_URI: 'bolt://localhost:7687',
+  NEO4J_USER: 'neo4j',
+  NEO4J_PASSWORD: 'password',
 };
 
 describe('validateEnvironment', () => {
@@ -36,6 +41,7 @@ describe('validateEnvironment', () => {
       RAG_CHUNK_OVERLAP: 64,
       EMBEDDING_DIMENSION: 1024,
       EMBEDDING_BATCH_SIZE: 10,
+      CHAT_MODEL_TIMEOUT_MS: 60000,
     });
   });
 
@@ -45,6 +51,14 @@ describe('validateEnvironment', () => {
 
     expect(() => validateEnvironment(missingPassword)).toThrow(
       'Environment variable POSTGRES_PASSWORD is required',
+    );
+  });
+
+  it('rejects a missing Neo4j connection variable', () => {
+    const missingNeo4j: Record<string, unknown> = { ...validEnvironment };
+    delete missingNeo4j.NEO4J_URI;
+    expect(() => validateEnvironment(missingNeo4j)).toThrow(
+      'Environment variable NEO4J_URI is required',
     );
   });
 

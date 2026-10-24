@@ -5,6 +5,7 @@ import type { EmbeddingService } from '../../infrastructure/embedding/embedding.
 import type { DocumentContentRepository } from '../document/repository/document-content.repository';
 import type { DocumentRepository } from '../document/repository/document.repository';
 import type { ChunkingService } from './chunking.service';
+import type { GraphBuildService } from './graph-build.service';
 import { PipelineOrchestrator } from './pipeline.orchestrator';
 import type { DocumentChunk } from './type/pipeline.types';
 
@@ -16,6 +17,10 @@ describe('PipelineOrchestrator', () => {
   const vectorIndexService = {
     deleteByDocId: vi.fn(),
     indexChunks: vi.fn(),
+  };
+  const graphBuildService = {
+    buildForDocument: vi.fn(),
+    deleteForDocument: vi.fn(),
   };
 
   let orchestrator: PipelineOrchestrator;
@@ -32,7 +37,41 @@ describe('PipelineOrchestrator', () => {
         indexDocument: vi.fn(),
         deleteDocument: vi.fn(),
       } as unknown as SearchIndexService,
+      graphBuildService as unknown as GraphBuildService,
     );
+  });
+
+  it('deletes KG graphs by id without loading soft-deleted documents', async () => {
+    await orchestrator.handleKgBuild('DELETE_BY_DOC_IDS', ['1', '2']);
+    expect(graphBuildService.deleteForDocument.mock.calls).toEqual([
+      ['1'],
+      ['2'],
+    ]);
+    expect(documentRepo.findActiveByIds).not.toHaveBeenCalled();
+  });
+
+  it('builds KG for each loaded document and isolates per-document failures', async () => {
+    documentRepo.findActiveByIds.mockResolvedValue([
+      { id: '1', title: 'A', contentId: 'c1', status: 1 },
+      { id: '2', title: 'B', contentId: 'c2', status: 1 },
+    ]);
+    contentRepo.findActiveContentById.mockResolvedValue({ content: '正文' });
+    graphBuildService.buildForDocument
+      .mockRejectedValueOnce(new Error('neo4j down'))
+      .mockResolvedValueOnce(3);
+
+    await orchestrator.handleKgBuild('BY_DOC_IDS', ['1', '2']);
+
+    expect(graphBuildService.buildForDocument).toHaveBeenCalledTimes(2);
+    expect(graphBuildService.buildForDocument.mock.calls[1]![0]).toEqual(
+      expect.objectContaining({ id: '2', content: '正文' }),
+    );
+  });
+
+  it('ignores unsupported KG types', async () => {
+    await orchestrator.handleKgBuild('BUILD_ALL', ['1']);
+    expect(documentRepo.findActiveByIds).not.toHaveBeenCalled();
+    expect(graphBuildService.buildForDocument).not.toHaveBeenCalled();
   });
 
   it('deletes vector chunks without loading soft-deleted documents', async () => {

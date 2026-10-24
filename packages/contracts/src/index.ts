@@ -280,6 +280,14 @@ export {
   RagBusinessReindexTypeSchema,
 } from './rag-business/reindex';
 
+export type {
+  RagBusinessKgBuildMessageV1,
+  RagBusinessKgBuildMessageV1Input,
+} from './rag-business/kg-build';
+export {
+  RagBusinessKgBuildMessageV1Schema,
+  RagBusinessKgBuildTypeSchema,
+} from './rag-business/kg-build';
 export {
   RagBusinessSearchDocumentSchema,
   RagBusinessSearchIndexMessageV1Schema,

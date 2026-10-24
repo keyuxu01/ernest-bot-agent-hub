@@ -6,13 +6,16 @@ import {
 import { DocumentPipelinePublisher } from './document-pipeline.publisher';
 import type { RabbitMqService } from './rabbitmq.service';
 import {
+  KG_GRAPH_EXCHANGE,
+  KG_RK_BUILD_BY_IDS,
+  KG_RK_DELETE,
   RAG_REINDEX_EXCHANGE,
   RAG_RK_DELETE,
   SEARCH_INDEX_EXCHANGE,
   SEARCH_RK_DELETE,
 } from './constants/rabbitmq.constants';
 describe('DocumentPipelinePublisher', () => {
-  it('publishes both delete commands with matching ids and version', async () => {
+  it('publishes all delete commands with matching ids and version', async () => {
     const publish = vi.fn().mockResolvedValue(true);
     const publisher = new DocumentPipelinePublisher({
       publish,
@@ -34,6 +37,15 @@ describe('DocumentPipelinePublisher', () => {
         schemaVersion: 1,
         type: 'DELETE',
         documentId: '1',
+      }),
+    );
+    expect(publish).toHaveBeenCalledWith(
+      KG_GRAPH_EXCHANGE,
+      KG_RK_DELETE,
+      expect.objectContaining({
+        schemaVersion: 1,
+        type: 'DELETE_BY_DOC_IDS',
+        documentIds: ['1'],
       }),
     );
   });
@@ -63,7 +75,17 @@ describe('DocumentPipelinePublisher', () => {
       updatedAt: null,
     };
     await publisher.afterPublish(document);
-    expect(publish).toHaveBeenCalledTimes(2);
+    // RAG + Search + KG 三条独立命令
+    expect(publish).toHaveBeenCalledTimes(3);
+    expect(publish).toHaveBeenCalledWith(
+      KG_GRAPH_EXCHANGE,
+      KG_RK_BUILD_BY_IDS,
+      expect.objectContaining({
+        schemaVersion: 1,
+        type: 'BY_DOC_IDS',
+        documentIds: ['1'],
+      }),
+    );
     expect(
       RagBusinessSearchIndexMessageV1Schema.parse(publish.mock.calls[1]![2]),
     ).toEqual(expect.objectContaining({ type: 'INDEX', document }));

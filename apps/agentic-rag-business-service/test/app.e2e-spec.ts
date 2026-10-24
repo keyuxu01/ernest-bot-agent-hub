@@ -11,6 +11,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { DataSource } from 'typeorm';
 import request from 'supertest';
 import { VectorIndexService } from './../src/infrastructure/elasticsearch/vector-index.service';
+import { GraphStoreService } from './../src/infrastructure/neo4j/graph-store.service';
 import { RabbitMqService } from './../src/infrastructure/rabbitmq/rabbitmq.service';
 import { AppModule } from './../src/app.module';
 import { MAX_UPLOAD_FILE_BYTES } from './../src/modules/document/constants/document-upload.constants';
@@ -40,6 +41,14 @@ describe('Business service (e2e)', () => {
       .useValue({
         deleteByDocId: async () => undefined,
         indexChunks: async () => undefined,
+      })
+      // Neo4j 启动时会连库并建约束；e2e 只验 HTTP 面，替换为空实现
+      .overrideProvider(GraphStoreService)
+      .useValue({
+        upsertDocument: async () => undefined,
+        upsertChunk: async () => undefined,
+        writeExtraction: async () => 0,
+        deleteByDocId: async () => undefined,
       })
       .compile();
 

@@ -1,10 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
+  RagBusinessKgBuildMessageV1Schema,
   RagBusinessReindexMessageV1Schema,
   RagBusinessSearchIndexMessageV1Schema,
 } from '@repo/contracts';
 import type { ConsumeMessage } from 'amqplib';
 import {
+  KG_GRAPH_QUEUE,
   RAG_REINDEX_QUEUE,
   SEARCH_INDEX_QUEUE,
 } from '../../infrastructure/rabbitmq/constants/rabbitmq.constants';
@@ -33,6 +35,19 @@ class DocumentPipelineConsumer {
     this.rabbit.registerHandler(SEARCH_INDEX_QUEUE, (msg) =>
       this.handleSearch(msg),
     );
+    // KG 建图走独立队列：LLM 抽取慢，不能堵住 RAG / Search 消息
+    this.rabbit.registerHandler(KG_GRAPH_QUEUE, (msg) => this.handleKg(msg));
+  }
+
+  /** KG：分块 → LLM 抽实体关系 → Neo4j；只记 ID，不记正文 */
+  private async handleKg(msg: ConsumeMessage): Promise<void> {
+    const body = RagBusinessKgBuildMessageV1Schema.parse(
+      JSON.parse(msg.content.toString('utf8')),
+    );
+    this.logger.log(
+      `[KG] type=${body.type}, taskId=${body.taskId}, documentIds=${JSON.stringify(body.documentIds)}`,
+    );
+    await this.orchestrator.handleKgBuild(body.type, body.documentIds);
   }
 
   /** Search 边界校验：拒绝缺失快照、错误版本及 ID 不一致的消息，不记录正文。 */
