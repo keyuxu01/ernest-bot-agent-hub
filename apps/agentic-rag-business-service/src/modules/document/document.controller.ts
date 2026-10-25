@@ -64,10 +64,22 @@ export class DocumentController {
     return this.documentService.findAll(query);
   }
 
-  /** 直接发布文档（无审核；发布后 MQ 异步触发 RAG） */
+  /** 发布文档：开启审核时进入待审；免审则直接发布并投递 RAG / Search / KG */
   @Put(':id/publish')
   publish(@Param('id') id: string) {
     return this.documentService.publish(id);
+  }
+
+  /** 归档：Published → Archived，并清 RAG / Search / KG 索引 */
+  @Put(':id/archive')
+  archive(@Param('id') id: string) {
+    return this.documentService.archive(id);
+  }
+
+  /** 存为草稿（下架编辑）：Published → Draft，清索引后可改内容再提交发布 */
+  @Put(':id/save-draft')
+  saveAsDraft(@Param('id') id: string) {
+    return this.documentService.saveAsDraft(id);
   }
 
   /** 查询文档详情（含正文） */

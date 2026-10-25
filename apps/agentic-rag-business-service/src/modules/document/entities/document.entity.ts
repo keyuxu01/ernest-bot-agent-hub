@@ -7,7 +7,12 @@ import {
 } from 'typeorm';
 import { bigintTransformer } from '../../../common/transformers/bigint.transformer';
 
-/** 文档状态 */
+/**
+ * 文档状态（与 kh_document.status 一致）
+ *
+ * 只有 Published 写入 RAG / Search / KG 索引；其余状态都不可检索。
+ * 流转规则见 helpers/document-status-rules.ts。
+ */
 export enum DocumentStatus {
   /** 草稿 */
   Draft = 0,
@@ -15,6 +20,8 @@ export enum DocumentStatus {
   Published = 1,
   /** 已归档：不会作为知识被检索 */
   Archived = 2,
+  /** 待审核：已提交发布、审核完成前，不进索引 */
+  PendingReview = 3,
 }
 
 /** 文档元数据（PostgreSQL kh_document） */
@@ -71,7 +78,7 @@ export class DocumentEntity {
   @Column({ type: 'varchar', nullable: true })
   tags?: string | null;
 
-  /** 状态：0 草稿 / 1 已发布 / 2 已归档 */
+  /** 状态：0 草稿 / 1 已发布 / 2 已归档 / 3 待审核 */
   @Column({ type: 'smallint', default: DocumentStatus.Draft })
   status: DocumentStatus;
 

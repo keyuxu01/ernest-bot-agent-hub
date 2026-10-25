@@ -16,6 +16,7 @@ import { RabbitMqService } from './../src/infrastructure/rabbitmq/rabbitmq.servi
 import { AppModule } from './../src/app.module';
 import { MAX_UPLOAD_FILE_BYTES } from './../src/modules/document/constants/document-upload.constants';
 import { DocumentEntity } from './../src/modules/document/entities/document.entity';
+import { DocumentReviewEntity } from './../src/modules/document/entities/document-review.entity';
 import { DocumentContent } from './../src/modules/document/schemas/document-content.schema';
 
 describe('Business service (e2e)', () => {
@@ -143,6 +144,7 @@ describe('Business service (e2e)', () => {
     const dataSource = app.get(DataSource);
 
     expect(dataSource.hasMetadata(DocumentEntity)).toBe(true);
+    expect(dataSource.hasMetadata(DocumentReviewEntity)).toBe(true);
     expect(app.get(getModelToken(DocumentContent.name))).toBeDefined();
   });
 

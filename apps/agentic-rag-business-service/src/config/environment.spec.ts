@@ -42,8 +42,41 @@ describe('validateEnvironment', () => {
       EMBEDDING_DIMENSION: 1024,
       EMBEDDING_BATCH_SIZE: 10,
       CHAT_MODEL_TIMEOUT_MS: 60000,
+      DOCUMENT_REQUIRE_APPROVAL: true,
     });
   });
+
+  it('defaults document approval to enabled when unset', () => {
+    expect(
+      validateEnvironment(validEnvironment).DOCUMENT_REQUIRE_APPROVAL,
+    ).toBe(true);
+  });
+
+  it.each([
+    ['true', true],
+    ['false', false],
+  ])('parses DOCUMENT_REQUIRE_APPROVAL=%s', (value, expected) => {
+    expect(
+      validateEnvironment({
+        ...validEnvironment,
+        DOCUMENT_REQUIRE_APPROVAL: value,
+      }).DOCUMENT_REQUIRE_APPROVAL,
+    ).toBe(expected);
+  });
+
+  it.each(['flase', 'FALSE', '', '1'])(
+    'rejects DOCUMENT_REQUIRE_APPROVAL=%j',
+    (value) => {
+      expect(() =>
+        validateEnvironment({
+          ...validEnvironment,
+          DOCUMENT_REQUIRE_APPROVAL: value,
+        }),
+      ).toThrow(
+        'Environment variable DOCUMENT_REQUIRE_APPROVAL must be true or false',
+      );
+    },
+  );
 
   it('rejects a missing required variable', () => {
     const missingPassword: Record<string, unknown> = { ...validEnvironment };

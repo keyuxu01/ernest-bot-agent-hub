@@ -251,9 +251,21 @@ Conversion stays inside `DocumentModule`. The MVP waits inside the request and k
 state, so an interrupted request must be re-uploaded. See
 [ADR-0015](./decisions/0015-use-in-process-document-parsers.md).
 
+## Document Lifecycle and Publish Review Boundary
+
+`kh_document.status` is `Draft`, `Published`, `Archived` or `PendingReview`, and only `Published` is
+indexed. Status changes go through dedicated endpoints (publish, archive, save-draft, review submit /
+approve / reject); PATCH only allows `Published → Draft`. With `DOCUMENT_REQUIRE_APPROVAL` (default
+`true`), publish creates a `kh_document_review` row and moves the document to `PendingReview`; approval
+publishes and indexes it, rejection returns it to `Draft`. Review row and document status commit in one
+PostgreSQL transaction, and a partial unique index allows one pending review per document. Index commands
+are sent only when a document enters or leaves `Published`. Review endpoints are unauthenticated until the
+user module lands: reviewer identity is caller-supplied. See
+[ADR-0023](./decisions/0023-document-publish-review-workflow.md).
+
 ## Document Publish and RAG Index Boundary
 
-`PUT /documents/:id/publish` writes `Published` in PostgreSQL, then publishes
+When a document becomes `Published` (direct publish or review approval), the service publishes
 `RagBusinessReindexMessageV1` to RabbitMQ. The message carries only document IDs. A consumer in
 `PipelineModule` loads metadata and Mongo bodies through document repositories, splits Markdown,
 embeds via `EmbeddingService` in `src/infrastructure/embedding` (Qwen / DashScope compatible-mode),
@@ -277,27 +289,27 @@ is no graph query API yet. See [ADR-0022](./decisions/0022-use-neo4j-for-knowled
 
 ## Architecture Decision Records
 
-| ADR                                                                      | Decision                                            | Status     |
-| ------------------------------------------------------------------------ | --------------------------------------------------- | ---------- |
-| [ADR-0001](./decisions/0001-use-zod-contracts.md)                        | Zod-based shared runtime contracts                  | Accepted   |
-| [ADR-0002](./decisions/0002-use-shadcn-tailwind.md)                      | shadcn/ui and Tailwind CSS for frontend UI          | Accepted   |
-| [ADR-0003](./decisions/0003-separate-ai-stream-rpc-and-mcp.md)           | Separate AI stream, business API and MCP boundaries | Accepted   |
-| [ADR-0004](./decisions/0004-evaluate-orpc.md)                            | Evaluate oRPC for Web-to-service APIs               | Proposed   |
-| [ADR-0005](./decisions/0005-evaluate-mcp-nest.md)                        | Evaluate `@rekog/mcp-nest` v2 for the MCP service   | Proposed   |
-| [ADR-0007](./decisions/0007-use-rabbitmq.md)                             | RabbitMQ for asynchronous messaging                 | Accepted   |
-| [ADR-0008](./decisions/0008-use-redis.md)                                | Redis for cache and distributed coordination        | Accepted   |
-| [ADR-0009](./decisions/0009-defer-kubernetes.md)                         | Defer Kubernetes during phase 1                     | Accepted   |
-| [ADR-0010](./decisions/0010-use-tanstack-query.md)                       | TanStack Query for browser server state             | Accepted   |
-| [ADR-0011](./decisions/0011-use-vercel-and-railway.md)                   | Use Vercel Web with Railway Backend Workloads       | Accepted   |
-| [ADR-0012](./decisions/0012-use-commonjs-nestjs.md)                      | CommonJS NestJS applications with NodeNext          | Accepted   |
-| [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md) | PostgreSQL metadata with MongoDB document content   | Accepted   |
-| [ADR-0014](./decisions/0014-use-mineru-cloud-for-document-parsing.md)    | MinerU cloud API for upload document parsing        | Superseded |
-| [ADR-0015](./decisions/0015-use-in-process-document-parsers.md)          | In-process parsers for upload document parsing      | Accepted   |
-| [ADR-0016](./decisions/0016-use-elasticsearch-for-rag-chunks.md)         | Elasticsearch + Qwen embeddings for RAG chunks      | Accepted   |
-| [ADR-0017](./decisions/0017-place-qwen-embedding-in-infrastructure.md)   | Qwen embedding client in `src/infrastructure`       | Accepted   |
-
-| [ADR-0021](./decisions/0021-document-search-index.md) | Separate document Search snapshots from RAG chunks | Accepted |
-| [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md) | Neo4j knowledge graph built from published documents | Accepted |
+| ADR                                                                      | Decision                                             | Status     |
+| ------------------------------------------------------------------------ | ---------------------------------------------------- | ---------- |
+| [ADR-0001](./decisions/0001-use-zod-contracts.md)                        | Zod-based shared runtime contracts                   | Accepted   |
+| [ADR-0002](./decisions/0002-use-shadcn-tailwind.md)                      | shadcn/ui and Tailwind CSS for frontend UI           | Accepted   |
+| [ADR-0003](./decisions/0003-separate-ai-stream-rpc-and-mcp.md)           | Separate AI stream, business API and MCP boundaries  | Accepted   |
+| [ADR-0004](./decisions/0004-evaluate-orpc.md)                            | Evaluate oRPC for Web-to-service APIs                | Proposed   |
+| [ADR-0005](./decisions/0005-evaluate-mcp-nest.md)                        | Evaluate `@rekog/mcp-nest` v2 for the MCP service    | Proposed   |
+| [ADR-0007](./decisions/0007-use-rabbitmq.md)                             | RabbitMQ for asynchronous messaging                  | Accepted   |
+| [ADR-0008](./decisions/0008-use-redis.md)                                | Redis for cache and distributed coordination         | Accepted   |
+| [ADR-0009](./decisions/0009-defer-kubernetes.md)                         | Defer Kubernetes during phase 1                      | Accepted   |
+| [ADR-0010](./decisions/0010-use-tanstack-query.md)                       | TanStack Query for browser server state              | Accepted   |
+| [ADR-0011](./decisions/0011-use-vercel-and-railway.md)                   | Use Vercel Web with Railway Backend Workloads        | Accepted   |
+| [ADR-0012](./decisions/0012-use-commonjs-nestjs.md)                      | CommonJS NestJS applications with NodeNext           | Accepted   |
+| [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md) | PostgreSQL metadata with MongoDB document content    | Accepted   |
+| [ADR-0014](./decisions/0014-use-mineru-cloud-for-document-parsing.md)    | MinerU cloud API for upload document parsing         | Superseded |
+| [ADR-0015](./decisions/0015-use-in-process-document-parsers.md)          | In-process parsers for upload document parsing       | Accepted   |
+| [ADR-0016](./decisions/0016-use-elasticsearch-for-rag-chunks.md)         | Elasticsearch + Qwen embeddings for RAG chunks       | Accepted   |
+| [ADR-0017](./decisions/0017-place-qwen-embedding-in-infrastructure.md)   | Qwen embedding client in `src/infrastructure`        | Accepted   |
+| [ADR-0021](./decisions/0021-document-search-index.md)                    | Separate document Search snapshots from RAG chunks   | Accepted   |
+| [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md)            | Neo4j knowledge graph built from published documents | Accepted   |
+| [ADR-0023](./decisions/0023-document-publish-review-workflow.md)         | Publish review workflow and status-driven index sync | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.
