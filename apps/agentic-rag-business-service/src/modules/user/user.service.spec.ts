@@ -6,6 +6,7 @@ import {
 import { hash } from 'bcryptjs';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { UserEntity } from './entities/user.entity';
+import type { DocumentRepository } from '../document/repository/document.repository';
 import type { UserRepository } from './repository/user.repository';
 import { UserService } from './user.service';
 
@@ -19,6 +20,7 @@ function userRow(overrides: Partial<UserEntity> = {}): UserEntity {
     realName: 'Alice',
     email: null,
     avatar: null,
+    emailVerified: 1,
     status: 1,
     deleted: false,
     ...overrides,
@@ -26,15 +28,24 @@ function userRow(overrides: Partial<UserEntity> = {}): UserEntity {
 }
 
 const userRepo = {
+  findByEmail: vi.fn(),
   findByUsername: vi.fn(),
   findById: vi.fn(),
   getRoleCodes: vi.fn(),
   saveUser: vi.fn(),
+  save: vi.fn(),
   findRoleByCode: vi.fn(),
+  findActiveRolesByCodes: vi.fn(),
   findUserRole: vi.fn(),
   saveUserRole: vi.fn(),
+  deleteUserRoles: vi.fn(),
   touchLastLogin: vi.fn(),
   getUserIdsByRoleCode: vi.fn(),
+  findPage: vi.fn(),
+};
+const documentRepo = {
+  countActiveByAuthor: vi.fn(),
+  sumStatsByAuthor: vi.fn(),
 };
 
 let service: UserService;
@@ -51,7 +62,12 @@ beforeEach(() => {
     roleCode,
   }));
   userRepo.findUserRole.mockResolvedValue(null);
-  service = new UserService(userRepo as unknown as UserRepository);
+  userRepo.findByEmail.mockResolvedValue(null);
+  userRepo.save.mockImplementation(async (u: UserEntity) => u);
+  service = new UserService(
+    userRepo as unknown as UserRepository,
+    documentRepo as unknown as DocumentRepository,
+  );
 });
 
 describe('UserService.validateCredentials', () => {
@@ -87,6 +103,111 @@ describe('UserService.validateCredentials', () => {
     await expect(
       service.validateCredentials('alice', '123456'),
     ).rejects.toThrow('账户已禁用');
+  });
+
+  it('rejects an enabled account whose email is not verified', async () => {
+    userRepo.findByUsername.mockResolvedValue(userRow({ emailVerified: 0 }));
+
+    await expect(
+      service.validateCredentials('alice', '123456'),
+    ).rejects.toThrow('账户未激活，请先验证邮箱');
+  });
+});
+
+describe('UserService.register email verification', () => {
+  it('rejects an email already in use', async () => {
+    userRepo.findByUsername.mockResolvedValue(null);
+    userRepo.findByEmail.mockResolvedValue(userRow());
+
+    await expect(
+      service.register({
+        username: 'bob',
+        password: '123456',
+        email: 'a@example.com',
+      }),
+    ).rejects.toThrow('邮箱已被使用');
+  });
+
+  it('creates a disabled, unverified user when verification is required', async () => {
+    userRepo.findByUsername.mockResolvedValue(null);
+
+    const result = await service.register({
+      username: 'bob',
+      password: '123456',
+      email: 'bob@example.com',
+      requireEmailVerification: true,
+    });
+
+    expect(result.emailVerificationRequired).toBe(true);
+    expect(userRepo.saveUser).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 0, emailVerified: 0 }),
+    );
+  });
+
+  it('activates email and enables the account', async () => {
+    const pending = userRow({ status: 0, emailVerified: 0 });
+    userRepo.findById.mockResolvedValue(pending);
+
+    await expect(service.activateEmail('10001')).resolves.toBe(
+      '账户激活成功，请登录',
+    );
+    expect(pending).toMatchObject({ status: 1, emailVerified: 1 });
+
+    userRepo.findById.mockResolvedValue(userRow());
+    await expect(service.activateEmail('10001')).resolves.toBe(
+      '账户已激活，请直接登录',
+    );
+  });
+});
+
+describe('UserService admin and profile', () => {
+  it('replaces roles and reports missing role codes', async () => {
+    userRepo.findById.mockResolvedValue(userRow());
+    userRepo.findActiveRolesByCodes.mockResolvedValueOnce([
+      { id: 'r1', roleCode: 'ROLE_ADMIN' },
+    ]);
+    await expect(
+      service.replaceRoles('10001', ['ROLE_ADMIN', 'ROLE_X']),
+    ).rejects.toThrow('角色不存在: ROLE_X');
+    expect(userRepo.deleteUserRoles).not.toHaveBeenCalled();
+
+    userRepo.findActiveRolesByCodes.mockResolvedValueOnce([
+      { id: 'r1', roleCode: 'ROLE_ADMIN' },
+    ]);
+    await expect(
+      service.replaceRoles('10001', ['ROLE_ADMIN']),
+    ).resolves.toEqual(['ROLE_ADMIN']);
+    expect(userRepo.deleteUserRoles).toHaveBeenCalledWith('10001');
+    expect(userRepo.saveUserRole).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: '10001', roleId: 'r1' }),
+    );
+  });
+
+  it('changes the password only when the old one matches', async () => {
+    userRepo.findById.mockResolvedValue(userRow());
+
+    await expect(
+      service.changePassword('10001', 'wrong', 'new-password'),
+    ).rejects.toThrow('原密码错误');
+    await service.changePassword('10001', '123456', 'new-password');
+    expect(userRepo.save).toHaveBeenCalled();
+  });
+
+  it('aggregates the author document statistics', async () => {
+    userRepo.findById.mockResolvedValue(userRow());
+    documentRepo.countActiveByAuthor.mockResolvedValue(3);
+    documentRepo.sumStatsByAuthor.mockResolvedValue({
+      viewCount: '10',
+      likeCount: '2',
+      commentCount: '1',
+    });
+
+    await expect(service.getUserStatistics('10001')).resolves.toEqual({
+      documentCount: 3,
+      viewCount: 10,
+      likeCount: 2,
+      commentCount: 1,
+    });
   });
 });
 

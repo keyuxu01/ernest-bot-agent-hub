@@ -12,7 +12,10 @@ import { DataSource } from 'typeorm';
 import request from 'supertest';
 import { VectorIndexService } from './../src/infrastructure/elasticsearch/vector-index.service';
 import { GraphStoreService } from './../src/infrastructure/neo4j/graph-store.service';
+import { MailerService } from '@nestjs-modules/mailer';
+import { nextSnowflakeId } from './../src/common/helpers/snowflake-id';
 import { RabbitMqService } from './../src/infrastructure/rabbitmq/rabbitmq.service';
+import { RedisService } from './../src/infrastructure/redis/redis.service';
 import { AppModule } from './../src/app.module';
 import { MAX_UPLOAD_FILE_BYTES } from './../src/modules/document/constants/document-upload.constants';
 import {
@@ -23,6 +26,55 @@ import { DocumentReviewEntity } from './../src/modules/document/entities/documen
 import { DocumentContent } from './../src/modules/document/schemas/document-content.schema';
 
 const E2E_PASSWORD = 'e2e-password-123';
+
+/** e2e 发出的邮件（MailerService 替身写入） */
+const sentMails: Array<{ to: string; text: string }> = [];
+
+/** RedisService 的内存替身：get / set（含 TTL）/ del / ttl */
+function createMemoryRedis() {
+  const store = new Map<string, { value: string; expiresAt?: number }>();
+  const alive = (key: string) => {
+    const entry = store.get(key);
+    if (entry?.expiresAt && entry.expiresAt <= Date.now()) {
+      store.delete(key);
+      return undefined;
+    }
+    return entry;
+  };
+  return {
+    get: async (key: string) => alive(key)?.value ?? null,
+    set: async (key: string, value: string, ttlSeconds?: number) => {
+      store.set(key, {
+        value,
+        expiresAt:
+          ttlSeconds === undefined ? undefined : Date.now() + ttlSeconds * 1000,
+      });
+    },
+    del: async (key: string) => {
+      store.delete(key);
+    },
+    ttl: async (key: string) => {
+      const entry = alive(key);
+      if (!entry) return -2;
+      if (!entry.expiresAt) return -1;
+      return Math.ceil((entry.expiresAt - Date.now()) / 1000);
+    },
+    incr: async (key: string, ttlSeconds?: number) => {
+      const entry = alive(key);
+      const next = Number(entry?.value ?? 0) + 1;
+      store.set(key, {
+        value: String(next),
+        expiresAt:
+          entry?.expiresAt ??
+          (ttlSeconds === undefined
+            ? undefined
+            : Date.now() + ttlSeconds * 1000),
+      });
+      return next;
+    },
+    onModuleDestroy: async () => undefined,
+  };
+}
 
 describe('Business service (e2e)', () => {
   let app: INestApplication;
@@ -57,6 +109,15 @@ describe('Business service (e2e)', () => {
         upsertChunk: async () => undefined,
         writeExtraction: async () => 0,
         deleteByDocId: async () => undefined,
+      })
+      // Redis 用内存实现，e2e 不依赖本地 Redis；SMTP 不发真实邮件，记录最后一封
+      .overrideProvider(RedisService)
+      .useValue(createMemoryRedis())
+      .overrideProvider(MailerService)
+      .useValue({
+        sendMail: async (mail: { to: string; text: string }) => {
+          sentMails.push(mail);
+        },
       })
       .compile();
 
@@ -284,6 +345,163 @@ describe('Business service (e2e)', () => {
     expect(edit.body.code).toBe('DOCUMENT_PUBLISHED_EDIT_REQUIRES_DRAFT');
   });
 
+  it('lets admins manage users and roles', async () => {
+    const admin = await loginAsNewUser(['ROLE_ADMIN']);
+    const normal = await loginAsNewUser();
+    const server = app.getHttpServer();
+    const as = (token: string) => ({ Authorization: `Bearer ${token}` });
+
+    await request(server).get('/users/page').set(as(normal.token)).expect(403);
+    await request(server).get('/roles/list').set(as(normal.token)).expect(403);
+
+    const created = await request(server)
+      .post('/users')
+      .set(as(admin.token))
+      .send({
+        username: `e2e_admin_created_${Date.now()}`,
+        password: E2E_PASSWORD,
+        roleCodes: ['ROLE_REVIEWER'],
+      })
+      .expect(201);
+    createdUserIds.push(created.body.id);
+    expect(created.body).toMatchObject({ roleCodes: ['ROLE_REVIEWER'] });
+    expect(created.body).not.toHaveProperty('password');
+
+    const page = await request(server)
+      .get('/users/page')
+      .query({ keyword: created.body.username, roleCode: 'ROLE_REVIEWER' })
+      .set(as(admin.token))
+      .expect(200);
+    expect(page.body.total).toBe(1);
+
+    await request(server)
+      .put(`/users/${created.body.id}/roles`)
+      .set(as(admin.token))
+      .send({ roleCodes: ['ROLE_USER', 'ROLE_ADMIN'] })
+      .expect(200);
+    const roles = await request(server)
+      .get(`/users/${created.body.id}/roles`)
+      .set(as(admin.token))
+      .expect(200);
+    expect(roles.body.roleCodes.sort()).toEqual(['ROLE_ADMIN', 'ROLE_USER']);
+
+    const roleList = await request(server)
+      .get('/roles/list')
+      .set(as(admin.token))
+      .expect(200);
+    expect(roleList.body.map((r: { roleCode: string }) => r.roleCode)).toEqual(
+      expect.arrayContaining(['ROLE_ADMIN', 'ROLE_REVIEWER', 'ROLE_USER']),
+    );
+  });
+
+  it('updates the profile, statistics and password of the current user', async () => {
+    const me = await loginAsNewUser();
+    const server = app.getHttpServer();
+    const as = { Authorization: `Bearer ${me.token}` };
+
+    const profile = await request(server)
+      .put('/users/me')
+      .set(as)
+      .send({ realName: 'E2E 用户' })
+      .expect(200);
+    expect(profile.body.realName).toBe('E2E 用户');
+
+    const stats = await request(server)
+      .get('/users/me/stats')
+      .set(as)
+      .expect(200);
+    expect(stats.body).toEqual({
+      documentCount: 0,
+      viewCount: 0,
+      likeCount: 0,
+      commentCount: 0,
+    });
+
+    await request(server)
+      .put('/users/password/change')
+      .set(as)
+      .send({ oldPassword: 'wrong-password', newPassword: 'new-password-1' })
+      .expect(400);
+    await request(server)
+      .put('/users/password/change')
+      .set(as)
+      .send({ oldPassword: E2E_PASSWORD, newPassword: 'new-password-1' })
+      .expect(200);
+    await request(server)
+      .post('/auth/login')
+      .send({ username: me.username, password: 'new-password-1' })
+      .expect(201);
+  });
+
+  it('resets a forgotten password with an emailed code', async () => {
+    const email = `e2e_${Date.now()}@example.com`;
+    const user = await loginAsNewUser([], email);
+    const server = app.getHttpServer();
+
+    await request(server)
+      .post('/auth/password/reset/send-code')
+      .send({ email: `missing_${email}` })
+      .expect(404);
+    await request(server)
+      .post('/auth/password/reset/send-code')
+      .send({ email })
+      .expect(201);
+    // 60 秒内重复发送被拦截
+    await request(server)
+      .post('/auth/password/reset/send-code')
+      .send({ email })
+      .expect(400);
+
+    const mail = sentMails.find((m) => m.to === email);
+    const code = /验证码是：(\d{6})/.exec(mail?.text ?? '')?.[1];
+    expect(code).toMatch(/^\d{6}$/);
+
+    await request(server)
+      .post('/auth/password/reset')
+      .send({ email, code: '000000', newPassword: 'reset-password-1' })
+      .expect(400);
+    await request(server)
+      .post('/auth/password/reset')
+      .send({ email, code, newPassword: 'reset-password-1' })
+      .expect(201);
+    await request(server)
+      .post('/auth/login')
+      .send({ username: user.username, password: 'reset-password-1' })
+      .expect(201);
+  });
+
+  it('invalidates the reset code after 3 wrong attempts', async () => {
+    const email = `e2e_lock_${Date.now()}@example.com`;
+    await loginAsNewUser([], email);
+    const server = app.getHttpServer();
+
+    await request(server)
+      .post('/auth/password/reset/send-code')
+      .send({ email })
+      .expect(201);
+    const mail = sentMails.find((m) => m.to === email);
+    const code = /验证码是：(\d{6})/.exec(mail?.text ?? '')?.[1];
+    const wrong = code === '000000' ? '111111' : '000000';
+
+    for (const expected of [
+      '验证码错误或已过期',
+      '验证码错误或已过期',
+      '验证码错误次数过多，请重新获取',
+    ]) {
+      const res = await request(server)
+        .post('/auth/password/reset')
+        .send({ email, code: wrong, newPassword: 'reset-password-1' })
+        .expect(400);
+      expect(res.body.message).toBe(expected);
+    }
+
+    // 正确的码也已作废
+    await request(server)
+      .post('/auth/password/reset')
+      .send({ email, code, newPassword: 'reset-password-1' })
+      .expect(400);
+  });
+
   it('/documents/upload/parse (POST) requires a file', async () => {
     const { token } = await loginAsNewUser();
     return request(app.getHttpServer())
@@ -349,11 +567,11 @@ describe('Business service (e2e)', () => {
   });
 
   /** 注册一个唯一用户名的账号（可额外授予角色）并登录 */
-  async function loginAsNewUser(extraRoles: string[] = []) {
+  async function loginAsNewUser(extraRoles: string[] = [], email?: string) {
     const username = `e2e_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const registered = await request(app.getHttpServer())
       .post('/auth/register')
-      .send({ username, password: E2E_PASSWORD })
+      .send({ username, password: E2E_PASSWORD, email })
       .expect(201);
     const userId: string = registered.body.userId;
     createdUserIds.push(userId);
@@ -362,7 +580,7 @@ describe('Business service (e2e)', () => {
       await app.get(DataSource).query(
         `INSERT INTO kh_user_role (id, user_id, role_id)
          SELECT $1, $2, id FROM kh_role WHERE role_code = $3`,
-        [`${Date.now()}${Math.floor(Math.random() * 1e5)}`, userId, roleCode],
+        [nextSnowflakeId(), userId, roleCode],
       );
     }
 

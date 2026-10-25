@@ -1,6 +1,6 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - 'apps/*'
+  - 'packages/*'
 # pnpm 11：未列出的依赖默认不跑 install/postinstall 脚本；跑脚本前需批准（pnpm approve-builds）
 allowBuilds:
   '@modelcontextprotocol/ext-apps': false
@@ -8,3 +8,6 @@ allowBuilds:
   esbuild: true
   tesseract.js: true
   tldjs: false
+# @nestjs-modules/mailer 的可选 peer：@types/mjml 4.18.x / 5.4.x 依赖尚未发布的 @types/mjml-core（上游发布错误），固定到可解析版本
+overrides:
+  '@types/mjml': 5.0.0

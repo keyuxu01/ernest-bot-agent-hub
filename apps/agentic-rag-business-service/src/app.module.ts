@@ -5,7 +5,9 @@ import { validateEnvironment } from './config/environment';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { ElasticsearchModule } from './infrastructure/elasticsearch/elasticsearch.module';
 import { EmbeddingModule } from './infrastructure/embedding/embedding.module';
+import { MailModule } from './infrastructure/mail/mail.module';
 import { RabbitmqModule } from './infrastructure/rabbitmq/rabbitmq.module';
+import { RedisModule } from './infrastructure/redis/redis.module';
 import { RustfsModule } from './infrastructure/rustfs/rustfs.module';
 import { ApiDocsModule } from './modules/api-docs/api-docs.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -30,6 +32,8 @@ import { PipelineModule } from './modules/pipeline/pipeline.module';
     RabbitmqModule,
     ElasticsearchModule,
     EmbeddingModule,
+    RedisModule,
+    MailModule,
 
     // 协议 / 平台
     ORPCModule.forRoot({}),

@@ -102,4 +102,30 @@ export class DocumentRepository {
 
     return { items, total, page, pageSize };
   }
+
+  /** 作者未删除文档数（个人统计） */
+  async countActiveByAuthor(authorId: string): Promise<number> {
+    return this.repo.count({ where: { authorId, deleted: false } });
+  }
+
+  /** 作者未删除文档的浏览 / 点赞 / 评论总数（个人统计） */
+  async sumStatsByAuthor(authorId: string): Promise<{
+    viewCount: string;
+    likeCount: string;
+    commentCount: string;
+  } | null> {
+    const raw = await this.repo
+      .createQueryBuilder('d')
+      .select('COALESCE(SUM(d.view_count), 0)', 'viewCount')
+      .addSelect('COALESCE(SUM(d.like_count), 0)', 'likeCount')
+      .addSelect('COALESCE(SUM(d.comment_count), 0)', 'commentCount')
+      .where('d.author_id = :authorId', { authorId })
+      .andWhere('d.deleted = false')
+      .getRawOne<{
+        viewCount: string;
+        likeCount: string;
+        commentCount: string;
+      }>();
+    return raw ?? null;
+  }
 }

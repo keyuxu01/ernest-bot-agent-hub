@@ -5,6 +5,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AuthUser } from '../user/type/user.types';
 import type { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
+import type { EmailActivationService } from './email-activation.service';
+import type { EmailService } from './email.service';
+import type { PasswordResetService } from './password-reset.service';
 
 const user: AuthUser = {
   userId: '10001',
@@ -16,6 +19,9 @@ const user: AuthUser = {
 };
 
 const userService = {
+  findByEmail: vi.fn(),
+  activateEmail: vi.fn(),
+  resetPasswordByEmail: vi.fn(),
   validateCredentials: vi.fn(),
   buildAuthUser: vi.fn(),
   register: vi.fn(),
@@ -30,6 +36,22 @@ const config = {
   ),
 };
 const jwtService = new JwtService({ secret: 'test-secret' });
+const emailService = {
+  sendActivationEmail: vi.fn(),
+  sendResetCodeEmail: vi.fn(),
+};
+const emailActivation = {
+  createToken: vi.fn(),
+  consumeToken: vi.fn(),
+  deleteByToken: vi.fn(),
+};
+const passwordReset = {
+  set: vi.fn(),
+  getTtl: vi.fn(),
+  verify: vi.fn(),
+  recordFailedAttempt: vi.fn(),
+  delete: vi.fn(),
+};
 
 let service: AuthService;
 
@@ -38,10 +60,16 @@ beforeEach(() => {
   for (const key of Object.keys(configValues)) delete configValues[key];
   userService.validateCredentials.mockResolvedValue(user);
   userService.buildAuthUser.mockResolvedValue(user);
+  emailActivation.createToken.mockResolvedValue('activation-token');
+  passwordReset.getTtl.mockResolvedValue(-2);
+  passwordReset.verify.mockResolvedValue(true);
   service = new AuthService(
     userService as unknown as UserService,
     jwtService,
     config as unknown as ConfigService,
+    emailService as unknown as EmailService,
+    emailActivation as unknown as EmailActivationService,
+    passwordReset as unknown as PasswordResetService,
   );
 });
 
@@ -129,6 +157,55 @@ describe('AuthService.register / getMe / getReviewerIds', () => {
     await expect(
       service.register({ username: 'bob', password: '123456' }),
     ).resolves.toEqual({ userId: '10002', message: '注册成功，请登录' });
+    expect(userService.register).toHaveBeenCalledWith(
+      expect.objectContaining({ requireEmailVerification: false }),
+    );
+    expect(emailService.sendActivationEmail).not.toHaveBeenCalled();
+  });
+
+  it('sends an activation email when verification is required', async () => {
+    configValues.REQUIRE_EMAIL_VERIFICATION = 'true';
+    userService.register.mockResolvedValue({
+      userId: '10002',
+      emailVerificationRequired: true,
+    });
+
+    await expect(
+      service.register({
+        username: 'bob',
+        password: '123456',
+        email: 'bob@example.com',
+      }),
+    ).resolves.toEqual({
+      userId: '10002',
+      message: '注册成功，请查收邮件激活账户',
+      emailVerificationRequired: true,
+    });
+    expect(emailService.sendActivationEmail).toHaveBeenCalledWith(
+      'bob@example.com',
+      'bob',
+      'activation-token',
+    );
+  });
+
+  it('drops the activation token when the email cannot be sent', async () => {
+    configValues.REQUIRE_EMAIL_VERIFICATION = 'true';
+    userService.register.mockResolvedValue({
+      userId: '10002',
+      emailVerificationRequired: true,
+    });
+    emailService.sendActivationEmail.mockRejectedValueOnce(new Error('smtp'));
+
+    await expect(
+      service.register({
+        username: 'bob',
+        password: '123456',
+        email: 'bob@example.com',
+      }),
+    ).rejects.toThrow('激活邮件发送失败，请稍后再试');
+    expect(emailActivation.deleteByToken).toHaveBeenCalledWith(
+      'activation-token',
+    );
   });
 
   it('loads the current user and reviewer ids', async () => {
@@ -139,6 +216,115 @@ describe('AuthService.register / getMe / getReviewerIds', () => {
     expect(userService.getUserIdsByRoleCode).toHaveBeenCalledWith(
       'ROLE_REVIEWER',
     );
+  });
+});
+
+describe('AuthService.verifyEmail', () => {
+  it('activates the user behind a valid token', async () => {
+    emailActivation.consumeToken.mockResolvedValue('10002');
+    userService.activateEmail.mockResolvedValue('账户激活成功，请登录');
+
+    await expect(service.verifyEmail('t')).resolves.toEqual({
+      message: '账户激活成功，请登录',
+    });
+  });
+
+  it('rejects an unknown or expired token', async () => {
+    emailActivation.consumeToken.mockResolvedValue(null);
+
+    await expect(service.verifyEmail('t')).rejects.toThrow(
+      '激活链接无效或已过期',
+    );
+  });
+});
+
+describe('AuthService password reset', () => {
+  it('rejects an unregistered email', async () => {
+    userService.findByEmail.mockResolvedValue(null);
+
+    await expect(
+      service.sendResetCode({ email: 'nobody@example.com' }),
+    ).rejects.toThrow('该邮箱未注册');
+  });
+
+  it('enforces the 60s resend cooldown', async () => {
+    userService.findByEmail.mockResolvedValue({ username: 'alice' });
+    passwordReset.getTtl.mockResolvedValue(580);
+
+    await expect(
+      service.sendResetCode({ email: 'alice@example.com' }),
+    ).rejects.toThrow('验证码已发送，请稍后再试');
+    expect(passwordReset.set).not.toHaveBeenCalled();
+  });
+
+  it('stores a 6-digit code and emails it', async () => {
+    userService.findByEmail.mockResolvedValue({ username: 'alice' });
+
+    await expect(
+      service.sendResetCode({ email: 'alice@example.com' }),
+    ).resolves.toEqual({ message: '验证码已发送' });
+    const code = passwordReset.set.mock.calls[0]?.[1];
+    expect(code).toMatch(/^\d{6}$/);
+    expect(emailService.sendResetCodeEmail).toHaveBeenCalledWith(
+      'alice@example.com',
+      'alice',
+      code,
+    );
+  });
+
+  it('clears the code when the email cannot be sent', async () => {
+    userService.findByEmail.mockResolvedValue({ username: 'alice' });
+    emailService.sendResetCodeEmail.mockRejectedValueOnce(new Error('smtp'));
+
+    await expect(
+      service.sendResetCode({ email: 'alice@example.com' }),
+    ).rejects.toThrow('邮件发送失败，请稍后再试');
+    expect(passwordReset.delete).toHaveBeenCalledWith('alice@example.com');
+  });
+
+  it('resets the password with a valid code and consumes it', async () => {
+    await expect(
+      service.resetPasswordByEmail({
+        email: 'alice@example.com',
+        code: '123456',
+        newPassword: 'new-password',
+      }),
+    ).resolves.toEqual({ message: '密码重置成功，请登录' });
+    expect(userService.resetPasswordByEmail).toHaveBeenCalledWith(
+      'alice@example.com',
+      'new-password',
+    );
+    expect(passwordReset.delete).toHaveBeenCalledWith('alice@example.com');
+  });
+
+  it('rejects a wrong code and records the attempt', async () => {
+    passwordReset.verify.mockResolvedValue(false);
+    passwordReset.recordFailedAttempt.mockResolvedValue(false);
+
+    await expect(
+      service.resetPasswordByEmail({
+        email: 'alice@example.com',
+        code: '000000',
+        newPassword: 'new-password',
+      }),
+    ).rejects.toThrow('验证码错误或已过期');
+    expect(passwordReset.recordFailedAttempt).toHaveBeenCalledWith(
+      'alice@example.com',
+    );
+    expect(userService.resetPasswordByEmail).not.toHaveBeenCalled();
+  });
+
+  it('tells the user to request a new code once attempts are exhausted', async () => {
+    passwordReset.verify.mockResolvedValue(false);
+    passwordReset.recordFailedAttempt.mockResolvedValue(true);
+
+    await expect(
+      service.resetPasswordByEmail({
+        email: 'alice@example.com',
+        code: '000000',
+        newPassword: 'new-password',
+      }),
+    ).rejects.toThrow('验证码错误次数过多，请重新获取');
   });
 });
 

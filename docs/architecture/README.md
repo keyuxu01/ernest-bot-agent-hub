@@ -269,11 +269,13 @@ are sent only when a document enters or leaves `Published`. Review decisions req
 in PostgreSQL, username + bcrypt password login, and HS256 access / refresh JWTs signed with
 `JWT_SECRET`. Global `JwtAuthGuard` and `RolesGuard` make every HTTP route require login unless marked
 `@Public()` (auth endpoints, health probes, greeting, OpenAPI). Each request reloads the user and roles
-from PostgreSQL, so disabling a user or changing roles takes effect immediately. Authorization is
-role-only; there is no document ownership check, refresh tokens are not revocable and login has no rate
-limit. This is separate from UserPlatform (ADR-0018). Token verification uses passport-jwt
-(`JwtStrategy`), and user resolution is isolated in `AuthService.buildAuthUser()` so it can later move to
-UserPlatform-issued tokens. See
+from PostgreSQL. Admins manage users and roles through `/users` and `/roles`; users edit their profile
+and password. Optional email activation and forgotten-password codes use Redis
+(`src/infrastructure/redis`) for short-lived tokens and SMTP (`src/infrastructure/mail`) for delivery.
+Authorization is role-only; there is no document ownership check, tokens are not revocable and login /
+reset codes have no rate limit. This is separate from UserPlatform (ADR-0018). Token verification uses
+passport-jwt (`JwtStrategy`), and user resolution is isolated in `AuthService.buildAuthUser()` so it can
+later move to UserPlatform-issued tokens. See
 [ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md).
 
 ## Document Publish and RAG Index Boundary
