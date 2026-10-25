@@ -1,0 +1,183 @@
+apps/agentic-rag-business-service/src/modules/auth/guards/auth.guards.spec.ts
+  s_bdd49b1e1fcb5d::t_3fefb77d855e55 128,131-141
+  s_bdd49b1e1fcb5d::t_a4b7e82707d190 2
+  s_bdd49b1e1fcb5d::t_8bd7e9ea7180fd 11-12
+  s_bdd49b1e1fcb5d::t_c3abf45428ef5a 3,6,13,37,43,47-49,51-53,57-78,81-85,88-89,91-94
+  s_bdd49b1e1fcb5d::t_5bc1350c3e0d35 1,5,7-10,14-36,38-42,44-46,50,54-56,79-80,86-87,90,95-127,129-130,142-143
+apps/agentic-rag-business-service/src/modules/document/document.service.spec.ts
+  s_bdd49b1e1fcb5d::t_adeecd3fb87244 218
+  s_bdd49b1e1fcb5d::t_4752472ac4abd5 229-231
+  s_bdd49b1e1fcb5d::t_f34d05e3e452d9 219-227,234-235,237-241
+  s_bdd49b1e1fcb5d::t_e19573775f2c26 228,232-233,236
+docs/architecture/decisions/0024-rag-business-built-in-auth-and-roles.md
+  s_bdd49b1e1fcb5d::t_12620b5be6f1e2 39-41,45-46
+  s_bdd49b1e1fcb5d::t_9803c53167dbbe 42-43
+  s_bdd49b1e1fcb5d::t_34fc9c85d88d30 1-38,44,47-66,69-78
+  s_bdd49b1e1fcb5d::t_026173aa241fc5 67-68
+init-scripts/postgresql/02-knowledge-hub.sql
+  s_bdd49b1e1fcb5d::t_ec8ccfeb2c882d 46,48-51,53,55-57,61-62,64-65,70-73,78-84,87
+  s_bdd49b1e1fcb5d::t_30389f910ee91b 89
+apps/agentic-rag-business-service/src/modules/auth/strategies/jwt.strategy.ts
+  s_bdd49b1e1fcb5d::t_f114422291d358 1-5,7-16,18-20,22-29
+  s_bdd49b1e1fcb5d::t_0d07f940b81eb9 6,21
+apps/agentic-rag-business-service/src/modules/auth/guards/jwt-auth.guard.ts
+  s_bdd49b1e1fcb5d::t_f6b8412b5de8e4 11
+  s_bdd49b1e1fcb5d::t_82557c674034ca 1-3,5-6,9-10,12,20-21,26,28-34,37,42,44-47
+  s_bdd49b1e1fcb5d::t_c7db4e7ab5f398 4,7,13-19,22-25,27,35-36,38-41,43
+apps/agentic-rag-business-service/src/modules/document/document.controller.ts
+  s_bdd49b1e1fcb5d::t_a6ada294ac6e17 25,27
+  s_bdd49b1e1fcb5d::t_0e023d296583a0 37-38
+  s_bdd49b1e1fcb5d::t_926dc0c3971b8c 96-101
+  s_bdd49b1e1fcb5d::t_53f2c8c8cc2fc1 59,61
+apps/agentic-rag-business-service/src/modules/auth/guards/roles.guard.ts
+  s_bdd49b1e1fcb5d::t_fbdfee89a3b0a5 12
+  s_bdd49b1e1fcb5d::t_dce7df8eb44f83 1-3,5-8,10-11,13,22-27,29-31,33,40-41,45-50
+  s_bdd49b1e1fcb5d::t_5d7250321dd379 4,14-21,28,32,34-39,42-44
+apps/agentic-rag-business-service/src/modules/user/constants/user.constants.ts
+  s_bdd49b1e1fcb5d::t_7d0cf95124bf8e 1,8
+  s_bdd49b1e1fcb5d::t_ceced8b0aef1c6 2-7
+apps/agentic-rag-business-service/src/modules/greeting/greeting.controller.ts
+  s_bdd49b1e1fcb5d::t_8b372e841e7280 6
+apps/agentic-rag-business-service/src/modules/health/health.controller.ts
+  s_bdd49b1e1fcb5d::t_33f15635fab647 23-24
+docs/architecture/README.md
+  s_bdd49b1e1fcb5d::t_0d5ea74428793f 262-263,266-273,277
+  s_bdd49b1e1fcb5d::t_fd0f6365160d50 326
+  s_bdd49b1e1fcb5d::t_6d96efad4b5693 274-276
+apps/agentic-rag-business-service/src/modules/document/document.service.ts
+  s_bdd49b1e1fcb5d::t_3a7aac544421da 128-130
+  s_bdd49b1e1fcb5d::t_addaf86965b01a 8
+  s_bdd49b1e1fcb5d::t_712b2d01ce803f 68
+  s_bdd49b1e1fcb5d::t_cefc57b384c58b 70
+  s_bdd49b1e1fcb5d::t_1d126b996f5b2b 187
+  s_bdd49b1e1fcb5d::t_014f07124022a1 119
+  s_bdd49b1e1fcb5d::t_c10f51db407e95 258-260
+apps/agentic-rag-business-service/src/modules/api-docs/openapi.controller.ts
+  h_329e897ccf6193 11
+apps/agentic-rag-business-service/src/modules/document/document-parse.service.ts
+  s_bdd49b1e1fcb5d::t_52f4057825997f 10
+  s_bdd49b1e1fcb5d::t_c9a60971043553 53
+  s_bdd49b1e1fcb5d::t_c16219d6cbf0b5 106-119
+apps/agentic-rag-business-service/src/modules/user/user.service.ts
+  s_bdd49b1e1fcb5d::t_74bea99f27e4e7 120-141
+  s_bdd49b1e1fcb5d::t_14d1b489e0fe5a 14
+  s_bdd49b1e1fcb5d::t_7bd505004b48a6 1-6,9-10,12,19-26,28-49,51-52,55-64,66-71,79-95,98-101,103-110,117-118
+  s_bdd49b1e1fcb5d::t_0c53c976b0199c 7-8,11,13,15-18,27,50,53-54,65,72-78,96-97,102,111-116,119,142-144
+apps/agentic-rag-business-service/.env.example
+  s_bdd49b1e1fcb5d::t_0931a14e408fb9 61-65
+  s_bdd49b1e1fcb5d::t_a790f4fd75bf66 66-69
+  s_bdd49b1e1fcb5d::t_bc5def77bb585b 60
+apps/agentic-rag-business-service/src/modules/document/document-parse.service.spec.ts
+  s_bdd49b1e1fcb5d::t_dc8affb80679a4 178
+  s_bdd49b1e1fcb5d::t_cbec8313c2908e 90-97,101,105,112
+apps/agentic-rag-business-service/src/modules/auth/decorators/current-user.decorator.ts
+  s_bdd49b1e1fcb5d::t_cc802aaaeb47c4 1-12
+apps/agentic-rag-business-service/src/modules/user/entities/user.entity.ts
+  s_bdd49b1e1fcb5d::t_a805fbc2f513c9 1-9,11-30,34-37,39-40,42-47
+  s_bdd49b1e1fcb5d::t_a6c09bb48b49ec 10,31-33,38,41,48
+apps/agentic-rag-business-service/src/modules/auth/auth.service.ts
+  s_bdd49b1e1fcb5d::t_d00e9c71f58e47 1-6
+  s_bdd49b1e1fcb5d::t_ca4ddeb40ba13b 15-17,23-34
+  s_bdd49b1e1fcb5d::t_78b0926a4f0313 7-11,13-14,18-22,35,38-39,42-43,54-55,65-66,95-96,99,101,103,106,109-110,113-114,124,127,129-134
+  s_bdd49b1e1fcb5d::t_724f7fc8f16fe1 12,36-37,40-41,44-53,56-64,67-94,97-98,100,102,104-105,107-108,111-112,115-123,125-126,128
+apps/agentic-rag-business-service/src/modules/user/type/user.types.ts
+  s_bdd49b1e1fcb5d::t_5173f98ff80f7e 5-6,9-11,13,15
+  s_bdd49b1e1fcb5d::t_15fde71b1e14d5 1-4,7-8,12,14
+apps/agentic-rag-business-service/src/modules/document/dto/document-review.dto.ts
+  h_329e897ccf6193 39,48
+apps/agentic-rag-business-service/src/modules/document/document-review.controller.ts
+  s_bdd49b1e1fcb5d::t_87f24709f3b514 4-5,17-18,26,33,40-46,51-57
+apps/agentic-rag-business-service/src/modules/auth/decorators/roles.decorator.ts
+  s_bdd49b1e1fcb5d::t_9535fcb82d5b19 1-9
+apps/agentic-rag-business-service/src/modules/user/user.service.spec.ts
+  s_bdd49b1e1fcb5d::t_2f9414672a86e1 6-7,9-21,23-28,36,38-42,44-47,54-56,70-73,82-83,86-87,90-92,98-99,104-106,110,112,114,132-133,138,140,143,145,149-152,156-157,160-163,165-166
+  s_bdd49b1e1fcb5d::t_ffd51f905964fd 1-5,8,22,29-35,37,43,48-53,57-69,74-81,84-85,88-89,93-97,100-103,107-109,111,113,115-131,134-137,139,141-142,144,146-148,153-155,158-159,164
+apps/agentic-rag-business-service/src/modules/greeting/greeting-rpc.controller.ts
+  s_bdd49b1e1fcb5d::t_e9d2eb8d23ea26 7
+apps/agentic-rag-business-service/src/config/environment.ts
+  s_bdd49b1e1fcb5d::t_ff372a0a798825 32-33,36-37
+  s_bdd49b1e1fcb5d::t_a06a5bac588f8c 79-97
+  s_bdd49b1e1fcb5d::t_852c2fd1561e29 67-68
+apps/agentic-rag-business-service/src/modules/user/entities/role.entity.ts
+  s_bdd49b1e1fcb5d::t_3a5717660f1840 1-3,5-23
+  s_bdd49b1e1fcb5d::t_e876e48455355c 4
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  h_329e897ccf6193 19-20,299-300,303
+  s_bdd49b1e1fcb5d::t_0628c1c14bdb26 192-198
+  s_bdd49b1e1fcb5d::t_bcbf5d2963865a 18,21
+  s_bdd49b1e1fcb5d::t_cd0d2f7ef94bc9 158-175
+  s_bdd49b1e1fcb5d::t_ad4788c5a4f48b 311-312,315
+  s_bdd49b1e1fcb5d::t_7182989eb647fe 239
+  s_bdd49b1e1fcb5d::t_d0dc1f116d715d 25-26,29-30
+apps/agentic-rag-business-service/src/config/environment.spec.ts
+  s_bdd49b1e1fcb5d::t_a648124c08c079 50-52,54-57
+  s_bdd49b1e1fcb5d::t_eed8e821841172 33
+  s_bdd49b1e1fcb5d::t_6768a306965549 53,58-69,71
+  h_329e897ccf6193 70,72
+apps/agentic-rag-business-service/src/modules/auth/auth.module.ts
+  s_bdd49b1e1fcb5d::t_d2f12062bb4272 13
+apps/agentic-rag-business-service/src/modules/document/document-review.service.ts
+  s_bdd49b1e1fcb5d::t_ad44d00fab5ee9 143
+  s_bdd49b1e1fcb5d::t_487b8323af4b68 248
+  s_bdd49b1e1fcb5d::t_541871424fb3ce 159-160
+  s_bdd49b1e1fcb5d::t_65e9605a397895 114,118,127-128
+  s_bdd49b1e1fcb5d::t_bd43392dce6d0c 9-10
+  s_bdd49b1e1fcb5d::t_ce6e6ebaa7f851 42
+  s_bdd49b1e1fcb5d::t_75f5f50da98786 250
+  s_bdd49b1e1fcb5d::t_5b8b5e41428c7d 249,251-252
+  s_bdd49b1e1fcb5d::t_578960de6af7ff 51-52
+apps/agentic-rag-business-service/src/modules/auth/auth.controller.ts
+  s_bdd49b1e1fcb5d::t_60012ee98c3c42 1-4,8-32,35-44
+  s_bdd49b1e1fcb5d::t_b1108058ceb668 5-7,33-34
+apps/agentic-rag-business-service/src/modules/auth/decorators/public.decorator.ts
+  s_bdd49b1e1fcb5d::t_66b79f32d9122d 1-8
+apps/agentic-rag-business-service/src/modules/document/document-review.service.spec.ts
+  s_bdd49b1e1fcb5d::t_6fda1226fcbc14 17
+  s_bdd49b1e1fcb5d::t_ad01d2f275b9ea 248-252,259-261
+  s_bdd49b1e1fcb5d::t_39856cc94e70bb 164-168,177
+  s_bdd49b1e1fcb5d::t_c5b9c8bdef198b 189,201,215,226,236
+apps/agentic-rag-business-service/src/modules/auth/dto/auth.dto.ts
+  s_bdd49b1e1fcb5d::t_e9cd887099b7d1 2-11,13,15-17,19-29,31-34
+  s_bdd49b1e1fcb5d::t_1936ef79479149 1,12,14,18,30
+apps/agentic-rag-business-service/src/modules/document/entities/document-review.entity.ts
+  s_bdd49b1e1fcb5d::t_f4c97893a861fa 36
+apps/agentic-rag-business-service/src/modules/auth/auth.service.spec.ts
+  s_bdd49b1e1fcb5d::t_7dbfe142c63b0d 2-18,21-22,25-27,31,33-38,41-48,50-51,57,66-67,79-80,82,84-87,91-97,99-100,103,105-106,110-111,118,122,124,128,132,136,141-163
+  s_bdd49b1e1fcb5d::t_fb1ebcbd030814 59-61,65
+  s_bdd49b1e1fcb5d::t_74638938270930 1,19-20,23-24,28-30,32,39-40,49,52-56,58,62-64,68-78,81,83,88-90,98,101-102,104,107-109,112-117,119-121,123,125-127,129-131,133-135,137-140
+apps/agentic-rag-business-service/src/modules/user/repository/user.repository.ts
+  s_bdd49b1e1fcb5d::t_6aa90dc7cece51 3,6,11,18-19,24-27,30-33,36,44,47-65,70,77,79-81
+  s_bdd49b1e1fcb5d::t_579ca752de6e87 1-2,4-5,7-10,12-17,20-23,28-29,34-35,37-43,45-46,66-69,71-76,78,82-84
+apps/agentic-rag-business-service/src/modules/auth/type/auth.types.ts
+  s_bdd49b1e1fcb5d::t_5f055b14442a43 3,9-17
+  s_bdd49b1e1fcb5d::t_811fa608a75576 1-2,4-8
+apps/agentic-rag-business-service/src/app.module.ts
+  s_bdd49b1e1fcb5d::t_dd313dc024a848 37-38
+  s_bdd49b1e1fcb5d::t_0e3870252425be 11
+apps/agentic-rag-business-service/src/modules/user/entities/user-role.entity.ts
+  s_bdd49b1e1fcb5d::t_2a0b92e12fa0ca 1-3,5-15,17-20
+  s_bdd49b1e1fcb5d::t_04488f46f21d5b 4,16
+apps/agentic-rag-business-service/src/modules/user/user.module.ts
+  s_bdd49b1e1fcb5d::t_c5ea29b493301f 1-13,15-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.51-trip",
+  "base_commit_sha": "ec1673d83250a0c1a1fa28d12fddcf82aec03501",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_bdd49b1e1fcb5d": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_fc4bc865-e1ed-4aaf-a99b-15d922033fcc",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
