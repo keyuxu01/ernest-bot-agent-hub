@@ -1,0 +1,109 @@
+apps/agentic-rag-business-service/src/app.module.ts
+  s_bdd49b1e1fcb5d::t_edb755b5688faa 8,10
+  s_bdd49b1e1fcb5d::t_594d6b9e22c24f 35-36
+apps/agentic-rag-business-service/src/modules/user/type/user.types.ts
+  s_bdd49b1e1fcb5d::t_6af8d53d954bbd 15-38
+apps/agentic-rag-business-service/src/modules/auth/auth.controller.ts
+  s_bdd49b1e1fcb5d::t_44a9e87a23f146 1,3-6
+  s_bdd49b1e1fcb5d::t_b712b67e6dc2ed 36-59
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_bdd49b1e1fcb5d::t_d3b730823f3b08 113-121
+  s_bdd49b1e1fcb5d::t_fe566cdb77b3f6 15,18
+  s_bdd49b1e1fcb5d::t_48551fba26dfd0 16
+  s_bdd49b1e1fcb5d::t_3972bfc7ca1808 583
+  s_bdd49b1e1fcb5d::t_b49136f0d4c71f 348-472
+  s_bdd49b1e1fcb5d::t_90744add8e812b 62-74
+  s_bdd49b1e1fcb5d::t_eef9fb61ce6c27 473-504
+  s_bdd49b1e1fcb5d::t_90c778b2b7e12f 570,574
+apps/agentic-rag-business-service/src/modules/auth/email.service.ts
+  s_bdd49b1e1fcb5d::t_adc4b6ea64bfcf 1-56
+apps/agentic-rag-business-service/src/modules/user/user.module.ts
+  s_bdd49b1e1fcb5d::t_f067337b9cfc7b 3,7,9-11,14,16-23
+apps/agentic-rag-business-service/.env.example
+  s_bdd49b1e1fcb5d::t_e24d3f34e02617 70-88
+apps/agentic-rag-business-service/src/infrastructure/mail/mail.module.ts
+  s_bdd49b1e1fcb5d::t_1661c7616abc93 9-10
+  s_bdd49b1e1fcb5d::t_13eaf1d1ed4f71 1-8,11-31
+docs/architecture/README.md
+  s_bdd49b1e1fcb5d::t_01610ccf050377 272-278
+apps/agentic-rag-business-service/src/infrastructure/redis/redis.service.ts
+  s_bdd49b1e1fcb5d::t_e0b0f53e74bcbb 1-39,49-54
+  s_bdd49b1e1fcb5d::t_7da28da96f8326 40-48
+apps/agentic-rag-business-service/src/modules/auth/auth.module.ts
+  s_bdd49b1e1fcb5d::t_22e6c214178cca 9-10,13,16,31-33,44
+apps/agentic-rag-business-service/src/modules/auth/auth.service.ts
+  s_bdd49b1e1fcb5d::t_4b2d6cc0d232f2 109-137,139,144-183,189-192
+  h_329e897ccf6193 72-77
+  s_bdd49b1e1fcb5d::t_2595191a6244d2 184-188
+apps/agentic-rag-business-service/src/modules/auth/auth.service.spec.ts
+  s_bdd49b1e1fcb5d::t_5dcf3869c68c5d 160-208
+  s_bdd49b1e1fcb5d::t_9820f33e429e1f 22-24
+  s_bdd49b1e1fcb5d::t_1d2ddb03317e97 300,302,311-313,315-327
+  s_bdd49b1e1fcb5d::t_969ca9e66e1a65 8-10
+  s_bdd49b1e1fcb5d::t_b82cdd00a5f425 52
+  s_bdd49b1e1fcb5d::t_35cbc5288663bc 39-51,53-54
+  s_bdd49b1e1fcb5d::t_cdfe1e335a11d2 63-65,70-72
+  s_bdd49b1e1fcb5d::t_9246d5f528b8bb 222-299,301,303-310,314,328-330
+pnpm-workspace.yaml
+  s_bdd49b1e1fcb5d::t_e9edb281521fbb 11,13
+  s_bdd49b1e1fcb5d::t_b27d1d58de860c 2-3,12
+apps/agentic-rag-business-service/src/modules/user/user.service.ts
+  s_bdd49b1e1fcb5d::t_1cd1b49c5c64fb 2,10,12-16,19,21,24-31,49-64,96-98,112-116,121-124,127,134-135,138-224,250-309
+apps/agentic-rag-business-service/src/modules/user/repository/user.repository.ts
+  s_bdd49b1e1fcb5d::t_e5e43181d8c758 3,7,25-28,52,57-61,66-79,91-94,111-142
+apps/agentic-rag-business-service/src/modules/user/role.service.ts
+  s_bdd49b1e1fcb5d::t_eec9e82edfaf6a 1-56
+apps/agentic-rag-business-service/src/modules/user/entities/user.entity.ts
+  s_bdd49b1e1fcb5d::t_ae71b3b9418478 31-34
+apps/agentic-rag-business-service/src/modules/user/repository/role.repository.ts
+  s_bdd49b1e1fcb5d::t_1b25a6957122f1 1-52
+apps/agentic-rag-business-service/src/modules/user/user.service.spec.ts
+  h_329e897ccf6193 9
+  s_bdd49b1e1fcb5d::t_ed667d5f4cce4d 65-70
+  s_bdd49b1e1fcb5d::t_a62e3da4a4a5ce 107-211
+  s_bdd49b1e1fcb5d::t_65714ca11090f3 31,36,38,41,44-48
+  s_bdd49b1e1fcb5d::t_2c34f59c383070 23
+apps/agentic-rag-business-service/src/infrastructure/redis/redis.module.ts
+  s_bdd49b1e1fcb5d::t_1716be266f943c 1-11
+apps/agentic-rag-business-service/src/modules/auth/password-reset.service.spec.ts
+  s_bdd49b1e1fcb5d::t_c58d3363493382 1-58
+apps/agentic-rag-business-service/src/modules/auth/password-reset.service.ts
+  s_bdd49b1e1fcb5d::t_36c94274001fb0 1-2,7-8,10-19,25-26,28-40,58-59,61-62,64-67
+  s_bdd49b1e1fcb5d::t_bad9b0a5b3ceb5 3-6,9,20-24,27,41-57,60,63
+apps/agentic-rag-business-service/src/modules/auth/dto/auth.dto.ts
+  s_bdd49b1e1fcb5d::t_5fee9b899a534d 12
+apps/agentic-rag-business-service/src/modules/auth/constants/auth.constants.ts
+  s_bdd49b1e1fcb5d::t_9de196d612f851 10-12,16
+  s_bdd49b1e1fcb5d::t_3103914bd3f6ff 1-9,13-15,17-18
+init-scripts/postgresql/02-knowledge-hub.sql
+  s_bdd49b1e1fcb5d::t_4b8b023625840c 56
+docs/architecture/decisions/0024-rag-business-built-in-auth-and-roles.md
+  s_bdd49b1e1fcb5d::t_a75b22691a7934 45
+  s_bdd49b1e1fcb5d::t_94e1afdbc48194 1,5-7,13-15,17-34,36,38-44,46-47,51,53-54,57-65,67,69-71,73-74
+  s_bdd49b1e1fcb5d::t_0d770fb7dea55e 55-56
+apps/agentic-rag-business-service/src/modules/document/repository/document.repository.ts
+  s_bdd49b1e1fcb5d::t_dcb393290c5546 105-130
+apps/agentic-rag-business-service/src/modules/auth/email-activation.service.ts
+  s_bdd49b1e1fcb5d::t_12df17a86b7f4e 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.51-trip",
+  "base_commit_sha": "6d2dd7295a088df2502f9f18f6119245f64aede8",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_bdd49b1e1fcb5d": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_fc4bc865-e1ed-4aaf-a99b-15d922033fcc",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
