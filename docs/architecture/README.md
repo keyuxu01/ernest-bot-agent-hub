@@ -259,9 +259,22 @@ approve / reject); PATCH only allows `Published → Draft`. With `DOCUMENT_REQUI
 `true`), publish creates a `kh_document_review` row and moves the document to `PendingReview`; approval
 publishes and indexes it, rejection returns it to `Draft`. Review row and document status commit in one
 PostgreSQL transaction, and a partial unique index allows one pending review per document. Index commands
-are sent only when a document enters or leaves `Published`. Review endpoints are unauthenticated until the
-user module lands: reviewer identity is caller-supplied. See
+are sent only when a document enters or leaves `Published`. Review decisions require `ROLE_REVIEWER` or
+`ROLE_ADMIN`, and the reviewer is the logged-in user. See
 [ADR-0023](./decisions/0023-document-publish-review-workflow.md).
+
+## RagBusiness Authentication Boundary
+
+`agentic-rag-business-service` owns its own accounts for now: `kh_user`, `kh_role` and `kh_user_role`
+in PostgreSQL, username + bcrypt password login, and HS256 access / refresh JWTs signed with
+`JWT_SECRET`. Global `JwtAuthGuard` and `RolesGuard` make every HTTP route require login unless marked
+`@Public()` (auth endpoints, health probes, greeting, OpenAPI). Each request reloads the user and roles
+from PostgreSQL, so disabling a user or changing roles takes effect immediately. Authorization is
+role-only; there is no document ownership check, refresh tokens are not revocable and login has no rate
+limit. This is separate from UserPlatform (ADR-0018). Token verification uses passport-jwt
+(`JwtStrategy`), and user resolution is isolated in `AuthService.buildAuthUser()` so it can later move to
+UserPlatform-issued tokens. See
+[ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md).
 
 ## Document Publish and RAG Index Boundary
 
@@ -310,6 +323,7 @@ is no graph query API yet. See [ADR-0022](./decisions/0022-use-neo4j-for-knowled
 | [ADR-0021](./decisions/0021-document-search-index.md)                    | Separate document Search snapshots from RAG chunks   | Accepted   |
 | [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md)            | Neo4j knowledge graph built from published documents | Accepted   |
 | [ADR-0023](./decisions/0023-document-publish-review-workflow.md)         | Publish review workflow and status-driven index sync | Accepted   |
+| [ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md)     | RagBusiness built-in accounts, JWT auth and roles    | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

@@ -21,8 +21,10 @@ import { UpdateDocumentDto } from './dto/update-document.dto';
 import { QueryDocumentDto } from './dto/query-document.dto';
 import { UploadParseDocumentDto } from './dto/upload-parse-document.dto';
 import { DocumentFileTooLargeFilter } from './filters/document-file-too-large.filter';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { AuthUser } from '../user/type/user.types';
 
-/** 文档接口 */
+/** 文档接口（全部需登录；当前用户写入 createBy / updateBy，authorId 缺省取当前用户） */
 @Controller('documents')
 export class DocumentController {
   constructor(
@@ -32,8 +34,8 @@ export class DocumentController {
 
   /** 创建文档 */
   @Post()
-  create(@Body() dto: CreateDocumentDto) {
-    return this.documentService.create(dto);
+  create(@Body() dto: CreateDocumentDto, @CurrentUser() user: AuthUser) {
+    return this.documentService.create(dto, user);
   }
 
   /**
@@ -54,8 +56,9 @@ export class DocumentController {
   uploadAndParse(
     @UploadedFile() file: unknown,
     @Body() dto: UploadParseDocumentDto,
+    @CurrentUser() user: AuthUser,
   ) {
-    return this.documentParseService.uploadAndParse(file, dto);
+    return this.documentParseService.uploadAndParse(file, dto, user);
   }
 
   /** 分页查询文档列表（仅元数据） */
@@ -90,8 +93,12 @@ export class DocumentController {
 
   /** 更新文档 */
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateDocumentDto) {
-    return this.documentService.update(id, dto);
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateDocumentDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.documentService.update(id, dto, user);
   }
 
   /** 软删除文档 */

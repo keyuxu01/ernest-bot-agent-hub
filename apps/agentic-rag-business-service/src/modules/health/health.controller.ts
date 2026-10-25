@@ -7,6 +7,7 @@ import {
   type SharedServiceIdentityResponse,
 } from '@repo/contracts';
 import { RabbitMqHealthIndicator } from '../../infrastructure/rabbitmq/rabbitmq.health-indicator';
+import { Public } from '../auth/decorators/public.decorator';
 import {
   BUSINESS_SERVICE_NAME,
   LOCAL_INSTANCE_ID,
@@ -19,6 +20,8 @@ const getNonEmptyEnvironmentValue = (name: string): string | undefined => {
   return value === '' ? undefined : value;
 };
 
+/** 探针必须免登录：平台 liveness / readiness 不带 token */
+@Public()
 @Controller('health')
 class HealthController {
   constructor(

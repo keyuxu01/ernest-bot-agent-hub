@@ -7,6 +7,7 @@ import {
 } from './constants/document-upload.constants';
 import { DocumentService } from './document.service';
 import { UploadParseDocumentDto } from './dto/upload-parse-document.dto';
+import type { AuthUser } from '../user/type/user.types';
 import { DocumentStatus } from './entities/document.entity';
 import { buildContentSummary } from './helpers/build-content-summary';
 import { detectDocumentFileType } from './helpers/detect-document-file-type';
@@ -49,6 +50,7 @@ class DocumentParseService {
   async uploadAndParse(
     uploaded: unknown,
     dto: UploadParseDocumentDto,
+    actor?: AuthUser,
   ): Promise<UploadParseDocumentResult> {
     const parsedFile = uploadedDocumentFileSchema.safeParse(uploaded);
     if (!parsedFile.success) {
@@ -101,17 +103,20 @@ class DocumentParseService {
 
     const { content, imageCount } = await this.storeImages(converted);
 
-    const created = await this.documentService.create({
-      title: dto.title?.trim() || titleFromFileName(file.originalname),
-      content,
-      status: DocumentStatus.Draft,
-      categoryId: dto.categoryId,
-      teamId: dto.teamId,
-      authorId: dto.authorId,
-      tags: dto.tags,
-      remark: dto.remark,
-      createBy: dto.createBy,
-    });
+    const created = await this.documentService.create(
+      {
+        title: dto.title?.trim() || titleFromFileName(file.originalname),
+        content,
+        status: DocumentStatus.Draft,
+        categoryId: dto.categoryId,
+        teamId: dto.teamId,
+        authorId: dto.authorId,
+        tags: dto.tags,
+        remark: dto.remark,
+        createBy: dto.createBy,
+      },
+      actor,
+    );
 
     // 出参边界校验：字段与 zod 推断类型对齐，避免漏加字段
     return uploadParseDocumentResultSchema.parse({

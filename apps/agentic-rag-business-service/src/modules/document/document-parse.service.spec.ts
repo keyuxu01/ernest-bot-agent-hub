@@ -87,18 +87,29 @@ describe('DocumentParseService', () => {
       converted({ markdown: '# 笔记\n\n正文', parser: 'plain-text' }),
     );
 
+    const actor = {
+      userId: '10001',
+      username: 'alice',
+      realName: null,
+      email: null,
+      avatar: null,
+      roles: ['ROLE_USER'],
+    };
     const result = await service.uploadAndParse(
       upload('notes.md', '\ufeff# 笔记\n\n正文', 'text/markdown'),
       {},
+      actor,
     );
 
     expect(convertDocument).toHaveBeenCalledWith('md', expect.any(Buffer));
+    // 当前用户透传给 DocumentService.create，由它写 createBy / authorId
     expect(create).toHaveBeenCalledWith(
       expect.objectContaining({
         title: 'notes',
         content: '# 笔记\n\n正文',
         status: DocumentStatus.Draft,
       }),
+      actor,
     );
     expect(result).toMatchObject({
       id: '42',
@@ -164,6 +175,7 @@ describe('DocumentParseService', () => {
 
     expect(create).toHaveBeenCalledWith(
       expect.objectContaining({ title: expected }),
+      undefined,
     );
   });
 

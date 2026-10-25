@@ -33,7 +33,7 @@ class DocumentReviewEntity {
   })
   documentId: string;
 
-  /** 审核人 ID；待审时为 NULL（暂由请求体传入，接入用户模块后改取登录用户） */
+  /** 审核人 ID（kh_user.id，取自登录用户）；待审 / 撤销时为 NULL */
   @Column({
     name: 'reviewer_id',
     type: 'bigint',

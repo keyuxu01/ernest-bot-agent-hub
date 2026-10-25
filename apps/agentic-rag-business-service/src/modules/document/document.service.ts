@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { nextSnowflakeId } from '../../common/helpers/snowflake-id';
+import type { AuthUser } from '../user/type/user.types';
 import { REVIEW_CANCELLED_ON_DELETE_COMMENT } from './constants/document-review.constants';
 import { DocumentIndexSyncService } from './document-index-sync.service';
 import { DocumentReviewService } from './document-review.service';
@@ -64,8 +65,9 @@ export class DocumentService {
    * 流程：生成雪花 ID → 写 Mongo 正文（拿 ObjectId）→ 写 Postgres 元数据
    * 若 Postgres 写入失败，回滚删除已写入的 Mongo 正文，避免脏数据
    * 仅允许草稿或（免审时）已发布；创建即发布会投递索引
+   * @param actor 当前登录用户：createBy / updateBy 以它为准，authorId 未传时取它
    */
-  async create(dto: CreateDocumentDto) {
+  async create(dto: CreateDocumentDto, actor?: AuthUser) {
     const status = dto.status ?? DocumentStatus.Draft;
     if (
       status !== DocumentStatus.Draft &&
@@ -114,7 +116,7 @@ export class DocumentService {
         summary: dto.summary,
         categoryId: dto.categoryId,
         teamId: dto.teamId,
-        authorId: dto.authorId,
+        authorId: dto.authorId ?? actor?.userId,
         coverImage: dto.coverImage,
         tags: dto.tags,
         status,
@@ -123,8 +125,9 @@ export class DocumentService {
         wordCount,
         // 创建即发布时，记录发布时间
         publishTime: status === DocumentStatus.Published ? new Date() : null,
-        createBy: dto.createBy,
-        updateBy: dto.createBy,
+        // 有登录用户时以它为准，不信任请求体，避免冒充他人创建
+        createBy: actor?.userId ?? dto.createBy,
+        updateBy: actor?.userId ?? dto.createBy,
         deleted: false,
       });
     } catch (error) {
@@ -181,7 +184,7 @@ export class DocumentService {
    * - 待审核期间不可改标题 / 正文；开启审核时已发布文档须先存草稿再改
    * - 免审时已发布文档改标题 / 正文会重建索引；其余元数据变更不重建（ADR-0021 既有限制）
    */
-  async update(id: string, dto: UpdateDocumentDto) {
+  async update(id: string, dto: UpdateDocumentDto, actor?: AuthUser) {
     const doc = await this.documentRepo.findActiveById(id);
     if (!doc) {
       throw new NotFoundException(`Document ${id} not found`);
@@ -252,7 +255,9 @@ export class DocumentService {
     if (dto.tags !== undefined) doc.tags = dto.tags;
     if (dto.remark !== undefined) doc.remark = dto.remark;
     if (dto.isPublic !== undefined) doc.isPublic = dto.isPublic;
-    if (dto.updateBy !== undefined) doc.updateBy = dto.updateBy;
+    // 有登录用户时以它为准，不信任请求体里的 updateBy
+    const updateBy = actor?.userId ?? dto.updateBy;
+    if (updateBy !== undefined) doc.updateBy = updateBy;
 
     doc.status = nextStatus;
     const saved = await this.documentRepo.save(doc);

@@ -30,6 +30,7 @@ const validEnvironment = {
   NEO4J_URI: 'bolt://localhost:7687',
   NEO4J_USER: 'neo4j',
   NEO4J_PASSWORD: 'password',
+  JWT_SECRET: 'test-secret',
 };
 
 describe('validateEnvironment', () => {
@@ -44,6 +45,31 @@ describe('validateEnvironment', () => {
       CHAT_MODEL_TIMEOUT_MS: 60000,
       DOCUMENT_REQUIRE_APPROVAL: true,
     });
+  });
+
+  it('requires JWT_SECRET', () => {
+    const missingSecret: Record<string, unknown> = { ...validEnvironment };
+    delete missingSecret.JWT_SECRET;
+
+    expect(() => validateEnvironment(missingSecret)).toThrow(
+      'Environment variable JWT_SECRET is required',
+    );
+  });
+
+  it('requires bootstrap admin username and password together', () => {
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        AUTH_BOOTSTRAP_ADMIN_USERNAME: 'admin',
+      }),
+    ).toThrow('must be set together');
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        AUTH_BOOTSTRAP_ADMIN_USERNAME: 'admin',
+        AUTH_BOOTSTRAP_ADMIN_PASSWORD: '12345',
+      }),
+    ).toThrow('at least 6 characters');
   });
 
   it('defaults document approval to enabled when unset', () => {

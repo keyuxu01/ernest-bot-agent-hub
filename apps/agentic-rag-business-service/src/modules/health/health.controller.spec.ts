@@ -32,23 +32,27 @@ describe('HealthController', () => {
   it('reports the process as live', async () => {
     const response = await controller.getLiveness();
 
-    expect(SharedHealthProbeResponseSchema.safeParse(response).success).toBe(true);
+    expect(SharedHealthProbeResponseSchema.safeParse(response).success).toBe(
+      true,
+    );
     expect(response.status).toBe('ok');
   });
 
   it('reports the service as ready when RabbitMQ is connected', async () => {
     const response = await controller.getReadiness();
 
-    expect(SharedHealthProbeResponseSchema.safeParse(response).success).toBe(true);
+    expect(SharedHealthProbeResponseSchema.safeParse(response).success).toBe(
+      true,
+    );
     expect(response.status).toBe('ok');
   });
 
   it('returns a validated instance identity', () => {
     const response = controller.getIdentity();
 
-    expect(SharedServiceIdentityResponseSchema.safeParse(response).success).toBe(
-      true,
-    );
+    expect(
+      SharedServiceIdentityResponseSchema.safeParse(response).success,
+    ).toBe(true);
     expect(response.service).toBe('agentic-rag-business-service');
   });
 

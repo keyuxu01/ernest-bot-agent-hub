@@ -19,7 +19,9 @@ describe('GreetingController', () => {
     it('should return "Hello World!"', () => {
       const response = greetingController.getHello();
 
-      expect(RagBusinessGreetingResponseSchema.safeParse(response).success).toBe(true);
+      expect(
+        RagBusinessGreetingResponseSchema.safeParse(response).success,
+      ).toBe(true);
       expect(response).toEqual({ message: 'Hello World!' });
     });
   });

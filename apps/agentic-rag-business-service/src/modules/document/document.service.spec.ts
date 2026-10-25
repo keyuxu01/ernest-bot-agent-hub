@@ -215,6 +215,30 @@ describe('DocumentService.create', () => {
     );
   });
 
+  it('records the logged-in user as creator instead of the request body', async () => {
+    const actor = {
+      userId: '20001',
+      username: 'alice',
+      realName: null,
+      email: null,
+      avatar: null,
+      roles: [],
+    };
+
+    // createBy 以登录用户为准；authorId 可代填
+    await expect(
+      service.create({ ...dto, createBy: '99999', authorId: '30001' }, actor),
+    ).resolves.toMatchObject({
+      createBy: '20001',
+      updateBy: '20001',
+      authorId: '30001',
+    });
+    // authorId 未传时取登录用户
+    await expect(service.create(dto, actor)).resolves.toMatchObject({
+      authorId: '20001',
+    });
+  });
+
   it('rejects creating as published when approval is required', async () => {
     reviewService.isApprovalRequired.mockReturnValue(true);
 

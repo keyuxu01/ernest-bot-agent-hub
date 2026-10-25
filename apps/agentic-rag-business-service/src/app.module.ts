@@ -8,6 +8,7 @@ import { EmbeddingModule } from './infrastructure/embedding/embedding.module';
 import { RabbitmqModule } from './infrastructure/rabbitmq/rabbitmq.module';
 import { RustfsModule } from './infrastructure/rustfs/rustfs.module';
 import { ApiDocsModule } from './modules/api-docs/api-docs.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { DocumentModule } from './modules/document/document.module';
 import { GreetingModule } from './modules/greeting/greeting.module';
 import { HealthModule } from './modules/health/health.module';
@@ -33,6 +34,8 @@ import { PipelineModule } from './modules/pipeline/pipeline.module';
     // 协议 / 平台
     ORPCModule.forRoot({}),
     ApiDocsModule,
+    // 认证：注册全局 JWT / 角色守卫，接口默认需登录
+    AuthModule,
 
     // 业务 feature
     GreetingModule,

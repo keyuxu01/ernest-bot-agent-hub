@@ -29,7 +29,12 @@ const REQUIRED_ENVIRONMENT_KEYS = [
   'NEO4J_URI',
   'NEO4J_USER',
   'NEO4J_PASSWORD',
+  // 认证：JWT 签名密钥；JWT_ACCESS_EXPIRES / JWT_REFRESH_EXPIRES 可选，缺省 2h / 7d
+  'JWT_SECRET',
 ] as const;
+
+/** 初始管理员密码最短长度，与注册接口（RegisterDto @MinLength(6)）一致 */
+const BOOTSTRAP_ADMIN_PASSWORD_MIN_LENGTH = 6;
 
 const NUMERIC_ENVIRONMENT_KEYS = [
   'POSTGRES_PORT',
@@ -59,6 +64,8 @@ function validateEnvironment(config: Environment): Environment {
   for (const key of NUMERIC_ENVIRONMENT_KEYS) {
     normalized[key] = Number(config[key]);
   }
+  validateBootstrapAdmin(config);
+
   // 文档发布审核：可选，默认开启
   normalized.DOCUMENT_REQUIRE_APPROVAL = parseBoolean(
     'DOCUMENT_REQUIRE_APPROVAL',
@@ -67,6 +74,25 @@ function validateEnvironment(config: Environment): Environment {
   );
 
   return normalized;
+}
+
+/** 初始管理员（可选）：用户名与密码须同时配置，密码不短于注册要求 */
+function validateBootstrapAdmin(config: Environment): void {
+  const username = config.AUTH_BOOTSTRAP_ADMIN_USERNAME;
+  const password = config.AUTH_BOOTSTRAP_ADMIN_PASSWORD;
+  if (username === undefined && password === undefined) {
+    return;
+  }
+  if (!username || !password) {
+    throw new Error(
+      'AUTH_BOOTSTRAP_ADMIN_USERNAME and AUTH_BOOTSTRAP_ADMIN_PASSWORD must be set together',
+    );
+  }
+  if (String(password).length < BOOTSTRAP_ADMIN_PASSWORD_MIN_LENGTH) {
+    throw new Error(
+      `Environment variable AUTH_BOOTSTRAP_ADMIN_PASSWORD must be at least ${BOOTSTRAP_ADMIN_PASSWORD_MIN_LENGTH} characters`,
+    );
+  }
 }
 
 /** 未配置取缺省值；只接受 true / false，其他值直接报错，避免开关静默失效 */

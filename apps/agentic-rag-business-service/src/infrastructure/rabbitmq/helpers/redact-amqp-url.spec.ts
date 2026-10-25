@@ -9,6 +9,8 @@ describe('redactAmqpUrl', () => {
   });
 
   it('leaves URLs without credentials unchanged', () => {
-    expect(redactAmqpUrl('amqp://localhost:5672')).toBe('amqp://localhost:5672');
+    expect(redactAmqpUrl('amqp://localhost:5672')).toBe(
+      'amqp://localhost:5672',
+    );
   });
 });

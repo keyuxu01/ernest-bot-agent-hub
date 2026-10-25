@@ -6,10 +6,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { nextSnowflakeId } from '../../common/helpers/snowflake-id';
-import {
-  DEFAULT_REVIEWER_NAME,
-  DOCUMENT_REQUIRE_APPROVAL_KEY,
-} from './constants/document-review.constants';
+import type { AuthUser } from '../user/type/user.types';
+import { DOCUMENT_REQUIRE_APPROVAL_KEY } from './constants/document-review.constants';
 import { DocumentIndexSyncService } from './document-index-sync.service';
 import type {
   ApproveReviewDto,
@@ -41,7 +39,7 @@ const RESULT_BY_FILTER: Record<
 };
 
 /**
- * 文档发布审核（迁自 knowledge-hub-backend `95917a3` DocumentReviewService）
+ * 文档发布审核
  *
  * 流程：提交审核（Draft / Published / Archived → PendingReview，记一条 kh_document_review）
  * → 通过（→ Published 并建索引）或驳回（→ Draft）。
@@ -50,8 +48,8 @@ const RESULT_BY_FILTER: Record<
  * 开关：DOCUMENT_REQUIRE_APPROVAL（默认开启）。关闭时 publish 不经过本服务，
  * 但单独的提交审核接口仍可用。
  *
- * 边界：审核人身份由请求体传入，不做鉴权——任何调用方都能通过 / 驳回，
- * 接入用户模块后改为取登录用户并校验审核权限（见 ADR-0023）。
+ * 权限：通过 / 驳回由 Controller 的 @Roles 限定为审核员或管理员，审核人取自登录用户（ADR-0024）。
+ * 不限制「作者审核自己的文档」，也不校验提审人是否为文档作者。
  */
 @Injectable()
 class DocumentReviewService {
@@ -113,10 +111,11 @@ class DocumentReviewService {
     return doc;
   }
 
-  /** 审核通过 → Published，刷新 publishTime 并建索引 */
+  /** 审核通过 → Published，刷新 publishTime 并建索引；审核人取自登录用户 */
   async approve(
     reviewId: string,
     dto: ApproveReviewDto,
+    reviewer: AuthUser,
   ): Promise<DocumentEntity> {
     const doc = await this.findReviewedDocument(reviewId);
     doc.status = DocumentStatus.Published;
@@ -125,8 +124,8 @@ class DocumentReviewService {
       {
         reviewId,
         result: DocumentReviewResult.Approved,
-        reviewerId: dto.reviewerId ?? null,
-        reviewerName: dto.reviewerName ?? DEFAULT_REVIEWER_NAME,
+        reviewerId: reviewer.userId,
+        reviewerName: reviewerDisplayName(reviewer),
         reviewComment: dto.reviewComment?.trim() || null,
       },
       doc,
@@ -141,6 +140,7 @@ class DocumentReviewService {
   async reject(
     reviewId: string,
     dto: RejectReviewDto,
+    reviewer: AuthUser,
   ): Promise<DocumentEntity> {
     const comment = dto.reviewComment?.trim();
     if (!comment) {
@@ -156,8 +156,8 @@ class DocumentReviewService {
       {
         reviewId,
         result: DocumentReviewResult.Rejected,
-        reviewerId: dto.reviewerId ?? null,
-        reviewerName: dto.reviewerName ?? DEFAULT_REVIEWER_NAME,
+        reviewerId: reviewer.userId,
+        reviewerName: reviewerDisplayName(reviewer),
         reviewComment: comment,
       },
       doc,
@@ -243,6 +243,11 @@ class DocumentReviewService {
     }
     return doc;
   }
+}
+
+/** 审核记录上的审核人名：realName ?? username */
+function reviewerDisplayName(reviewer: AuthUser): string {
+  return reviewer.realName ?? reviewer.username;
 }
 
 export { DocumentReviewService };

@@ -1,4 +1,8 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RoleCode } from '../user/constants/user.constants';
+import type { AuthUser } from '../user/type/user.types';
 import { DocumentReviewService } from './document-review.service';
 import {
   ApproveReviewDto,
@@ -10,7 +14,8 @@ import {
  * 文档发布审核接口
  *
  * 与 DocumentController 共用 `documents` 前缀；静态段 `reviews/...` 与 `:id` 的段数不同，不会互相吞路由。
- * 未鉴权：审核人身份由请求体传入，接入用户模块前任何调用方都能通过 / 驳回。
+ * 全部需登录；审核工作台（列表 / 计数 / 通过 / 驳回）另需 ROLE_REVIEWER 或 ROLE_ADMIN，
+ * 审核人身份取自当前登录用户。
  */
 @Controller('documents')
 class DocumentReviewController {
@@ -18,26 +23,38 @@ class DocumentReviewController {
 
   /** 审核任务列表（默认待办） */
   @Get('reviews/tasks')
+  @Roles(RoleCode.REVIEWER, RoleCode.ADMIN)
   listTasks(@Query() query: QueryReviewTasksDto) {
     return this.reviewService.listTasks(query);
   }
 
   /** 待审核数量（导航角标） */
   @Get('reviews/tasks/pending-count')
+  @Roles(RoleCode.REVIEWER, RoleCode.ADMIN)
   countPending() {
     return this.reviewService.countPending();
   }
 
   /** 审核通过 → 文档 Published 并建索引 */
   @Post('reviews/tasks/:taskId/approve')
-  approve(@Param('taskId') taskId: string, @Body() dto: ApproveReviewDto) {
-    return this.reviewService.approve(taskId, dto);
+  @Roles(RoleCode.REVIEWER, RoleCode.ADMIN)
+  approve(
+    @Param('taskId') taskId: string,
+    @Body() dto: ApproveReviewDto,
+    @CurrentUser() reviewer: AuthUser,
+  ) {
+    return this.reviewService.approve(taskId, dto, reviewer);
   }
 
   /** 审核驳回 → 文档回 Draft，作者修改后可再次提交 */
   @Post('reviews/tasks/:taskId/reject')
-  reject(@Param('taskId') taskId: string, @Body() dto: RejectReviewDto) {
-    return this.reviewService.reject(taskId, dto);
+  @Roles(RoleCode.REVIEWER, RoleCode.ADMIN)
+  reject(
+    @Param('taskId') taskId: string,
+    @Body() dto: RejectReviewDto,
+    @CurrentUser() reviewer: AuthUser,
+  ) {
+    return this.reviewService.reject(taskId, dto, reviewer);
   }
 
   /** 单独提交审核（开启审核时 publish 内部也走这里） */

@@ -19,7 +19,9 @@ describe('GreetingRpcController', () => {
   it('returns a contract-valid greeting', async () => {
     const response = await call(controller.greeting(), undefined);
 
-    expect(RagBusinessGreetingResponseSchema.safeParse(response).success).toBe(true);
+    expect(RagBusinessGreetingResponseSchema.safeParse(response).success).toBe(
+      true,
+    );
     expect(response).toEqual({ message: 'Hello World!' });
   });
 });

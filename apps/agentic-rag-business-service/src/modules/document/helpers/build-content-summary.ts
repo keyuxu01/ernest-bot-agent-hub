@@ -4,7 +4,5 @@
  */
 export function buildContentSummary(content: string, maxLen = 200): string {
   const trimmed = content.trim().replace(/\s+/g, ' ');
-  return trimmed.length <= maxLen
-    ? trimmed
-    : `${trimmed.slice(0, maxLen)}...`;
+  return trimmed.length <= maxLen ? trimmed : `${trimmed.slice(0, maxLen)}...`;
 }

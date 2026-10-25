@@ -5,7 +5,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  Matches,
   Max,
   Min,
 } from 'class-validator';
@@ -37,42 +36,18 @@ export class QueryReviewTasksDto {
 
 /**
  * 审核通过请求体
- * reviewerId / reviewerName 暂由调用方传入、不做身份校验；接入用户模块后改取登录用户。
+ * 审核人取自登录用户，请求体不接受 reviewerId / reviewerName（传了会被全局校验拒绝）
  */
 export class ApproveReviewDto {
   /** 审核意见 */
   @IsOptional()
   @IsString()
   reviewComment?: string;
-
-  /** 审核人 ID（雪花 ID 字符串，写入 BIGINT 列） */
-  @IsOptional()
-  @Matches(/^\d+$/)
-  reviewerId?: string;
-
-  /** 审核人姓名 */
-  @IsOptional()
-  @IsString()
-  reviewerName?: string;
 }
 
-/**
- * 审核驳回请求体：意见必填
- * 不继承 ApproveReviewDto：class-validator 会合并父类的 @IsOptional，必填校验失效
- */
+/** 审核驳回请求体：意见必填（服务端再去空白校验） */
 export class RejectReviewDto {
-  /** 驳回意见（必填，服务端再去空白校验） */
   @IsString()
   @IsNotEmpty()
   reviewComment: string;
-
-  /** 审核人 ID（雪花 ID 字符串，写入 BIGINT 列） */
-  @IsOptional()
-  @Matches(/^\d+$/)
-  reviewerId?: string;
-
-  /** 审核人姓名 */
-  @IsOptional()
-  @IsString()
-  reviewerName?: string;
 }

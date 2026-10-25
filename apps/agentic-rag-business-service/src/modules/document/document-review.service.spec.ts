@@ -14,6 +14,7 @@ import {
 import type { DocumentReviewRepository } from './repository/document-review.repository';
 import type { DocumentRepository } from './repository/document.repository';
 import type { DocumentLifecycleErrorCode } from './type/document-lifecycle.types';
+import type { AuthUser } from '../user/type/user.types';
 
 function doc(status: DocumentStatus): DocumentEntity {
   return {
@@ -51,6 +52,15 @@ async function expectCode(
   expect((error as HttpException).getStatus()).toBe(status);
   expect((error as HttpException).getResponse()).toMatchObject({ code });
 }
+
+const reviewer: AuthUser = {
+  userId: '20001',
+  username: 'reviewer',
+  realName: '审核员张三',
+  email: null,
+  avatar: null,
+  roles: ['ROLE_REVIEWER'],
+};
 
 const documentRepo = { findActiveById: vi.fn() };
 const reviewRepo = {
@@ -151,10 +161,11 @@ describe('DocumentReviewService.approve', () => {
       doc(DocumentStatus.PendingReview),
     );
 
-    const result = await service.approve('90001', {
-      reviewerId: '20001',
-      reviewComment: '  符合规范  ',
-    });
+    const result = await service.approve(
+      '90001',
+      { reviewComment: '  符合规范  ' },
+      reviewer,
+    );
 
     expect(result.status).toBe(DocumentStatus.Published);
     expect(result.publishTime).toBeInstanceOf(Date);
@@ -163,7 +174,7 @@ describe('DocumentReviewService.approve', () => {
         reviewId: '90001',
         result: DocumentReviewResult.Approved,
         reviewerId: '20001',
-        reviewerName: '审核员',
+        reviewerName: '审核员张三',
         reviewComment: '符合规范',
       },
       result,
@@ -175,7 +186,7 @@ describe('DocumentReviewService.approve', () => {
     reviewRepo.findById.mockResolvedValue(null);
 
     await expectCode(
-      service.approve('missing', {}),
+      service.approve('missing', {}, reviewer),
       'DOCUMENT_REVIEW_NOT_FOUND',
       HttpStatus.NOT_FOUND,
     );
@@ -187,7 +198,7 @@ describe('DocumentReviewService.approve', () => {
     );
 
     await expectCode(
-      service.approve('90001', {}),
+      service.approve('90001', {}, reviewer),
       'DOCUMENT_REVIEW_ALREADY_CLOSED',
     );
     expect(reviewRepo.close).not.toHaveBeenCalled();
@@ -201,7 +212,7 @@ describe('DocumentReviewService.approve', () => {
     reviewRepo.close.mockResolvedValue(false);
 
     await expectCode(
-      service.approve('90001', {}),
+      service.approve('90001', {}, reviewer),
       'DOCUMENT_REVIEW_ALREADY_CLOSED',
     );
     expect(indexSync.publish).not.toHaveBeenCalled();
@@ -212,7 +223,7 @@ describe('DocumentReviewService.approve', () => {
     documentRepo.findActiveById.mockResolvedValue(doc(DocumentStatus.Draft));
 
     await expectCode(
-      service.approve('90001', {}),
+      service.approve('90001', {}, reviewer),
       'DOCUMENT_TRANSITION_NOT_ALLOWED',
     );
     expect(reviewRepo.close).not.toHaveBeenCalled();
@@ -222,7 +233,7 @@ describe('DocumentReviewService.approve', () => {
 describe('DocumentReviewService.reject', () => {
   it('requires a non-blank comment', async () => {
     await expectCode(
-      service.reject('90001', { reviewComment: '   ' }),
+      service.reject('90001', { reviewComment: '   ' }, reviewer),
       'DOCUMENT_REVIEW_COMMENT_REQUIRED',
     );
     expect(reviewRepo.findById).not.toHaveBeenCalled();
@@ -234,18 +245,20 @@ describe('DocumentReviewService.reject', () => {
       doc(DocumentStatus.PendingReview),
     );
 
-    const result = await service.reject('90001', {
-      reviewComment: ' 缺少附件 ',
-      reviewerName: '张三',
-    });
+    const result = await service.reject(
+      '90001',
+      { reviewComment: ' 缺少附件 ' },
+      { ...reviewer, realName: null },
+    );
 
     expect(result.status).toBe(DocumentStatus.Draft);
     expect(reviewRepo.close).toHaveBeenCalledWith(
       expect.objectContaining({
         result: DocumentReviewResult.Rejected,
         reviewComment: '缺少附件',
-        reviewerName: '张三',
-        reviewerId: null,
+        // 没有显示名时用用户名
+        reviewerName: 'reviewer',
+        reviewerId: '20001',
       }),
       result,
     );
