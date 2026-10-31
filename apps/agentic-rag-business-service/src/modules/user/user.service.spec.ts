@@ -112,6 +112,16 @@ describe('UserService.validateCredentials', () => {
       service.validateCredentials('alice', '123456'),
     ).rejects.toThrow('账户未激活，请先验证邮箱');
   });
+
+  it('reports a pending-activation account as not activated', async () => {
+    userRepo.findByUsername.mockResolvedValue(
+      userRow({ status: 0, emailVerified: 0 }),
+    );
+
+    await expect(
+      service.validateCredentials('alice', '123456'),
+    ).rejects.toThrow('账户未激活，请先验证邮箱');
+  });
 });
 
 describe('UserService.register email verification', () => {
@@ -269,8 +279,19 @@ describe('UserService.ensureBootstrapAdmin', () => {
     userRepo.findByUsername.mockResolvedValue(null);
 
     await expect(
-      service.ensureBootstrapAdmin('admin', 'strong-password'),
+      service.ensureBootstrapAdmin(
+        'admin',
+        'strong-password',
+        'admin@example.com',
+      ),
     ).resolves.toBe(true);
+    expect(userRepo.saveUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'admin@example.com',
+        status: 1,
+        emailVerified: 1,
+      }),
+    );
     expect(
       userRepo.saveUserRole.mock.calls.map(([link]) => link.roleId),
     ).toEqual(['role-ROLE_USER', 'role-ROLE_ADMIN', 'role-ROLE_REVIEWER']);
@@ -280,8 +301,59 @@ describe('UserService.ensureBootstrapAdmin', () => {
     userRepo.findByUsername.mockResolvedValue(userRow());
 
     await expect(
-      service.ensureBootstrapAdmin('alice', 'strong-password'),
+      service.ensureBootstrapAdmin(
+        'alice',
+        'strong-password',
+        'alice@example.com',
+      ),
     ).resolves.toBe(false);
+    expect(userRepo.saveUser).not.toHaveBeenCalled();
+  });
+});
+
+describe('UserService email uniqueness on write', () => {
+  it('rejects a profile email owned by another user', async () => {
+    userRepo.findById.mockResolvedValue(userRow());
+    userRepo.findByEmail.mockResolvedValue(
+      userRow({ id: '20002', username: 'bob', email: 'bob@example.com' }),
+    );
+
+    await expect(
+      service.updateProfile('10001', { email: 'bob@example.com' }),
+    ).rejects.toThrow(new ConflictException('邮箱已被使用'));
+    expect(userRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('allows keeping the current profile email', async () => {
+    const me = userRow({ email: 'alice@example.com' });
+    userRepo.findById.mockResolvedValue(me);
+    userRepo.findByEmail.mockResolvedValue(me);
+
+    await expect(
+      service.updateProfile('10001', { email: 'alice@example.com' }),
+    ).resolves.toMatchObject({ email: 'alice@example.com' });
+  });
+
+  it('rejects an admin update to an email owned by another user', async () => {
+    userRepo.findById.mockResolvedValue(userRow());
+    userRepo.findByEmail.mockResolvedValue(userRow({ id: '20002' }));
+
+    await expect(
+      service.updateUser('10001', { email: 'bob@example.com' }),
+    ).rejects.toThrow(new ConflictException('邮箱已被使用'));
+  });
+
+  it('rejects admin creation with an email already in use', async () => {
+    userRepo.findByUsername.mockResolvedValue(null);
+    userRepo.findByEmail.mockResolvedValue(userRow({ id: '20002' }));
+
+    await expect(
+      service.createUser({
+        username: 'carol',
+        password: '123456',
+        email: 'bob@example.com',
+      }),
+    ).rejects.toThrow(new ConflictException('邮箱已被使用'));
     expect(userRepo.saveUser).not.toHaveBeenCalled();
   });
 });

@@ -13,7 +13,7 @@ class UserRoleEntity {
   @Column({ name: 'role_id', type: 'bigint', transformer: bigintTransformer })
   roleId: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 }
 

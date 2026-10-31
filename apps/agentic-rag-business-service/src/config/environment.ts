@@ -76,16 +76,17 @@ function validateEnvironment(config: Environment): Environment {
   return normalized;
 }
 
-/** 初始管理员（可选）：用户名与密码须同时配置，密码不短于注册要求 */
+/** 初始管理员（可选）：用户名、密码、邮箱须同时配置，密码不短于注册要求 */
 function validateBootstrapAdmin(config: Environment): void {
   const username = config.AUTH_BOOTSTRAP_ADMIN_USERNAME;
   const password = config.AUTH_BOOTSTRAP_ADMIN_PASSWORD;
-  if (username === undefined && password === undefined) {
+  const email = config.AUTH_BOOTSTRAP_ADMIN_EMAIL;
+  if (username === undefined && password === undefined && email === undefined) {
     return;
   }
-  if (!username || !password) {
+  if (!username || !password || !email) {
     throw new Error(
-      'AUTH_BOOTSTRAP_ADMIN_USERNAME and AUTH_BOOTSTRAP_ADMIN_PASSWORD must be set together',
+      'AUTH_BOOTSTRAP_ADMIN_USERNAME, AUTH_BOOTSTRAP_ADMIN_PASSWORD and AUTH_BOOTSTRAP_ADMIN_EMAIL must be set together',
     );
   }
   if (String(password).length < BOOTSTRAP_ADMIN_PASSWORD_MIN_LENGTH) {

@@ -338,12 +338,14 @@ describe('AuthService.onModuleInit', () => {
   it('ensures the configured bootstrap admin exists', async () => {
     configValues.AUTH_BOOTSTRAP_ADMIN_USERNAME = 'admin';
     configValues.AUTH_BOOTSTRAP_ADMIN_PASSWORD = 'strong-password';
+    configValues.AUTH_BOOTSTRAP_ADMIN_EMAIL = 'admin@example.com';
 
     await service.onModuleInit();
 
     expect(userService.ensureBootstrapAdmin).toHaveBeenCalledWith(
       'admin',
       'strong-password',
+      'admin@example.com',
     );
   });
 });

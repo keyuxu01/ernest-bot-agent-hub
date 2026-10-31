@@ -59,11 +59,11 @@ class DocumentReviewEntity {
   beforeStatus: DocumentStatus;
 
   /** 结案时间 */
-  @Column({ name: 'reviewed_at', type: 'timestamp', nullable: true })
+  @Column({ name: 'reviewed_at', type: 'timestamptz', nullable: true })
   reviewedAt?: Date | null;
 
   /** 提交审核时间 */
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 }
 

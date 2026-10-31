@@ -42,6 +42,17 @@ class UserService {
     return user;
   }
 
+  /** 邮箱须在未删除用户中唯一；exceptUserId 为本人时允许保持原邮箱 */
+  private async assertEmailAvailable(
+    email: string,
+    exceptUserId?: string,
+  ): Promise<void> {
+    const owner = await this.findByEmail(email);
+    if (owner && owner.id !== exceptUserId) {
+      throw new ConflictException('邮箱已被使用');
+    }
+  }
+
   async getRoleCodes(userId: string): Promise<string[]> {
     return this.userRepo.getRoleCodes(userId);
   }
@@ -90,11 +101,12 @@ class UserService {
     if (!user) {
       throw new UnauthorizedException('用户名或密码错误');
     }
-    if (user.status !== 1) {
-      throw new UnauthorizedException('账户已禁用');
-    }
+    // 待激活账户注册时 status 也为 0，须先判未激活，否则会误报"已禁用"
     if (user.emailVerified === 0) {
       throw new UnauthorizedException('账户未激活，请先验证邮箱');
+    }
+    if (user.status !== 1) {
+      throw new UnauthorizedException('账户已禁用');
     }
     const ok = await compare(password, user.password);
     if (!ok) {
@@ -119,8 +131,7 @@ class UserService {
       throw new ConflictException('用户名已存在');
     }
     if (input.email) {
-      const emailUsed = await this.findByEmail(input.email);
-      if (emailUsed) throw new ConflictException('邮箱已被使用');
+      await this.assertEmailAvailable(input.email);
     }
 
     const userId = nextSnowflakeId();
@@ -147,6 +158,9 @@ class UserService {
     if (exists) {
       throw new ConflictException('用户名已存在');
     }
+    if (dto.email) {
+      await this.assertEmailAvailable(dto.email);
+    }
     const userId = nextSnowflakeId();
     await this.userRepo.saveUser({
       id: userId,
@@ -165,6 +179,7 @@ class UserService {
 
   async updateUser(userId: string, dto: UpdateUserDto): Promise<UserVO> {
     const user = await this.findByIdOrThrow(userId);
+    if (dto.email) await this.assertEmailAvailable(dto.email, userId);
     if (dto.email !== undefined) user.email = dto.email;
     if (dto.realName !== undefined) user.realName = dto.realName;
     if (dto.avatar !== undefined) user.avatar = dto.avatar;
@@ -253,6 +268,7 @@ class UserService {
 
   async updateProfile(userId: string, dto: UpdateProfileDto): Promise<UserVO> {
     const user = await this.findByIdOrThrow(userId);
+    if (dto.email) await this.assertEmailAvailable(dto.email, userId);
     if (dto.email !== undefined) user.email = dto.email;
     if (dto.realName !== undefined) user.realName = dto.realName;
     if (dto.avatar !== undefined) user.avatar = dto.avatar;
@@ -311,12 +327,14 @@ class UserService {
 
   /**
    * 启动时按 AUTH_BOOTSTRAP_ADMIN_* 确保初始管理员存在（ROLE_ADMIN + ROLE_REVIEWER）
-   * 已存在则不做任何修改（不重置密码、不补角色）
+   * 已存在则不做任何修改（不重置密码、不补角色、不改邮箱）
+   * 不走邮件激活，创建即为已验证
    * @returns true 表示本次新建
    */
   async ensureBootstrapAdmin(
     username: string,
     password: string,
+    email: string,
   ): Promise<boolean> {
     if (await this.findByUsername(username)) {
       return false;
@@ -324,6 +342,7 @@ class UserService {
     const { userId } = await this.register({
       username,
       password,
+      email,
       realName: '系统管理员',
     });
     await this.assignRole(userId, RoleCode.ADMIN);

@@ -41,10 +41,13 @@ class AuthService implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     const username = this.config.get<string>('AUTH_BOOTSTRAP_ADMIN_USERNAME');
     const password = this.config.get<string>('AUTH_BOOTSTRAP_ADMIN_PASSWORD');
-    if (!username || !password) {
+    const email = this.config.get<string>('AUTH_BOOTSTRAP_ADMIN_EMAIL');
+    if (!username || !password || !email) {
       return;
     }
-    if (await this.userService.ensureBootstrapAdmin(username, password)) {
+    if (
+      await this.userService.ensureBootstrapAdmin(username, password, email)
+    ) {
       this.logger.log(`已创建初始管理员：username=${username}`);
     }
   }

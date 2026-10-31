@@ -56,7 +56,7 @@ describe('validateEnvironment', () => {
     );
   });
 
-  it('requires bootstrap admin username and password together', () => {
+  it('requires bootstrap admin username, password and email together', () => {
     expect(() =>
       validateEnvironment({
         ...validEnvironment,
@@ -67,7 +67,15 @@ describe('validateEnvironment', () => {
       validateEnvironment({
         ...validEnvironment,
         AUTH_BOOTSTRAP_ADMIN_USERNAME: 'admin',
+        AUTH_BOOTSTRAP_ADMIN_PASSWORD: 'strong-password',
+      }),
+    ).toThrow('must be set together');
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        AUTH_BOOTSTRAP_ADMIN_USERNAME: 'admin',
         AUTH_BOOTSTRAP_ADMIN_PASSWORD: '12345',
+        AUTH_BOOTSTRAP_ADMIN_EMAIL: 'admin@example.com',
       }),
     ).toThrow('at least 6 characters');
   });

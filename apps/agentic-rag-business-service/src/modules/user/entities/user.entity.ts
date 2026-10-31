@@ -36,13 +36,13 @@ class UserEntity {
   @Column({ type: 'smallint', default: 1 })
   status: number;
 
-  @Column({ name: 'last_login_at', type: 'timestamp', nullable: true })
+  @Column({ name: 'last_login_at', type: 'timestamptz', nullable: true })
   lastLoginAt?: Date | null;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
 
   @Column({ type: 'boolean', default: false })
