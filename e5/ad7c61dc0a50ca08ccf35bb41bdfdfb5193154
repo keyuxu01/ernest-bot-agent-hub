@@ -1,0 +1,176 @@
+apps/agentic-rag-business-service/__tests__/rbac-api.curl.md
+  s_648aabf0f6e214::t_3922ceae1e9d5a 88,91-92
+  s_648aabf0f6e214::t_3f066883db63fe 1-87,89-90,93-117
+apps/agentic-rag-business-service/src/modules/user/constants/permission.constants.ts
+  s_648aabf0f6e214::t_4b5faeadbbeb83 1-34
+apps/agentic-rag-business-service/src/modules/team/dto/team.dto.ts
+  s_648aabf0f6e214::t_174c81fb6e5ef3 1-89
+apps/agentic-rag-business-service/src/modules/user/user.service.ts
+  s_648aabf0f6e214::t_2b881af39c6b4a 84-90
+  s_648aabf0f6e214::t_77f3492dd45edb 151-154
+  s_648aabf0f6e214::t_ad1eaf2eedc5e6 18
+  s_648aabf0f6e214::t_8614d3a761a0ac 107-112
+  s_648aabf0f6e214::t_b0271a9be204d3 124-130
+  h_329e897ccf6193 119-121
+  s_648aabf0f6e214::t_16dc654db538e9 25-30
+  s_648aabf0f6e214::t_a26ede2bf12892 34
+apps/agentic-rag-business-service/src/modules/user/entities/user-permission.entity.ts
+  s_648aabf0f6e214::t_de367a8982ccfa 7,11,15,23
+  s_648aabf0f6e214::t_0c1be2bfbfc0a2 1-3,5-6,8-10,12-14,16-22,24-28
+  s_648aabf0f6e214::t_03343e566b0e3a 4
+apps/agentic-rag-business-service/src/modules/team/team.controller.ts
+  s_648aabf0f6e214::t_536a9d623547ea 1-16,18-20,25-26,32-37,44-49,55-61,67-72,78-82,88-93,100-105,112-117,123-130
+  s_648aabf0f6e214::t_118bbebb2c7170 21-24,27-31,38-43,50-54,62-66,73-77,83-87,94-99,106-111,118-122
+apps/agentic-rag-business-service/src/modules/user/dto/permission.dto.ts
+  s_648aabf0f6e214::t_2535de420bb4fe 1-122
+apps/agentic-rag-business-service/src/modules/auth/auth.module.ts
+  s_648aabf0f6e214::t_40f2209dcc5012 47-50
+  s_648aabf0f6e214::t_ecb50b38d6c47a 18
+  s_648aabf0f6e214::t_15b3bf861ba1ee 14
+apps/agentic-rag-business-service/src/modules/team/team.service.ts
+  s_648aabf0f6e214::t_ebb5fb36c83846 135
+  s_648aabf0f6e214::t_7371994940c97a 1-6,13-19,24-25,31-43,51-67,74-84,91-96,102-113,120,126-134,136-141,149-167,175-180,187-191,222-229
+  s_648aabf0f6e214::t_1d4c50bd51b813 20-23,26-30,44-50,68-73,85-90,97-101,114-118,121-125,142-148,168-174,181-186,193-196,216-221
+  s_648aabf0f6e214::t_4e39c08ec90259 192,197-215
+  s_648aabf0f6e214::t_29900b1bfe3e24 7
+  s_648aabf0f6e214::t_4aeebe045a5a84 8-12,119
+docs/architecture/decisions/0025-rag-business-permission-codes-and-teams.md
+  s_648aabf0f6e214::t_6e603eb2b5b8f7 1-26,28-35,44-53,57-65
+  s_648aabf0f6e214::t_b38b969a7eae39 54-56
+  s_648aabf0f6e214::t_c572660df2c622 27
+  s_648aabf0f6e214::t_d7effadfb92f26 66-71
+  s_648aabf0f6e214::t_b0eb133d409b57 40-43
+apps/agentic-rag-business-service/src/app.module.ts
+  s_648aabf0f6e214::t_e60b790cf4fbd3 18
+  s_648aabf0f6e214::t_a9c37b71bcdd45 42,50
+apps/agentic-rag-business-service/src/modules/user/repository/permission.repository.ts
+  s_648aabf0f6e214::t_3ffcfd63cf7f08 18-24,36-39,41,43,45,50-54,56,60-64,66,68,70,75-79,81,83,88-92,94,96,101-105,107-108,112-116,118,122-126,128,132-136,138,142-146,148,152-156,160,163-164,170,172,174,176,178,183-187,189,191,195-199,201,205-209,213,217-221,223,225,229-233,235,239-243,247,251-255,258,260,262,264,266,268,270,275-279,282,284,286,288,290,292,294,296
+  s_648aabf0f6e214::t_9cc175d767d6c2 1-17,25-35,40,42,44,46-49,55,57-59,65,67,69,71-74,80,82,84-87,93,95,97-100,106,109-111,117,119-121,127,129-131,137,139-141,147,149-151,157-159,161-162,165-169,171,173,175,177,179-182,188,190,192-194,200,202-204,214-216,222,224,226-228,234,236-238,248-250,256-257,259,261,263,265,267,269,271-274,280-281,283,285,287,289,291,293,295,297-302
+  s_648aabf0f6e214::t_b4a56a1abb5eb9 210-212,244-246
+apps/agentic-rag-business-service/src/modules/user/user.controller.ts
+  s_648aabf0f6e214::t_708d1e3de92be4 115,120,127-138,145-157
+  s_648aabf0f6e214::t_8a5104ef806f5b 121-126
+  s_648aabf0f6e214::t_440ce99ef9dd2e 139-144
+  s_648aabf0f6e214::t_3e0e7aaa9b3a1b 16,19,21,33-36
+  s_648aabf0f6e214::t_f862cb9a4ea090 28-32
+  s_648aabf0f6e214::t_67c2989a62f50f 107-112
+apps/agentic-rag-business-service/src/modules/team/type/team.types.ts
+  s_648aabf0f6e214::t_1ed65dca20a771 1-22
+apps/agentic-rag-business-service/src/modules/user/user.service.spec.ts
+  s_648aabf0f6e214::t_08cacb422215c8 93,95-97
+  s_648aabf0f6e214::t_6484c6db8af8c5 10
+  s_648aabf0f6e214::t_950fb57513167a 72,76,81
+  s_648aabf0f6e214::t_45b5918e88ddc2 52-55
+apps/agentic-rag-business-service/src/modules/document/document-parse.service.spec.ts
+  s_648aabf0f6e214::t_f02a6ac043a47b 97
+apps/agentic-rag-business-service/src/modules/user/permission.service.ts
+  s_648aabf0f6e214::t_f71252ca0953e4 1-30,37-42,47-50,57-62,68-71,78-95,103-128,135-149,155-165,170-171,177-186,193-197,205-218,224-227,235-247,254-270,277-281,288-297
+  s_648aabf0f6e214::t_278be1a5907e92 31-36,43-46,51-56,63-67,72-77,96-102,129-134,150-154,166-169,172-176,187-192,198-204,219-223,228-234,248-253,271-276,282-287
+apps/agentic-rag-business-service/src/modules/auth/guards/auth.guards.spec.ts
+  s_648aabf0f6e214::t_be8355871107d1 26
+  s_648aabf0f6e214::t_bc70e3326514b6 15-16
+  s_648aabf0f6e214::t_0e9e27c4930c17 147-201
+apps/agentic-rag-business-service/src/modules/user/entities/permission.entity.ts
+  s_648aabf0f6e214::t_2e161b944d54b6 1-9,11-12,14-16,18-25,27-29,31-38,40-42,44-46,48-50,52-54,56-58,60-62,64-66,68-70,72-74,76-80
+  s_648aabf0f6e214::t_03343e566b0e3a 10
+  s_648aabf0f6e214::t_98bb96d5093d1d 13,17,26,30,39,43,47,51,55,59,63,67,71,75
+apps/agentic-rag-business-service/src/modules/user/permission.controller.ts
+  s_648aabf0f6e214::t_b5becb8afbac6e 1-24,29-30,35-40,45-50,56-61,67-72,78-83,89-94,101-106,112-120
+  s_648aabf0f6e214::t_7c131acfe209ac 25-28,31-34,41-44,51-55,62-66,73-77,84-88,95-100,107-111
+apps/agentic-rag-business-service/src/modules/team/entities/team.entity.ts
+  s_648aabf0f6e214::t_03343e566b0e3a 10
+  s_648aabf0f6e214::t_5d3461876fc6da 13,17,21,25,29,38,47,51,55,59,63
+  s_648aabf0f6e214::t_94af2735fcff57 1-9,11-12,14-16,18-20,22-24,26-28,30-37,39-46,48-50,52-54,56-58,60-62,64-68
+apps/agentic-rag-business-service/src/modules/team/entities/team-member.entity.ts
+  s_648aabf0f6e214::t_03343e566b0e3a 4
+  s_648aabf0f6e214::t_67e3de00216385 7,11,15,19,28
+  s_648aabf0f6e214::t_5a0b77b93749ea 1-3,5-6,8-10,12-14,16-18,20-27,29-33
+init-scripts/postgresql/02-knowledge-hub.sql
+  s_648aabf0f6e214::t_00745620671eca 96-175,179-181,183-210
+  s_648aabf0f6e214::t_6fa3e1a2ea15bc 47
+  s_648aabf0f6e214::t_c35ec61ce6823c 93-95,176-178,182
+apps/agentic-rag-business-service/src/modules/team/constants/team.constants.ts
+  s_648aabf0f6e214::t_667e92fbea8c41 1-4
+apps/agentic-rag-business-service/src/modules/user/entities/role-permission.entity.ts
+  s_648aabf0f6e214::t_2f1e009b5a2825 1-3,5-6,8-10,12-14,16-22,24-28
+  s_648aabf0f6e214::t_03343e566b0e3a 4
+  s_648aabf0f6e214::t_cc3b50e674460d 7,11,15,23
+apps/agentic-rag-business-service/src/modules/user/permission.service.spec.ts
+  s_648aabf0f6e214::t_2aeb9477b81bda 1-95,97-142
+  s_648aabf0f6e214::t_f02a6ac043a47b 96
+apps/agentic-rag-business-service/src/modules/auth/decorators/require-permission.decorator.ts
+  s_648aabf0f6e214::t_071a592a2fb3c2 5-10
+  s_648aabf0f6e214::t_cc111a0ebb4c4c 1-4,11-14
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_648aabf0f6e214::t_92f5850b64121c 797
+  s_648aabf0f6e214::t_dfccce865902c0 512-518
+  s_648aabf0f6e214::t_02a9c9fc088a1f 632-634,661-663,796,798
+  s_648aabf0f6e214::t_22979a68b65bea 794-795,799-806
+  s_648aabf0f6e214::t_27ac6ef020be63 763-776,779-780
+  s_648aabf0f6e214::t_8bf17313c3c8cc 735-744,746-753
+  s_648aabf0f6e214::t_581df43dffefc3 83-84
+  s_648aabf0f6e214::t_42386f9e2840de 399-511,519-573
+apps/agentic-rag-business-service/src/modules/auth/auth.service.spec.ts
+  s_648aabf0f6e214::t_f02a6ac043a47b 20
+  s_648aabf0f6e214::t_0555c757e3e05b 33-36
+  s_648aabf0f6e214::t_b28d5da4d4252e 79
+  s_648aabf0f6e214::t_b923b2d9e56de6 7
+apps/agentic-rag-business-service/src/modules/auth/auth.service.ts
+  s_648aabf0f6e214::t_ae4147007e2438 57-60
+  s_648aabf0f6e214::t_ffd7a3be2b1fba 43-45
+  s_648aabf0f6e214::t_f13f31727ecd31 39
+  h_329e897ccf6193 15
+apps/agentic-rag-business-service/src/modules/user/type/user.types.ts
+  s_648aabf0f6e214::t_82389d8e439940 14-15
+  s_648aabf0f6e214::t_dffccba59e3604 2
+  s_648aabf0f6e214::t_5fc182b00534d5 41-58
+apps/agentic-rag-business-service/src/modules/user/user.module.ts
+  s_648aabf0f6e214::t_5acc9192f8f997 4-5,7,10-12,20-23,26-33,37-46
+apps/agentic-rag-business-service/src/modules/auth/guards/permissions.guard.ts
+  s_648aabf0f6e214::t_f7d689524b199a 21-24,27-31,33
+  s_648aabf0f6e214::t_032f2c6cbf9f13 1-20,25-26,32,34-37,39-42,44-45,47-50,52-55,57-66
+  s_648aabf0f6e214::t_33806cc4855cae 38,43,46,51,56
+apps/agentic-rag-business-service/src/modules/auth/guards/roles.guard.ts
+  s_648aabf0f6e214::t_d61fc7fc3da00a 12
+apps/agentic-rag-business-service/src/modules/team/team.module.ts
+  s_648aabf0f6e214::t_c072af3b281542 1-21
+apps/agentic-rag-business-service/src/modules/document/document-review.service.spec.ts
+  s_648aabf0f6e214::t_f02a6ac043a47b 63
+apps/agentic-rag-business-service/src/modules/document/document.service.spec.ts
+  s_648aabf0f6e214::t_f02a6ac043a47b 226
+docs/architecture/README.md
+  s_648aabf0f6e214::t_4c3cd5d4594f4d 275-279,281
+  s_648aabf0f6e214::t_e54fc1b957618c 280
+  s_648aabf0f6e214::t_569806a2155f15 284-285
+  s_648aabf0f6e214::t_edd42372192e95 335
+apps/agentic-rag-business-service/src/modules/user/role.controller.ts
+  s_648aabf0f6e214::t_08e02f014293a6 83-87
+  s_648aabf0f6e214::t_70f0640d086619 21-25
+  s_648aabf0f6e214::t_f22bfb477bcbbf 95-100
+  s_648aabf0f6e214::t_91cf51deb1cae9 11,13,15,26-29
+  s_648aabf0f6e214::t_85dcd3ec9d0755 82,88-94,101-112
+apps/agentic-rag-business-service/src/modules/team/repository/team.repository.ts
+  s_648aabf0f6e214::t_372dcbc5393e68 16-21,31-35,37-38,42-46,48,52-56,58,62-66,68,72-75,77,79,81,86-90,94,97,102,104,107,109,111,113,115,120-124,126,130-135,140,144-148,150,154-158,160,164-169,171,175-179,181,185-189,191-210
+  s_648aabf0f6e214::t_3162ff022d710c 1-15,22-30,36,39-41,47,49-51,57,59-61,67,69-71,76,78,80,82-85,91-93,95-96,98-101,103,105-106,108,110,112,114,116-119,125,127-129,136-139,141-143,149,151-153,159,161-163,170,172-174,180,182-184,190,211-214
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.51-trip",
+  "base_commit_sha": "e5ad7c61dc0a50ca08ccf35bb41bdfdfb5193154",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_648aabf0f6e214": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_61150004-3e58-4fd6-a33f-cdc940b25f65",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
