@@ -289,10 +289,11 @@ export {
   RagBusinessKgBuildTypeSchema,
 } from './rag-business/kg-build';
 export {
-  RagBusinessSearchDocumentSchema,
   RagBusinessSearchIndexMessageV1Schema,
+  RagBusinessSearchIndexTypeSchema,
 } from './rag-business/search-index';
 export type {
-  RagBusinessSearchDocument,
   RagBusinessSearchIndexMessageV1,
+  RagBusinessSearchIndexMessageV1Input,
+  RagBusinessSearchIndexType,
 } from './rag-business/search-index';

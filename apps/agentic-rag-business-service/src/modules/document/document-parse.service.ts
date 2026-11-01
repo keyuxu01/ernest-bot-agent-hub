@@ -44,13 +44,17 @@ class DocumentParseService {
   ) {}
 
   /**
-   * @param uploaded `@UploadedFile()` 的原始值；未上传 `file` 字段时为 undefined
+   * @description 上传文件 → 转 Markdown → 原文件与图片存 RustFS → 以草稿创建文档；作者 / 创建人取登录用户
+   * @param uploaded unknown，`@UploadedFile()` 的原始值；未上传 `file` 字段时为 undefined
+   * @param dto UploadParseDocumentDto，multipart 文本字段：标题、分类、团队、标签、备注
+   * @param actor AuthUser，当前登录用户，透传给 DocumentService.create 写 authorId / createBy / updateBy
+   * @returns Promise<UploadParseDocumentResult>，新草稿 ID、标题、解析器、字数、图片数与原文件信息
    * @throws HttpException 响应体 `{ statusCode, code, message }`，code 见 `documentUploadErrorCodeSchema`
    */
   async uploadAndParse(
     uploaded: unknown,
     dto: UploadParseDocumentDto,
-    actor?: AuthUser,
+    actor: AuthUser,
   ): Promise<UploadParseDocumentResult> {
     const parsedFile = uploadedDocumentFileSchema.safeParse(uploaded);
     if (!parsedFile.success) {
@@ -110,10 +114,8 @@ class DocumentParseService {
         status: DocumentStatus.Draft,
         categoryId: dto.categoryId,
         teamId: dto.teamId,
-        authorId: dto.authorId,
         tags: dto.tags,
         remark: dto.remark,
-        createBy: dto.createBy,
       },
       actor,
     );

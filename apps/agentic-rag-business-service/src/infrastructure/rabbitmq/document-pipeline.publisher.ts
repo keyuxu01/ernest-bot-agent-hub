@@ -6,7 +6,7 @@ import {
   RagBusinessSearchIndexMessageV1Schema,
   type RagBusinessKgBuildMessageV1Input,
   type RagBusinessReindexMessageV1Input,
-  type RagBusinessSearchDocument,
+  type RagBusinessSearchIndexMessageV1Input,
 } from '@repo/contracts';
 import {
   KG_GRAPH_EXCHANGE,
@@ -35,14 +35,15 @@ class DocumentPipelinePublisher {
   constructor(private readonly rabbit: RabbitMqService) {}
 
   /**
-   * 发布成功后调用：并行投递 RAG / Search / KG。
-   * @param document 业务层已截断正文的快照；基础设施不依赖 DocumentEntity。
+   * @description 发布成功后调用：并行投递 RAG / Search / KG，三条消息都只带文档 ID
+   * @param documentId string，已进入 Published 的文档 ID
+   * @returns Promise<void>，单条投递失败只记日志
    */
-  async afterPublish(document: RagBusinessSearchDocument) {
+  async afterPublish(documentId: string) {
     await Promise.all([
-      this.triggerRagReindex(document.id),
-      this.triggerSearchIndex(document),
-      this.triggerKgBuild(document.id),
+      this.triggerRagReindex(documentId),
+      this.triggerSearchIndex(documentId),
+      this.triggerKgBuild(documentId),
     ]);
   }
 
@@ -122,15 +123,16 @@ class DocumentPipelinePublisher {
   }
 
   /**
-   * Search：消息内直接带文档快照，消费者无需再查库也能写索引。
-   * content 只截前 1000 字，控制消息体积。
+   * @description Search：只投 documentId，消费者从 Postgres + Mongo 拉全文再写 ES，
+   * 避免 MQ 塞正文、也不再截断前 1000 字
+   * @param documentId string，文档 ID
+   * @returns Promise<void>，投递失败只记日志
    */
-  private async triggerSearchIndex(document: RagBusinessSearchDocument) {
-    const message = {
+  private async triggerSearchIndex(documentId: string) {
+    const message: RagBusinessSearchIndexMessageV1Input = {
       taskId: randomUUID(),
       type: 'INDEX',
-      documentId: document.id,
-      document: document,
+      documentId,
     };
     const ok = await this.rabbit.publish(
       SEARCH_INDEX_EXCHANGE,
@@ -138,12 +140,17 @@ class DocumentPipelinePublisher {
       RagBusinessSearchIndexMessageV1Schema.parse(message),
     );
     this.logger.log(
-      `ES 搜索索引${ok ? '已投递' : '投递失败'}：documentId=${document.id}, taskId=${message.taskId}`,
+      `ES 搜索索引${ok ? '已投递' : '投递失败'}：documentId=${documentId}, taskId=${message.taskId}`,
     );
   }
 
+  /**
+   * @description Search：投递按文档 ID 删除 kh_document 记录的命令
+   * @param documentId string，文档 ID
+   * @returns Promise<void>，投递失败只记日志
+   */
   private async triggerSearchDelete(documentId: string) {
-    const message = {
+    const message: RagBusinessSearchIndexMessageV1Input = {
       taskId: randomUUID(),
       type: 'DELETE',
       documentId,

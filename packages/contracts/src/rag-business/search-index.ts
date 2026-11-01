@@ -1,51 +1,33 @@
 import { z } from 'zod';
 
-/** 文档级搜索快照；正文仅携带前 1000 个 UTF-16 码元，不是完整正文。 */
-const RagBusinessSearchDocumentSchema = z.object({
-  id: z.string().min(1),
-  title: z.string(),
-  summary: z.string().nullable(),
-  content: z.string().max(1000).nullable(),
-  categoryId: z.string().nullable(),
-  tags: z.string().nullable(),
-  status: z.number().int(),
-  isPublic: z.boolean(),
-  viewCount: z.number().int(),
-  likeCount: z.number().int(),
-  commentCount: z.number().int(),
-  authorId: z.string().nullable(),
-  publishTime: z.iso.datetime().nullable(),
-  createdAt: z.iso.datetime().nullable(),
-  updatedAt: z.iso.datetime().nullable(),
+/** 搜索索引命令类型：INDEX 写入 / 覆盖，DELETE 删除 */
+const RagBusinessSearchIndexTypeSchema = z.enum(['INDEX', 'DELETE']);
+
+/**
+ * 文档搜索索引消息（kh_document）
+ *
+ * 只带文档 ID：INDEX 由消费者从 Postgres + Mongo 读取全文再写 ES，
+ * 与 RAG / KG 消息一致，正文不进 broker，也不再截断。
+ * 旧版消息多带的 `document` 快照字段会被忽略。
+ */
+const RagBusinessSearchIndexMessageV1Schema = z.object({
+  schemaVersion: z.literal(1).default(1),
+  taskId: z.string().uuid(),
+  type: RagBusinessSearchIndexTypeSchema,
+  documentId: z.string().min(1),
 });
 
-/** INDEX 必须携带快照且 ID 一致；DELETE 只需文档 ID。消费端必须再次校验。 */
-const RagBusinessSearchIndexMessageV1Schema = z
-  .discriminatedUnion('type', [
-    z.object({
-      schemaVersion: z.literal(1).default(1),
-      taskId: z.string().uuid(),
-      type: z.literal('INDEX'),
-      documentId: z.string().min(1),
-      document: RagBusinessSearchDocumentSchema,
-    }),
-    z.object({
-      schemaVersion: z.literal(1).default(1),
-      taskId: z.string().uuid(),
-      type: z.literal('DELETE'),
-      documentId: z.string().min(1),
-    }),
-  ])
-  .refine(
-    message => message.type === 'DELETE' || message.document.id === message.documentId,
-    {
-      message: '搜索快照 ID 与 documentId 不一致',
-    },
-  );
-
-type RagBusinessSearchDocument = z.output<typeof RagBusinessSearchDocumentSchema>;
+type RagBusinessSearchIndexType = z.output<typeof RagBusinessSearchIndexTypeSchema>;
+type RagBusinessSearchIndexMessageV1Input = z.input<
+  typeof RagBusinessSearchIndexMessageV1Schema
+>;
 type RagBusinessSearchIndexMessageV1 = z.output<
   typeof RagBusinessSearchIndexMessageV1Schema
 >;
-export { RagBusinessSearchDocumentSchema, RagBusinessSearchIndexMessageV1Schema };
-export type { RagBusinessSearchDocument, RagBusinessSearchIndexMessageV1 };
+
+export { RagBusinessSearchIndexMessageV1Schema, RagBusinessSearchIndexTypeSchema };
+export type {
+  RagBusinessSearchIndexMessageV1,
+  RagBusinessSearchIndexMessageV1Input,
+  RagBusinessSearchIndexType,
+};

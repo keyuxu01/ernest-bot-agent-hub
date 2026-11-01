@@ -277,8 +277,9 @@ permission codes (direct ∪ role; `ROLE_ADMIN` also gets a fixed admin set), re
 `AuthUser.permissions` and checked by a third global `PermissionsGuard` on `@RequirePermission()` routes
 (admins bypass it). Admins manage permissions through `/permissions`, role / user bindings through
 `/roles/:id/permissions` and `/users/:id/permissions`, and teams (`kh_team` / `kh_team_member`) through
-`/teams` (admin only). Document and review routes are still role-only; there is no document
-ownership check, tokens are not revocable and login / reset codes have no rate limit. This is separate from UserPlatform (ADR-0018). Token verification uses
+`/teams` (admin only). Document routes also check `document:*` codes (review decisions still need
+`ROLE_REVIEWER` / `ROLE_ADMIN`), and author / creator / updater always come from the logged-in user;
+there is no document ownership check, tokens are not revocable and login / reset codes have no rate limit. This is separate from UserPlatform (ADR-0018). Token verification uses
 passport-jwt (`JwtStrategy`), and user resolution is isolated in `AuthService.buildAuthUser()` so it can
 later move to UserPlatform-issued tokens. See
 [ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md) and
@@ -305,8 +306,20 @@ Publish and soft delete also send `RagBusinessKgBuildMessageV1` (document IDs on
 relations per chunk with the Qwen chat model from `src/infrastructure/chat-model`, and writes
 `KnowledgeDocument` / `DocumentChunk` / `KnowledgeEntity` nodes through `GraphStoreService` in
 `src/infrastructure/neo4j`. Each build deletes the document's previous graph first. Neo4j is required at
-startup like RabbitMQ and Elasticsearch. Delivery has the same no-outbox / no-DLQ limits as RAG, and there
-is no graph query API yet. See [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md).
+startup like RabbitMQ and Elasticsearch. Delivery has the same no-outbox / no-DLQ limits as RAG.
+Logged-in users can read the graph through `GET /graph/search|nodes|edges`. See
+[ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md) and
+[ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md).
+
+## Document Search Boundary
+
+Publish also sends `RagBusinessSearchIndexMessageV1` with only the document ID. The consumer loads
+PostgreSQL metadata and the full Mongo body and overwrites one Elasticsearch `kh_document` record per
+document, using IK analyzers (`ik_max_word` at index time, `ik_smart` at query time). `POST /search`
+(permission code `search`) runs a weighted `multi_match` over title, summary and body with highlights.
+Read failures in Search and Graph queries are logged and return empty results; index writes still fail
+the message. See [ADR-0021](./decisions/0021-document-search-index.md) and
+[ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md).
 
 ## Architecture Decision Records
 
@@ -333,6 +346,7 @@ is no graph query API yet. See [ADR-0022](./decisions/0022-use-neo4j-for-knowled
 | [ADR-0023](./decisions/0023-document-publish-review-workflow.md)         | Publish review workflow and status-driven index sync | Accepted   |
 | [ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md)     | RagBusiness built-in accounts, JWT auth and roles    | Accepted   |
 | [ADR-0025](./decisions/0025-rag-business-permission-codes-and-teams.md)  | RagBusiness permission-code RBAC and teams           | Accepted   |
+| [ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md)  | RagBusiness full-text search and graph read APIs     | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

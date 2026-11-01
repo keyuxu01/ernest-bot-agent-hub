@@ -98,6 +98,12 @@ describe('Business service (e2e)', () => {
       .useValue({
         indexDocument: async () => undefined,
         deleteDocument: async () => undefined,
+        searchDocuments: async (params: { keyword: string }) => ({
+          items: [{ id: '1', title: params.keyword }],
+          total: 1,
+          page: 1,
+          pageSize: 10,
+        }),
       })
       .overrideProvider(VectorIndexService)
       .useValue({
@@ -111,6 +117,11 @@ describe('Business service (e2e)', () => {
         upsertChunk: async () => undefined,
         writeExtraction: async () => 0,
         deleteByDocId: async () => undefined,
+        searchGraph: async (keyword: string) => [
+          { id: keyword, name: keyword },
+        ],
+        listNodes: async () => [{ id: '财务部', name: '财务部' }],
+        listEdges: async () => [],
       })
       // Redis 用内存实现，e2e 不依赖本地 Redis；SMTP 不发真实邮件，记录最后一封
       .overrideProvider(RedisService)
@@ -272,6 +283,12 @@ describe('Business service (e2e)', () => {
       .set(as(author.token))
       .send({ title: 'e2e 审核流', content: '# e2e\n\n正文' })
       .expect(201);
+    // 作者 / 创建人只取登录用户，请求体传 authorId / createBy 直接被拒
+    await request(server)
+      .post('/documents')
+      .set(as(author.token))
+      .send({ title: 'x', content: 'x', authorId: reviewer.userId })
+      .expect(400);
     const documentId: string = created.body.id;
     createdDocumentIds.push(documentId);
     expect(created.body).toMatchObject({
@@ -440,7 +457,9 @@ describe('Business service (e2e)', () => {
       .get('/roles/2000000000000000002/permissions')
       .set(as(admin.token))
       .expect(200);
+    // 审核员：搜索、文档列表、文档审核
     expect(reviewerPerms.body.permissionIds.sort()).toEqual([
+      '4000000000000000003',
       '4000000000000000011',
       '4000000000000000015',
     ]);
@@ -569,6 +588,56 @@ describe('Business service (e2e)', () => {
       .get(`/teams/${teamId}`)
       .set(as(admin.token))
       .expect(404);
+  });
+
+  it('searches documents and the graph with login and permission checks', async () => {
+    const user = await loginAsNewUser();
+    const server = app.getHttpServer();
+    const as = { Authorization: `Bearer ${user.token}` };
+
+    await request(server).post('/search').send({ keyword: 'x' }).expect(401);
+    await request(server).post('/search').set(as).send({}).expect(400);
+    // ROLE_USER 预置绑定了 search 权限码
+    const found = await request(server)
+      .post('/search')
+      .set(as)
+      .send({ keyword: '安装' })
+      .expect(201);
+    expect(found.body).toMatchObject({ total: 1, items: [{ title: '安装' }] });
+
+    // 去掉 search 权限后 403（权限每次请求重读）
+    const db = app.get(DataSource);
+    await db.query(
+      `INSERT INTO kh_user_role (id, user_id, role_id)
+       SELECT $1, $2, id FROM kh_role WHERE role_code = 'ROLE_REVIEWER'`,
+      [nextSnowflakeId(), user.userId],
+    );
+    await db.query(
+      `DELETE FROM kh_user_role WHERE user_id = $1
+       AND role_id = (SELECT id FROM kh_role WHERE role_code = 'ROLE_USER')`,
+      [user.userId],
+    );
+    await request(server)
+      .post('/documents')
+      .set(as)
+      .send({ title: 'x', content: 'x' })
+      .expect(403);
+    await request(server)
+      .post('/search')
+      .set(as)
+      .send({ keyword: '安装' })
+      .expect(201);
+
+    await request(server).get('/graph/nodes').expect(401);
+    const graph = await request(server)
+      .get('/graph/search')
+      .query({ keyword: '财务' })
+      .set(as)
+      .expect(200);
+    expect(graph.body).toEqual([{ id: '财务', name: '财务' }]);
+    await request(server).get('/graph/search').set(as).expect(400);
+    await request(server).get('/graph/nodes').set(as).expect(200);
+    await request(server).get('/graph/edges').set(as).expect(200);
   });
 
   it('updates the profile, statistics and password of the current user', async () => {

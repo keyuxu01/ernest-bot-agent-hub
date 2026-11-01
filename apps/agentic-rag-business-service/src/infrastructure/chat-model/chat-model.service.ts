@@ -14,7 +14,7 @@ import { ChatOpenAI } from '@langchain/openai';
  * 环境变量：
  * - `QWEN_LLM_API_KEY` / `QWEN_CODER_TURBO_MODEL_BASE_URL`（与 Embedding 共用）
  * - `CHAT_MODEL_NAME`：如 qwen-plus
- * - `CHAT_MODEL_TIMEOUT_MS`：qwen-plus + 完整抽取 prompt 常超过 20s，建议 60000
+ * - `CHAT_MODEL_TIMEOUT_MS`：qwen-plus + 完整抽取 prompt 常超过 20s，建议 120000
  */
 @Injectable()
 class ChatModelService {

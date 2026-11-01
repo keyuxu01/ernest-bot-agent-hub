@@ -1,3 +1,4 @@
+import type { AuthUser } from '../user/type/user.types';
 import { HttpException, NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DocumentPipelinePublisher } from '../../infrastructure/rabbitmq/document-pipeline.publisher';
@@ -12,6 +13,17 @@ import type { DocumentContentRepository } from './repository/document-content.re
 import type { DocumentReviewRepository } from './repository/document-review.repository';
 import type { DocumentRepository } from './repository/document.repository';
 import type { DocumentLifecycleErrorCode } from './type/document-lifecycle.types';
+
+/** 当前登录用户：authorId / createBy / updateBy 都取它 */
+const actor: AuthUser = {
+  userId: '20001',
+  username: 'alice',
+  realName: null,
+  email: null,
+  avatar: null,
+  roles: ['ROLE_USER'],
+  permissions: [],
+};
 
 function draftDoc(overrides: Partial<DocumentEntity> = {}): DocumentEntity {
   return {
@@ -88,7 +100,6 @@ beforeEach(() => {
 
   // 索引同步用真实实现，断言最终投递到 publisher 的命令
   const indexSync = new DocumentIndexSyncService(
-    contentRepo as unknown as DocumentContentRepository,
     pipelinePublisher as unknown as DocumentPipelinePublisher,
   );
   service = new DocumentService(
@@ -104,14 +115,13 @@ describe('DocumentService.publish（免审）', () => {
   it('publishes a draft and enqueues RAG reindex', async () => {
     documentRepo.findActiveById.mockResolvedValue(draftDoc());
 
-    const result = await service.publish('10001');
+    const result = await service.publish('10001', actor);
 
     expect(result.status).toBe(DocumentStatus.Published);
     expect(result.content).toBe('正文');
     expect(result.publishTime).toBeInstanceOf(Date);
-    expect(pipelinePublisher.afterPublish).toHaveBeenCalledWith(
-      expect.objectContaining({ id: '10001', content: '正文' }),
-    );
+    // 只投递文档 ID，正文由消费者从库里读
+    expect(pipelinePublisher.afterPublish).toHaveBeenCalledWith('10001');
     expect(reviewService.submit).not.toHaveBeenCalled();
   });
 
@@ -119,24 +129,22 @@ describe('DocumentService.publish（免审）', () => {
     documentRepo.findActiveById.mockResolvedValue(draftDoc());
     pipelinePublisher.afterPublish.mockRejectedValue(new Error('broker down'));
 
-    const result = await service.publish('10001');
+    const result = await service.publish('10001', actor);
 
     expect(result.status).toBe(DocumentStatus.Published);
     expect(pipelinePublisher.afterPublish).toHaveBeenCalled();
   });
 
-  it('caps the search snapshot without truncating returned content', async () => {
+  it('returns the full body and only enqueues the document id', async () => {
     documentRepo.findActiveById.mockResolvedValue(draftDoc());
     contentRepo.findActiveContentById.mockResolvedValue({
       content: '文'.repeat(1001),
     });
 
-    const result = await service.publish('10001');
+    const result = await service.publish('10001', actor);
 
     expect(result.content).toHaveLength(1001);
-    expect(pipelinePublisher.afterPublish).toHaveBeenCalledWith(
-      expect.objectContaining({ content: '文'.repeat(1000) }),
-    );
+    expect(pipelinePublisher.afterPublish).toHaveBeenCalledWith('10001');
   });
 
   it('republishes an archived document', async () => {
@@ -144,7 +152,7 @@ describe('DocumentService.publish（免审）', () => {
       draftDoc({ status: DocumentStatus.Archived }),
     );
 
-    const result = await service.publish('10001');
+    const result = await service.publish('10001', actor);
 
     expect(result.status).toBe(DocumentStatus.Published);
     expect(pipelinePublisher.afterPublish).toHaveBeenCalled();
@@ -155,14 +163,14 @@ describe('DocumentService.publish（免审）', () => {
       draftDoc({ status: DocumentStatus.PendingReview }),
     );
 
-    await expectCode(service.publish('10001'), 'DOCUMENT_UNDER_REVIEW');
+    await expectCode(service.publish('10001', actor), 'DOCUMENT_UNDER_REVIEW');
     expect(pipelinePublisher.afterPublish).not.toHaveBeenCalled();
   });
 
   it('rejects missing documents', async () => {
     documentRepo.findActiveById.mockResolvedValue(null);
 
-    await expect(service.publish('missing')).rejects.toBeInstanceOf(
+    await expect(service.publish('missing', actor)).rejects.toBeInstanceOf(
       NotFoundException,
     );
   });
@@ -183,9 +191,9 @@ describe('DocumentService.publish（开启审核）', () => {
       draftDoc({ status: DocumentStatus.PendingReview }),
     );
 
-    const result = await service.publish('10001');
+    const result = await service.publish('10001', actor);
 
-    expect(reviewService.submit).toHaveBeenCalledWith('10001');
+    expect(reviewService.submit).toHaveBeenCalledWith('10001', actor);
     expect(result.status).toBe(DocumentStatus.PendingReview);
     expect(result.content).toBe('正文');
     expect(documentRepo.save).not.toHaveBeenCalled();
@@ -197,45 +205,29 @@ describe('DocumentService.create', () => {
   const dto = { title: '标题', content: '正文' };
 
   it('creates a draft without indexing', async () => {
-    const result = await service.create(dto);
+    const result = await service.create(dto, actor);
 
     expect(result.status).toBe(DocumentStatus.Draft);
     expect(pipelinePublisher.afterPublish).not.toHaveBeenCalled();
   });
 
   it('indexes a document created as published when approval is off', async () => {
-    const result = await service.create({
-      ...dto,
-      status: DocumentStatus.Published,
-    });
+    const result = await service.create(
+      {
+        ...dto,
+        status: DocumentStatus.Published,
+      },
+      actor,
+    );
 
     expect(result.publishTime).toBeInstanceOf(Date);
-    expect(pipelinePublisher.afterPublish).toHaveBeenCalledWith(
-      expect.objectContaining({ content: '正文' }),
-    );
+    expect(pipelinePublisher.afterPublish).toHaveBeenCalledWith(result.id);
   });
 
-  it('records the logged-in user as creator instead of the request body', async () => {
-    const actor = {
-      userId: '20001',
-      username: 'alice',
-      realName: null,
-      email: null,
-      avatar: null,
-      roles: [],
-      permissions: [],
-    };
-
-    // createBy 以登录用户为准；authorId 可代填
-    await expect(
-      service.create({ ...dto, createBy: '99999', authorId: '30001' }, actor),
-    ).resolves.toMatchObject({
+  it('records the logged-in user as author, creator and updater', async () => {
+    await expect(service.create(dto, actor)).resolves.toMatchObject({
       createBy: '20001',
       updateBy: '20001',
-      authorId: '30001',
-    });
-    // authorId 未传时取登录用户
-    await expect(service.create(dto, actor)).resolves.toMatchObject({
       authorId: '20001',
     });
   });
@@ -244,7 +236,7 @@ describe('DocumentService.create', () => {
     reviewService.isApprovalRequired.mockReturnValue(true);
 
     await expectCode(
-      service.create({ ...dto, status: DocumentStatus.Published }),
+      service.create({ ...dto, status: DocumentStatus.Published }, actor),
       'DOCUMENT_APPROVAL_REQUIRED',
     );
     expect(contentRepo.create).not.toHaveBeenCalled();
@@ -254,7 +246,7 @@ describe('DocumentService.create', () => {
     'rejects creating with status %s',
     async (status) => {
       await expectCode(
-        service.create({ ...dto, status }),
+        service.create({ ...dto, status }, actor),
         'DOCUMENT_CREATE_STATUS_INVALID',
       );
       expect(contentRepo.create).not.toHaveBeenCalled();
@@ -269,7 +261,7 @@ describe('DocumentService.update', () => {
     );
 
     await expectCode(
-      service.update('10001', { content: '新正文' }),
+      service.update('10001', { content: '新正文' }, actor),
       'DOCUMENT_UNDER_REVIEW',
     );
     expect(contentRepo.updateContent).not.toHaveBeenCalled();
@@ -281,7 +273,7 @@ describe('DocumentService.update', () => {
       draftDoc({ status: DocumentStatus.PendingReview }),
     );
 
-    const result = await service.update('10001', { tags: 'a,b' });
+    const result = await service.update('10001', { tags: 'a,b' }, actor);
 
     expect(result.tags).toBe('a,b');
     expect(pipelinePublisher.afterPublish).not.toHaveBeenCalled();
@@ -294,7 +286,7 @@ describe('DocumentService.update', () => {
     );
 
     await expectCode(
-      service.update('10001', { title: '新标题' }),
+      service.update('10001', { title: '新标题' }, actor),
       'DOCUMENT_PUBLISHED_EDIT_REQUIRES_DRAFT',
     );
     expect(documentRepo.save).not.toHaveBeenCalled();
@@ -306,10 +298,14 @@ describe('DocumentService.update', () => {
       draftDoc({ status: DocumentStatus.Published }),
     );
 
-    const result = await service.update('10001', {
-      status: DocumentStatus.Draft,
-      content: '新正文',
-    });
+    const result = await service.update(
+      '10001',
+      {
+        status: DocumentStatus.Draft,
+        content: '新正文',
+      },
+      actor,
+    );
 
     expect(result.status).toBe(DocumentStatus.Draft);
     expect(result.content).toBe('新正文');
@@ -322,11 +318,9 @@ describe('DocumentService.update', () => {
       draftDoc({ status: DocumentStatus.Published }),
     );
 
-    await service.update('10001', { content: '新正文' });
+    await service.update('10001', { content: '新正文' }, actor);
 
-    expect(pipelinePublisher.afterPublish).toHaveBeenCalledWith(
-      expect.objectContaining({ content: '新正文' }),
-    );
+    expect(pipelinePublisher.afterPublish).toHaveBeenCalledWith('10001');
   });
 
   it('does not reindex a published document for metadata-only edits', async () => {
@@ -334,7 +328,7 @@ describe('DocumentService.update', () => {
       draftDoc({ status: DocumentStatus.Published }),
     );
 
-    await service.update('10001', { tags: 'a' });
+    await service.update('10001', { tags: 'a' }, actor);
 
     expect(pipelinePublisher.afterPublish).not.toHaveBeenCalled();
     expect(pipelinePublisher.afterUnpublish).not.toHaveBeenCalled();
@@ -348,7 +342,7 @@ describe('DocumentService.update', () => {
     documentRepo.findActiveById.mockResolvedValue(draftDoc({ status: from }));
 
     await expectCode(
-      service.update('10001', { status: to }),
+      service.update('10001', { status: to }, actor),
       'DOCUMENT_STATUS_CHANGE_NOT_ALLOWED',
     );
     expect(documentRepo.save).not.toHaveBeenCalled();
@@ -366,9 +360,10 @@ describe('DocumentService.archive / saveAsDraft', () => {
         draftDoc({ status: DocumentStatus.Published }),
       );
 
-      const result = await service[method]('10001');
+      const result = await service[method]('10001', actor);
 
       expect(result.status).toBe(target);
+      expect(result.updateBy).toBe('20001');
       expect(pipelinePublisher.afterUnpublish).toHaveBeenCalledWith('10001');
     },
   );
@@ -379,7 +374,7 @@ describe('DocumentService.archive / saveAsDraft', () => {
       documentRepo.findActiveById.mockResolvedValue(draftDoc());
 
       await expectCode(
-        service[method]('10001'),
+        service[method]('10001', actor),
         'DOCUMENT_TRANSITION_NOT_ALLOWED',
       );
       expect(documentRepo.save).not.toHaveBeenCalled();
@@ -396,11 +391,12 @@ describe('DocumentService.remove', () => {
       new Error('broker down'),
     );
 
-    await expect(service.remove('10001')).resolves.toEqual({
+    await expect(service.remove('10001', actor)).resolves.toEqual({
       id: '10001',
       deleted: true,
     });
     expect(doc.deleted).toBe(true);
+    expect(doc.updateBy).toBe('20001');
     expect(reviewRepo.saveDeletedDocument).toHaveBeenCalledWith(
       doc,
       expect.any(String),

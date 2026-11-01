@@ -10,7 +10,10 @@ import { GRAPH_CONSTRAINT_STATEMENTS } from './constants/graph-store.constants';
 import type {
   GraphChunkNode,
   GraphDocumentNode,
+  GraphEdgeVO,
   GraphExtraction,
+  GraphNodeVO,
+  GraphSearchHitVO,
 } from './type/graph-store.types';
 
 /**
@@ -27,6 +30,7 @@ import type {
  * - 写入抽取结果：实体 / MENTIONS / RELATED_TO（writeExtraction）
  *   RELATED_TO 边属性：weight 取各块证据强度最大值；chunkIds 为去重来源块，mentions = size(chunkIds)
  * - 按文档 ID 删除文档、块、只由本文档支撑的关系边，以及删除后无人提及的孤儿实体
+ * - 只读查询：实体节点、RELATED_TO 边、关键词检索（供 GET /graph/*）；查询失败只记日志并返回 []
  *
  * 边界：
  * - 与 ES / RabbitMQ 一致，连不上 Neo4j 会阻断启动；不迁入源提交
@@ -264,6 +268,160 @@ class GraphStoreService implements OnModuleInit, OnModuleDestroy {
     } finally {
       await session.close();
     }
+  }
+
+  /**
+   * @description 查询知识实体节点，可按实体类型过滤；Neo4j 查询失败只记日志并返回 []
+   * @param type string | undefined，实体类型（如 PERSON / CONCEPT）；不传或空串表示不过滤
+   * @param limit number，最多返回条数，默认 200，限制在 1-500
+   * @returns Promise<GraphNodeVO[]>，实体数组，id 与 name 都取实体名
+   */
+  async listNodes(type?: string, limit = 200): Promise<GraphNodeVO[]> {
+    const cap = Math.min(Math.max(limit, 1), 500);
+    const session = this.driver.session();
+    try {
+      const result = await session.run(
+        `
+        // 匹配所有知识实体节点
+        MATCH (e:KnowledgeEntity)
+        // 未传类型时不过滤，否则只要该类型
+        WHERE $type IS NULL OR $type = '' OR e.type = $type
+        // 实体按 name 唯一，id 与 name 都取 name
+        RETURN e.name AS id, e.name AS name, e.type AS type,
+               e.description AS description
+        // 最多返回 cap 条
+        LIMIT $limit
+        `,
+        // LIMIT 参数必须是 Neo4j 整数，不能传 JS 浮点数
+        { type: type ?? null, limit: neo4j.int(cap) },
+      );
+      return result.records.map((record) => ({
+        id: record.get('id') as string,
+        name: record.get('name') as string,
+        type: (record.get('type') as string) ?? null,
+        description: (record.get('description') as string) ?? null,
+      }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`图谱节点查询失败：${message}`);
+      return [];
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
+   * @description 查询实体之间的 RELATED_TO 边；Neo4j 查询失败只记日志并返回 []
+   * @param limit number，最多返回条数，默认 500，限制在 1-1000
+   * @returns Promise<GraphEdgeVO[]>，边数组：source / target 为实体名，relation 为关系类型，weight 为证据强度
+   */
+  async listEdges(limit = 500): Promise<GraphEdgeVO[]> {
+    const cap = Math.min(Math.max(limit, 1), 1000);
+    const session = this.driver.session();
+    try {
+      const result = await session.run(
+        `
+        // 匹配实体 a 指向实体 b 的 RELATED_TO 边
+        MATCH (a:KnowledgeEntity)-[r:RELATED_TO]->(b:KnowledgeEntity)
+        // 返回两端实体名、关系类型与权重
+        RETURN a.name AS source, b.name AS target,
+               r.relation AS relation, r.weight AS weight
+        // 最多返回 cap 条
+        LIMIT $limit
+        `,
+        { limit: neo4j.int(cap) },
+      );
+      return result.records.map((record) => ({
+        source: record.get('source') as string,
+        target: record.get('target') as string,
+        relation: (record.get('relation') as string) ?? 'RELATED_TO',
+        weight: this.toNumber(record.get('weight'), 0.5),
+      }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`图谱边查询失败：${message}`);
+      return [];
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
+   * @description 图谱关键词检索：不区分大小写地匹配实体名 / 描述、文档标题 / 摘要、块标题 / 正文；
+   * 关键词为空返回 []，Neo4j 查询失败只记日志并返回 []
+   * @param keyword string，关键词（前后空白会去掉）
+   * @param limit number，最多返回条数，默认 50，限制在 1-200
+   * @returns Promise<GraphSearchHitVO[]>，命中节点数组，label 为节点类型（KnowledgeEntity / KnowledgeDocument / DocumentChunk），snippet 为正文前 160 字
+   */
+  async searchGraph(keyword: string, limit = 50): Promise<GraphSearchHitVO[]> {
+    const kw = keyword.trim();
+    if (!kw) return [];
+
+    const cap = Math.min(Math.max(limit, 1), 200);
+    const session = this.driver.session();
+    try {
+      const result = await session.run(
+        `
+        // 扫描所有节点（实体 / 文档 / 块），属性不存在时 coalesce 成空串再匹配
+        MATCH (n)
+        WHERE toLower(coalesce(n.name, '')) CONTAINS toLower($kw)
+           OR toLower(coalesce(n.title, '')) CONTAINS toLower($kw)
+           OR toLower(coalesce(n.heading, '')) CONTAINS toLower($kw)
+           OR toLower(coalesce(n.description, '')) CONTAINS toLower($kw)
+           OR toLower(coalesce(n.summary, '')) CONTAINS toLower($kw)
+           OR toLower(coalesce(n.content, '')) CONTAINS toLower($kw)
+        // label：节点类型；name / id：按节点类型取第一个非空的属性
+        RETURN labels(n)[0] AS label,
+               coalesce(n.name, n.title, n.heading, n.id, n.chunkId) AS name,
+               coalesce(n.id, n.chunkId, n.name) AS id,
+               n.type AS type,
+               n.title AS title,
+               n.description AS description,
+               n.heading AS heading,
+               n.documentId AS documentId,
+               n.summary AS summary,
+               // 只有块节点有 content，截前 160 字作为摘要片段
+               CASE
+                 WHEN n.content IS NULL THEN null
+                 ELSE substring(n.content, 0, 160)
+               END AS snippet
+        // 按节点类型、名称排序
+        ORDER BY label, name
+        LIMIT $limit
+        `,
+        { kw, limit: neo4j.int(cap) },
+      );
+      return result.records.map((record) => ({
+        id: record.get('id') as string,
+        name: record.get('name') as string,
+        label: (record.get('label') as string) ?? null,
+        type: (record.get('type') as string) ?? null,
+        title: (record.get('title') as string) ?? null,
+        description: (record.get('description') as string) ?? null,
+        heading: (record.get('heading') as string) ?? null,
+        documentId: (record.get('documentId') as string) ?? null,
+        summary: (record.get('summary') as string) ?? null,
+        snippet: (record.get('snippet') as string) ?? null,
+      }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`图谱检索失败：keyword=${kw}, ${message}`);
+      return [];
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
+   * @description 把 Neo4j 返回的数值转成 JS number（Neo4j 整数是 Integer 对象，不是 number）
+   * @param value unknown，Neo4j 记录里的值
+   * @param fallback number，值缺失或无法转换时的默认值
+   * @returns number，转换后的数值
+   */
+  private toNumber(value: unknown, fallback: number): number {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (neo4j.isInt(value)) return value.toNumber();
+    return fallback;
   }
 
   /** 声明唯一约束（幂等），失败视为启动失败 */

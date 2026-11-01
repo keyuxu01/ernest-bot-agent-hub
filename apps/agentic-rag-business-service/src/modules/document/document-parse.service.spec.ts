@@ -1,3 +1,4 @@
+import type { AuthUser } from '../user/type/user.types';
 import { HttpException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RustfsService } from '../../infrastructure/rustfs/rustfs.service';
@@ -7,6 +8,17 @@ import type { DocumentService } from './document.service';
 import { DocumentStatus } from './entities/document.entity';
 import type { ConvertedDocument } from './type/document-convert.types';
 import type { UploadedDocumentFile } from './type/document-upload.types';
+
+/** 当前登录用户：authorId / createBy / updateBy 都取它 */
+const actor: AuthUser = {
+  userId: '20001',
+  username: 'alice',
+  realName: null,
+  email: null,
+  avatar: null,
+  roles: ['ROLE_USER'],
+  permissions: [],
+};
 
 const { convertDocument } = vi.hoisted(() => ({
   convertDocument:
@@ -87,15 +99,6 @@ describe('DocumentParseService', () => {
       converted({ markdown: '# 笔记\n\n正文', parser: 'plain-text' }),
     );
 
-    const actor = {
-      userId: '10001',
-      username: 'alice',
-      realName: null,
-      email: null,
-      avatar: null,
-      roles: ['ROLE_USER'],
-      permissions: [],
-    };
     const result = await service.uploadAndParse(
       upload('notes.md', '\ufeff# 笔记\n\n正文', 'text/markdown'),
       {},
@@ -146,6 +149,7 @@ describe('DocumentParseService', () => {
     const result = await service.uploadAndParse(
       upload('季度报告.docx', 'docx-bytes'),
       { title: '  自定义标题 ' },
+      actor,
     );
 
     expect(uploadBytes).toHaveBeenCalledTimes(2);
@@ -172,18 +176,20 @@ describe('DocumentParseService', () => {
     ['.txt', undefined, '未命名文档'],
     ['a.txt', '   ', 'a'],
   ])('derives title for %s', async (fileName, title, expected) => {
-    await service.uploadAndParse(upload(fileName, 'hello'), { title });
+    await service.uploadAndParse(upload(fileName, 'hello'), { title }, actor);
 
     expect(create).toHaveBeenCalledWith(
       expect.objectContaining({ title: expected }),
-      undefined,
+      actor,
     );
   });
 
   it.each([undefined, { originalname: 'a.txt' }])(
     'requires a valid file (%o)',
     async (uploaded) => {
-      expect(await errorBody(service.uploadAndParse(uploaded, {}))).toEqual({
+      expect(
+        await errorBody(service.uploadAndParse(uploaded, {}, actor)),
+      ).toEqual({
         status: 400,
         body: expect.objectContaining({ code: 'DOCUMENT_FILE_REQUIRED' }),
       });
@@ -192,7 +198,9 @@ describe('DocumentParseService', () => {
 
   it('rejects unsupported types before storing or converting', async () => {
     expect(
-      await errorBody(service.uploadAndParse(upload('legacy.doc', 'x'), {})),
+      await errorBody(
+        service.uploadAndParse(upload('legacy.doc', 'x'), {}, actor),
+      ),
     ).toEqual({
       status: 415,
       body: expect.objectContaining({ code: 'DOCUMENT_FILE_TYPE_UNSUPPORTED' }),
@@ -205,7 +213,9 @@ describe('DocumentParseService', () => {
     convertDocument.mockResolvedValue(converted({ markdown: ' \n\t' }));
 
     expect(
-      await errorBody(service.uploadAndParse(upload('blank.txt', 'x'), {})),
+      await errorBody(
+        service.uploadAndParse(upload('blank.txt', 'x'), {}, actor),
+      ),
     ).toEqual({
       status: 422,
       body: expect.objectContaining({ code: 'DOCUMENT_PARSE_EMPTY' }),
@@ -218,7 +228,7 @@ describe('DocumentParseService', () => {
     convertDocument.mockRejectedValue(new Error('exceljs internal boom'));
 
     const { status, body } = await errorBody(
-      service.uploadAndParse(upload('a.xlsx', 'x'), {}),
+      service.uploadAndParse(upload('a.xlsx', 'x'), {}, actor),
     );
 
     expect(status).toBe(422);

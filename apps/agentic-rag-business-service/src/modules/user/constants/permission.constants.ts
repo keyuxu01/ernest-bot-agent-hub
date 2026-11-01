@@ -1,5 +1,15 @@
 import { RoleCode } from './user.constants';
 
+/** 运行时校验用的权限编码（@RequirePermission 的入参，与 kh_permission.permission_code 一致） */
+const PermissionCode = {
+  documentList: 'document:list',
+  documentCreate: 'document:create',
+  documentEdit: 'document:edit',
+  documentDelete: 'document:delete',
+  documentReview: 'document:review',
+  search: 'search',
+} as const;
+
 /** 管理员自动拥有的操作权限（不依赖 kh_role_permission 绑定） */
 const ADMIN_OPERATION_PERMISSIONS = [
   'document:list',
@@ -11,6 +21,7 @@ const ADMIN_OPERATION_PERMISSIONS = [
   'document:category:query',
   'document:tag',
   'document:version',
+  'search',
   'system:user',
   'system:role',
   'system:permission',
@@ -31,4 +42,9 @@ enum PermissionType {
   Api = 3,
 }
 
-export { ADMIN_OPERATION_PERMISSIONS, ADMIN_ROLES, PermissionType };
+export {
+  ADMIN_OPERATION_PERMISSIONS,
+  ADMIN_ROLES,
+  PermissionCode,
+  PermissionType,
+};

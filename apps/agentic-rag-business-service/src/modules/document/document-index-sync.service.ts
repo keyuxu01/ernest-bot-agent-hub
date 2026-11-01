@@ -1,9 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DocumentPipelinePublisher } from '../../infrastructure/rabbitmq/document-pipeline.publisher';
 import type { DocumentEntity } from './entities/document.entity';
-import { buildSearchIndexData } from './helpers/build-search-index-data';
-import { DocumentContentRepository } from './repository/document-content.repository';
-
 /**
  * 文档状态变化后投递 RAG / Search / KG 索引命令
  *
@@ -15,24 +12,16 @@ import { DocumentContentRepository } from './repository/document-content.reposit
 class DocumentIndexSyncService {
   private readonly logger = new Logger(DocumentIndexSyncService.name);
 
-  constructor(
-    private readonly contentRepo: DocumentContentRepository,
-    private readonly pipelinePublisher: DocumentPipelinePublisher,
-  ) {}
+  constructor(private readonly pipelinePublisher: DocumentPipelinePublisher) {}
 
   /**
-   * 建 / 重建索引
-   * @param content 已在手的正文；未传时按 contentId 读 Mongo
+   * @description 建 / 重建索引：只投递文档 ID，RAG / Search / KG 消费者各自从 PG + Mongo 读正文
+   * @param document DocumentEntity，已进入 Published 的文档
+   * @returns Promise<void>，投递失败只记日志，不抛
    */
-  async publish(document: DocumentEntity, content?: string): Promise<void> {
+  async publish(document: DocumentEntity): Promise<void> {
     try {
-      const body =
-        content ??
-        (await this.contentRepo.findActiveContentById(document.contentId))
-          ?.content;
-      await this.pipelinePublisher.afterPublish(
-        buildSearchIndexData(document, body),
-      );
+      await this.pipelinePublisher.afterPublish(document.id);
     } catch (error) {
       this.logger.warn(
         `索引投递失败（不影响文档状态）：documentId=${document.id}, error=${toMessage(error)}`,

@@ -14,7 +14,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { DocumentModule } from './modules/document/document.module';
 import { GreetingModule } from './modules/greeting/greeting.module';
 import { HealthModule } from './modules/health/health.module';
+import { GraphModule } from './modules/graph/graph.module';
 import { PipelineModule } from './modules/pipeline/pipeline.module';
+import { SearchModule } from './modules/search/search.module';
 import { TeamModule } from './modules/team/team.module';
 
 @Module({
@@ -48,6 +50,8 @@ import { TeamModule } from './modules/team/team.module';
     DocumentModule,
     PipelineModule,
     TeamModule,
+    SearchModule,
+    GraphModule,
   ],
 })
 export class AppModule {}

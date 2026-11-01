@@ -50,7 +50,12 @@ class DocumentPipelineConsumer {
     await this.orchestrator.handleKgBuild(body.type, body.documentIds);
   }
 
-  /** Search 边界校验：拒绝缺失快照、错误版本及 ID 不一致的消息，不记录正文。 */
+  /**
+   * @description Search 消息入口：校验版本化消息（拒绝错误版本或缺 documentId），再交给编排器；
+   * 消息只带 ID，正文由编排器从库里读
+   * @param msg ConsumeMessage，RabbitMQ 推来的原始消息，content 为 JSON 字节
+   * @returns Promise<void>，抛错时由 RabbitMqService nack
+   */
   private async handleSearch(msg: ConsumeMessage): Promise<void> {
     const body = RagBusinessSearchIndexMessageV1Schema.parse(
       JSON.parse(msg.content.toString('utf8')),
@@ -58,7 +63,7 @@ class DocumentPipelineConsumer {
     this.logger.log(
       `[Search] type=${body.type}, taskId=${body.taskId}, documentId=${body.documentId}`,
     );
-    await this.orchestrator.handleSearchIndex(body);
+    await this.orchestrator.handleSearchIndex(body.type, body.documentId);
   }
 
   /** RAG：分块 → 向量化 → ES kh_chunk（dense_vector） */

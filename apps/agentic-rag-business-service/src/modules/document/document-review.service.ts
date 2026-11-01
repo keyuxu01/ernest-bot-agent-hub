@@ -70,8 +70,11 @@ class DocumentReviewService {
   /**
    * 提交审核：Draft / Published / Archived → PendingReview
    * 来自 Published 时先清索引：审核期间不可检索。
+   * @param documentId string，文档 ID
+   * @param actor AuthUser | undefined，提交人；传了就写入文档 updateBy
+   * @returns Promise<DocumentEntity>，状态已改为 PendingReview 的文档
    */
-  async submit(documentId: string): Promise<DocumentEntity> {
+  async submit(documentId: string, actor?: AuthUser): Promise<DocumentEntity> {
     const doc = await this.findDocumentOrThrow(documentId);
     if (doc.status === DocumentStatus.PendingReview) {
       throw documentLifecycleError(
@@ -89,6 +92,7 @@ class DocumentReviewService {
     const beforeStatus = doc.status;
     const reviewId = nextSnowflakeId();
     doc.status = DocumentStatus.PendingReview;
+    if (actor?.userId) doc.updateBy = actor.userId;
     const created = await this.reviewRepo.createPending(
       { id: reviewId, documentId, beforeStatus },
       doc,

@@ -67,8 +67,7 @@ cmd_upload() {
   local body
   body="$(
     curl -sS -X POST "$BASE_URL/documents/upload/parse" \
-      -F "file=@${file}" \
-      -F "createBy=10001"
+      -F "file=@${file}"
   )"
   printf '%s\n' "$body" | summary
   local id
@@ -164,8 +163,7 @@ export DOC_ID='${id:-<先 upload 再 curls>}'
 
 # 上传（记下响应里的 id）
 curl -sS -X POST "\$BASE_URL/documents/upload/parse" \\
-  -F "file=@${SAMPLES}/员工考勤表.xlsx" \\
-  -F "createBy=10001" | jq '{id, title, parser, wordCount, imageCount, source}'
+  -F "file=@${SAMPLES}/员工考勤表.xlsx" | jq '{id, title, parser, wordCount, imageCount, source}'
 
 # 详情（要 id）
 curl -sS "\$BASE_URL/documents/\$DOC_ID" | jq '{id, title, content}'

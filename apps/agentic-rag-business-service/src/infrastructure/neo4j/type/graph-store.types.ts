@@ -57,10 +57,49 @@ type GraphExtraction = {
   relations: GraphRelation[];
 };
 
+/** GET /graph/nodes 返回的实体节点 */
+type GraphNodeVO = {
+  /** 实体名（实体按 name 唯一） */
+  id: string;
+  name: string;
+  type: string | null;
+  description: string | null;
+};
+
+/** GET /graph/edges 返回的实体关系边 */
+type GraphEdgeVO = {
+  /** 起点实体名 */
+  source: string;
+  /** 终点实体名 */
+  target: string;
+  relation: string;
+  /** 证据强度 0-1，缺失时为 0.5 */
+  weight: number;
+};
+
+/** GET /graph/search 返回的命中节点（实体 / 文档 / 块） */
+type GraphSearchHitVO = {
+  id: string;
+  name: string;
+  /** 节点类型：KnowledgeEntity / KnowledgeDocument / DocumentChunk */
+  label: string | null;
+  type: string | null;
+  title: string | null;
+  description: string | null;
+  heading: string | null;
+  documentId: string | null;
+  summary: string | null;
+  /** 块正文前 160 字 */
+  snippet: string | null;
+};
+
 export type {
   GraphChunkNode,
   GraphDocumentNode,
+  GraphEdgeVO,
   GraphEntity,
   GraphExtraction,
+  GraphNodeVO,
   GraphRelation,
+  GraphSearchHitVO,
 };

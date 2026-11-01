@@ -1,8 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import {
-  RagBusinessSearchIndexMessageV1Schema,
-  type RagBusinessSearchDocument,
-} from '@repo/contracts';
+import { RagBusinessSearchIndexMessageV1Schema } from '@repo/contracts';
 import { DocumentPipelinePublisher } from './document-pipeline.publisher';
 import type { RabbitMqService } from './rabbitmq.service';
 import {
@@ -49,7 +46,7 @@ describe('DocumentPipelinePublisher', () => {
       }),
     );
   });
-  it('still sends a valid search snapshot if RAG publish returns false', async () => {
+  it('still sends an id-only search command if RAG publish returns false', async () => {
     const publish = vi
       .fn()
       .mockResolvedValueOnce(false)
@@ -57,24 +54,7 @@ describe('DocumentPipelinePublisher', () => {
     const publisher = new DocumentPipelinePublisher({
       publish,
     } as unknown as RabbitMqService);
-    const document: RagBusinessSearchDocument = {
-      id: '1',
-      title: '标题',
-      content: null,
-      summary: null,
-      categoryId: null,
-      tags: null,
-      status: 1,
-      isPublic: false,
-      viewCount: 0,
-      likeCount: 0,
-      commentCount: 0,
-      authorId: null,
-      publishTime: null,
-      createdAt: null,
-      updatedAt: null,
-    };
-    await publisher.afterPublish(document);
+    await publisher.afterPublish('1');
     // RAG + Search + KG 三条独立命令
     expect(publish).toHaveBeenCalledTimes(3);
     expect(publish).toHaveBeenCalledWith(
@@ -88,6 +68,11 @@ describe('DocumentPipelinePublisher', () => {
     );
     expect(
       RagBusinessSearchIndexMessageV1Schema.parse(publish.mock.calls[1]![2]),
-    ).toEqual(expect.objectContaining({ type: 'INDEX', document }));
+    ).toEqual({
+      schemaVersion: 1,
+      taskId: expect.any(String),
+      type: 'INDEX',
+      documentId: '1',
+    });
   });
 });

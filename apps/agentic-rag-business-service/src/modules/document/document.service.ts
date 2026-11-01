@@ -61,13 +61,15 @@ export class DocumentService {
   ) {}
 
   /**
-   * 创建文档
-   * 流程：生成雪花 ID → 写 Mongo 正文（拿 ObjectId）→ 写 Postgres 元数据
-   * 若 Postgres 写入失败，回滚删除已写入的 Mongo 正文，避免脏数据
-   * 仅允许草稿或（免审时）已发布；创建即发布会投递索引
-   * @param actor 当前登录用户：createBy / updateBy 以它为准，authorId 未传时取它
+   * @description 创建文档。流程：生成雪花 ID → 写 Mongo 正文（拿 ObjectId）→ 写 Postgres 元数据；
+   * Postgres 写入失败时删除刚写入的 Mongo 正文，避免脏数据。
+   * 仅允许草稿或（免审时）已发布；创建即发布会投递索引（只投文档 ID）
+   * @param dto CreateDocumentDto，标题、正文必填；摘要、分类、团队、封面、标签、状态、备注、是否公开可选（不含作者 / 创建人）
+   * @param actor AuthUser，当前登录用户：authorId / createBy / updateBy 都取它的 userId
+   * @returns Promise<DocumentEntity & { content: string }>，新建的文档元数据加正文
+   * @throws HttpException DOCUMENT_CREATE_STATUS_INVALID（状态不是草稿 / 已发布）、DOCUMENT_APPROVAL_REQUIRED（开启审核时直接创建已发布）
    */
-  async create(dto: CreateDocumentDto, actor?: AuthUser) {
+  async create(dto: CreateDocumentDto, actor: AuthUser) {
     const status = dto.status ?? DocumentStatus.Draft;
     if (
       status !== DocumentStatus.Draft &&
@@ -116,7 +118,7 @@ export class DocumentService {
         summary: dto.summary,
         categoryId: dto.categoryId,
         teamId: dto.teamId,
-        authorId: dto.authorId ?? actor?.userId,
+        authorId: actor.userId,
         coverImage: dto.coverImage,
         tags: dto.tags,
         status,
@@ -125,9 +127,8 @@ export class DocumentService {
         wordCount,
         // 创建即发布时，记录发布时间
         publishTime: status === DocumentStatus.Published ? new Date() : null,
-        // 有登录用户时以它为准，不信任请求体，避免冒充他人创建
-        createBy: actor?.userId ?? dto.createBy,
-        updateBy: actor?.userId ?? dto.createBy,
+        createBy: actor.userId,
+        updateBy: actor.userId,
         deleted: false,
       });
     } catch (error) {
@@ -138,7 +139,7 @@ export class DocumentService {
 
     // ③ 创建即发布（只可能是免审）：投递索引；失败不影响创建结果
     if (status === DocumentStatus.Published) {
-      await this.indexSync.publish(saved, dto.content);
+      await this.indexSync.publish(saved);
     }
     return { ...saved, content: dto.content };
   }
@@ -183,8 +184,14 @@ export class DocumentService {
    * - status 只允许 Published → Draft（等价于 save-draft，会清索引）；其余走专用接口
    * - 待审核期间不可改标题 / 正文；开启审核时已发布文档须先存草稿再改
    * - 免审时已发布文档改标题 / 正文会重建索引；其余元数据变更不重建（ADR-0021 既有限制）
+   * @description 更新文档（PATCH 语义：只改传了的字段），更新人一律取登录用户
+   * @param id string，文档 ID
+   * @param dto UpdateDocumentDto，要修改的字段，都可选（不含作者 / 更新人）
+   * @param actor AuthUser，当前登录用户，写入 updateBy
+   * @returns Promise<DocumentEntity & { content: string }>，更新后的元数据加正文
+   * @throws NotFoundException 文档不存在；HttpException 状态变更不允许、审核中改正文、已发布需先存草稿
    */
-  async update(id: string, dto: UpdateDocumentDto, actor?: AuthUser) {
+  async update(id: string, dto: UpdateDocumentDto, actor: AuthUser) {
     const doc = await this.documentRepo.findActiveById(id);
     if (!doc) {
       throw new NotFoundException(`Document ${id} not found`);
@@ -250,15 +257,11 @@ export class DocumentService {
     if (dto.summary !== undefined) doc.summary = dto.summary;
     if (dto.categoryId !== undefined) doc.categoryId = dto.categoryId;
     if (dto.teamId !== undefined) doc.teamId = dto.teamId;
-    if (dto.authorId !== undefined) doc.authorId = dto.authorId;
     if (dto.coverImage !== undefined) doc.coverImage = dto.coverImage;
     if (dto.tags !== undefined) doc.tags = dto.tags;
     if (dto.remark !== undefined) doc.remark = dto.remark;
     if (dto.isPublic !== undefined) doc.isPublic = dto.isPublic;
-    // 有登录用户时以它为准，不信任请求体里的 updateBy
-    const updateBy = actor?.userId ?? dto.updateBy;
-    if (updateBy !== undefined) doc.updateBy = updateBy;
-
+    doc.updateBy = actor.userId;
     doc.status = nextStatus;
     const saved = await this.documentRepo.save(doc);
     const content = await this.resolveContent(doc.contentId, dto.content);
@@ -270,7 +273,7 @@ export class DocumentService {
     ) {
       await this.indexSync.unpublish(id);
     } else if (nextStatus === DocumentStatus.Published && editsBody) {
-      await this.indexSync.publish(saved, content);
+      await this.indexSync.publish(saved);
     }
 
     return { ...saved, content };
@@ -283,9 +286,14 @@ export class DocumentService {
    * - 已发布再次发布 = 重建索引（需审时则重新走审核）
    *
    * 异步消费侧见 DocumentPipelineConsumer → PipelineOrchestrator：
-   * RAG：分块 → 嵌入 → ES(kh_chunk)；Search：正文前缀快照 → ES(kh_document)；KG：抽取 → Neo4j
+   * RAG：分块 → 嵌入 → ES(kh_chunk)；Search：PG + Mongo 全文 → ES(kh_document)；KG：抽取 → Neo4j
+   * @description 发布文档：开启审核时提交审核，免审时直接发布并投递索引
+   * @param id string，文档 ID
+   * @param actor AuthUser，当前登录用户，写入 updateBy（提交审核时同样写入）
+   * @returns Promise<DocumentEntity & { content: string }>，发布后（或进入待审后）的文档加正文
+   * @throws NotFoundException 文档不存在；HttpException DOCUMENT_UNDER_REVIEW、DOCUMENT_TRANSITION_NOT_ALLOWED
    */
-  async publish(id: string) {
+  async publish(id: string, actor: AuthUser) {
     this.logger.log(`发布文档：documentId=${id}`);
 
     const doc = await this.documentRepo.findActiveById(id);
@@ -307,25 +315,33 @@ export class DocumentService {
 
     if (this.reviewService.isApprovalRequired()) {
       // 归档文档重新上架同样走审核，不能绕过
-      const submitted = await this.reviewService.submit(id);
+      const submitted = await this.reviewService.submit(id, actor);
       const content = await this.resolveContent(submitted.contentId);
       return { ...submitted, content };
     }
 
     doc.status = DocumentStatus.Published;
     doc.publishTime = new Date();
+    doc.updateBy = actor.userId;
     const saved = await this.documentRepo.save(doc);
     const content = await this.resolveContent(doc.contentId);
-    await this.indexSync.publish(saved, content);
+    await this.indexSync.publish(saved);
 
     this.logger.log(`文档发布成功：documentId=${id}`);
     return { ...saved, content };
   }
 
-  /** 归档：Published → Archived，保留正文、清索引 */
-  async archive(id: string) {
+  /**
+   * @description 归档：Published → Archived，保留正文、清索引
+   * @param id string，文档 ID
+   * @param actor AuthUser，当前登录用户，写入 updateBy
+   * @returns Promise<DocumentEntity>，归档后的文档
+   * @throws NotFoundException 文档不存在；HttpException 不是已发布状态
+   */
+  async archive(id: string, actor: AuthUser) {
     const saved = await this.moveOutOfPublished(
       id,
+      actor,
       DocumentStatus.Archived,
       canArchiveFrom,
       '只有已发布文档可以归档',
@@ -334,10 +350,17 @@ export class DocumentService {
     return saved;
   }
 
-  /** 存为草稿（下架编辑）：Published → Draft，清索引后可改内容再提交发布 */
-  async saveAsDraft(id: string) {
+  /**
+   * @description 存为草稿（下架编辑）：Published → Draft，清索引后可改内容再提交发布
+   * @param id string，文档 ID
+   * @param actor AuthUser，当前登录用户，写入 updateBy
+   * @returns Promise<DocumentEntity>，改为草稿后的文档
+   * @throws NotFoundException 文档不存在；HttpException 不是已发布状态
+   */
+  async saveAsDraft(id: string, actor: AuthUser) {
     const saved = await this.moveOutOfPublished(
       id,
+      actor,
       DocumentStatus.Draft,
       canSaveAsDraftFrom,
       '只有已发布文档可以存为草稿',
@@ -351,14 +374,20 @@ export class DocumentService {
    * Postgres、Mongo 两侧都将 deleted 置为 true（不物理删正文）；
    * PG 软删与撤销待审任务同事务，避免已删文档的任务留在待办。
    * 无论原状态都投递清理：幂等，也能补上此前失败的清理。
+   * @description 软删除文档并投递索引清理
+   * @param id string，文档 ID
+   * @param actor AuthUser，当前登录用户，写入 updateBy（记录谁删的）
+   * @returns Promise<{ id: string; deleted: true }>，被删文档 ID
+   * @throws NotFoundException 文档不存在或已删除
    */
-  async remove(id: string) {
+  async remove(id: string, actor: AuthUser) {
     const doc = await this.documentRepo.findActiveById(id);
     if (!doc) {
       throw new NotFoundException(`Document ${id} not found`);
     }
 
     doc.deleted = true;
+    doc.updateBy = actor.userId;
     await this.reviewRepo.saveDeletedDocument(
       doc,
       REVIEW_CANCELLED_ON_DELETE_COMMENT,
@@ -370,9 +399,19 @@ export class DocumentService {
     return { id, deleted: true };
   }
 
-  /** 已发布 → 目标状态并清索引（归档 / 存草稿共用） */
+  /**
+   * @description 已发布 → 目标状态并清索引（归档 / 存草稿共用）
+   * @param id string，文档 ID
+   * @param actor AuthUser，当前登录用户，写入 updateBy
+   * @param target DocumentStatus，目标状态（Archived / Draft）
+   * @param allowed (status: DocumentStatus) => boolean，判断当前状态能否转出的规则函数
+   * @param message string，不允许转出时的错误提示
+   * @returns Promise<DocumentEntity>，状态变更后的文档
+   * @throws NotFoundException 文档不存在；HttpException DOCUMENT_TRANSITION_NOT_ALLOWED
+   */
   private async moveOutOfPublished(
     id: string,
+    actor: AuthUser,
     target: DocumentStatus,
     allowed: (status: DocumentStatus) => boolean,
     message: string,
@@ -386,6 +425,7 @@ export class DocumentService {
     }
 
     doc.status = target;
+    doc.updateBy = actor.userId;
     const saved = await this.documentRepo.save(doc);
     await this.indexSync.unpublish(id);
     return saved;

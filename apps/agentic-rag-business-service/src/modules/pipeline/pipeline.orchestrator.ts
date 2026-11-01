@@ -1,4 +1,3 @@
-import type { RagBusinessSearchIndexMessageV1 } from '@repo/contracts';
 import { SearchIndexService } from '../../infrastructure/elasticsearch/search-index.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { VectorIndexService } from '../../infrastructure/elasticsearch/vector-index.service';
@@ -9,12 +8,14 @@ import { ChunkingService } from './chunking.service';
 import { GraphBuildService } from './graph-build.service';
 import { toIsoDate } from './helpers/to-iso-date';
 import { toPipelineDocument } from './helpers/to-pipeline-document';
+import { toSearchIndexDocument } from './helpers/to-search-index-document';
 import type { PipelineDocument } from './type/pipeline.types';
 
 /**
  * 发布后知识管线编排器
  *
  * RAG：分块 → Embedding → ES kh_chunk。
+ * Search：Postgres + Mongo 全文 → ES kh_document。
  * KG：分块 → LLM 抽实体关系 → Neo4j（迁自 knowledge-hub-backend `bb867d5e`）。
  * 由 DocumentPipelineConsumer 在消费到 MQ 消息后调用；
  * 本类负责「加载文档 → 调具体服务」，不直接碰 RabbitMQ。
@@ -63,15 +64,32 @@ class PipelineOrchestrator {
     }
   }
 
-  /** Search 使用已校验快照；删除按 ES _id，异常交给 MQ 消费边界处理。 */
-  async handleSearchIndex(
-    message: RagBusinessSearchIndexMessageV1,
-  ): Promise<void> {
-    if (message.type === 'DELETE') {
-      await this.searchIndexService.deleteDocument(message.documentId);
-    } else {
-      await this.searchIndexService.indexDocument(message.document);
+  /**
+   * @description 处理 Search 索引消息；ES 写入 / 删除失败向上抛，交给 MQ 消费边界 nack
+   * - INDEX：按 documentId 从 Postgres + Mongo 拉全文，写入 ES kh_document
+   * - DELETE：按 documentId 删除
+   * @param type string，消息类型 INDEX / DELETE
+   * @param documentId string，文档 ID
+   * @returns Promise<void>，文档不存在（已删除 / 未激活）时记日志后返回
+   */
+  async handleSearchIndex(type: string, documentId: string): Promise<void> {
+    if (type === 'DELETE') {
+      await this.searchIndexService.deleteDocument(documentId);
+      return;
     }
+
+    if (type === 'INDEX') {
+      const docs = await this.loadDocumentsByIds([documentId]);
+      const doc = docs[0];
+      if (!doc) {
+        this.logger.warn(`Search INDEX 文档不存在：documentId=${documentId}`);
+        return;
+      }
+      await this.searchIndexService.indexDocument(toSearchIndexDocument(doc));
+      return;
+    }
+
+    this.logger.warn(`忽略未支持的 Search 消息：type=${type}`);
   }
 
   /**

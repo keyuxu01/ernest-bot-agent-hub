@@ -1,6 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 
-/** 上传解析的 multipart 文本字段（文件在 `file` 字段，不在此 DTO） */
+/** 上传解析的 multipart 文本字段（文件在 `file` 字段，不在此 DTO；作者从 JWT 取，不在表单传） */
 class UploadParseDocumentDto {
   /** 标题；未传则取文件名（去扩展名） */
   @IsOptional()
@@ -17,11 +17,6 @@ class UploadParseDocumentDto {
   @IsString()
   teamId?: string;
 
-  /** 作者 ID */
-  @IsOptional()
-  @IsString()
-  authorId?: string;
-
   /** 标签（逗号分隔） */
   @IsOptional()
   @IsString()
@@ -31,11 +26,6 @@ class UploadParseDocumentDto {
   @IsOptional()
   @IsString()
   remark?: string;
-
-  /** 创建人 ID */
-  @IsOptional()
-  @IsString()
-  createBy?: string;
 }
 
 export { UploadParseDocumentDto };

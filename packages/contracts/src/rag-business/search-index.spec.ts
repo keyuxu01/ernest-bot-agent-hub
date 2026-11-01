@@ -1,28 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { RagBusinessSearchIndexMessageV1Schema } from './search-index';
 import { RagBusinessReindexMessageV1Schema } from './reindex';
+
 const base = { taskId: '123e4567-e89b-42d3-a456-426614174000', documentId: '1' };
-const document = {
-  id: '1',
-  title: '标题',
-  content: '正文',
-  summary: null,
-  categoryId: null,
-  tags: null,
-  status: 1,
-  isPublic: false,
-  viewCount: 0,
-  likeCount: 0,
-  commentCount: 0,
-  authorId: null,
-  publishTime: null,
-  createdAt: null,
-  updatedAt: null,
-};
+
 describe('搜索消息契约', () => {
-  it('accepts index snapshots and id-only deletes with version 1', () => {
+  it('accepts id-only index and delete messages with version 1', () => {
     expect(
-      RagBusinessSearchIndexMessageV1Schema.parse({ ...base, type: 'INDEX', document })
+      RagBusinessSearchIndexMessageV1Schema.parse({ ...base, type: 'INDEX' })
         .schemaVersion,
     ).toBe(1);
     expect(
@@ -36,10 +21,21 @@ describe('搜索消息契约', () => {
       }).type,
     ).toBe('DELETE_BY_DOC_IDS');
   });
+
+  it('drops the snapshot carried by older index messages', () => {
+    const parsed = RagBusinessSearchIndexMessageV1Schema.parse({
+      ...base,
+      type: 'INDEX',
+      document: { id: '1', title: '旧快照' },
+    });
+
+    expect(parsed).not.toHaveProperty('document');
+  });
+
   it.each([
-    { ...base, type: 'INDEX' },
-    { ...base, type: 'INDEX', document: { ...document, id: '2' } },
-    { ...base, type: 'INDEX', document: { ...document, content: 'x'.repeat(1001) } },
+    { ...base, type: 'INDEX', documentId: '' },
+    { taskId: base.taskId, type: 'INDEX' },
+    { ...base, type: 'INDEX', taskId: 'not-a-uuid' },
     { ...base, type: 'DELETE', schemaVersion: 2 },
     { ...base, type: 'OTHER' },
   ])('rejects malformed or incompatible messages', message => {

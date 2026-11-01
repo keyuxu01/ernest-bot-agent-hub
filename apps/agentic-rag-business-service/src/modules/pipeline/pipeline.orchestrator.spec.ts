@@ -18,6 +18,10 @@ describe('PipelineOrchestrator', () => {
     deleteByDocId: vi.fn(),
     indexChunks: vi.fn(),
   };
+  const searchIndexService = {
+    indexDocument: vi.fn(),
+    deleteDocument: vi.fn(),
+  };
   const graphBuildService = {
     buildForDocument: vi.fn(),
     deleteForDocument: vi.fn(),
@@ -33,10 +37,7 @@ describe('PipelineOrchestrator', () => {
       chunkingService as unknown as ChunkingService,
       embeddingService as unknown as EmbeddingService,
       vectorIndexService as unknown as VectorIndexService,
-      {
-        indexDocument: vi.fn(),
-        deleteDocument: vi.fn(),
-      } as unknown as SearchIndexService,
+      searchIndexService as unknown as SearchIndexService,
       graphBuildService as unknown as GraphBuildService,
     );
   });
@@ -117,5 +118,41 @@ describe('PipelineOrchestrator', () => {
     expect(vectorIndexService.indexChunks).toHaveBeenCalledWith([
       { ...chunks[0], embedding: [0.1, 0.2] },
     ]);
+  });
+
+  it('indexes the full Mongo body for Search INDEX messages', async () => {
+    const longBody = '正文'.repeat(800);
+    documentRepo.findActiveByIds.mockResolvedValue([
+      {
+        id: '1',
+        title: 'A',
+        contentId: 'c1',
+        status: 1,
+        publishTime: new Date('2026-10-31T00:00:00Z'),
+      },
+    ]);
+    contentRepo.findActiveContentById.mockResolvedValue({ content: longBody });
+
+    await orchestrator.handleSearchIndex('INDEX', '1');
+
+    expect(documentRepo.findActiveByIds).toHaveBeenCalledWith(['1']);
+    expect(searchIndexService.indexDocument).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: '1',
+        title: 'A',
+        content: longBody,
+        publishTime: '2026-10-31T00:00:00.000Z',
+      }),
+    );
+  });
+
+  it('skips Search INDEX for missing documents and deletes by id', async () => {
+    documentRepo.findActiveByIds.mockResolvedValue([]);
+
+    await orchestrator.handleSearchIndex('INDEX', '1');
+    await orchestrator.handleSearchIndex('DELETE', '2');
+
+    expect(searchIndexService.indexDocument).not.toHaveBeenCalled();
+    expect(searchIndexService.deleteDocument).toHaveBeenCalledWith('2');
   });
 });

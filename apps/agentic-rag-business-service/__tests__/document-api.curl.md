@@ -23,26 +23,22 @@ export DOC_ID=''   # 上传响应里的 id
 ```bash
 # xlsx
 curl -sS -X POST "$BASE_URL/documents/upload/parse" \
-  -F "file=@../../../test-files/员工考勤表.xlsx" \
-  -F "createBy=10001" | jq '{id, title, parser, wordCount, imageCount, source}'
+  -F "file=@../../../test-files/员工考勤表.xlsx" | jq '{id, title, parser, wordCount, imageCount, source}'
 
 # docx
 curl -sS -X POST "$BASE_URL/documents/upload/parse" \
-  -F "file=@../../../test-files/梁多强_Agent开发_17601230573.docx" \
-  -F "createBy=10001" | jq '{id, title, parser, wordCount, imageCount}'
+  -F "file=@../../../test-files/梁多强_Agent开发_17601230573.docx" | jq '{id, title, parser, wordCount, imageCount}'
 
 # pdf
 curl -sS -X POST "$BASE_URL/documents/upload/parse" \
-  -F "file=@../../../test-files/李先生_28岁_76761.pdf" \
-  -F "createBy=10001" | jq '{id, title, parser, wordCount, imageCount}'
+  -F "file=@../../../test-files/李先生_28岁_76761.pdf" | jq '{id, title, parser, wordCount, imageCount}'
 
 # pptx
 curl -sS -X POST "$BASE_URL/documents/upload/parse" \
-  -F "file=@../../../test-files/申论总结课.pptx" \
-  -F "createBy=10001" | jq '{id, title, parser, wordCount, imageCount}'
+  -F "file=@../../../test-files/申论总结课.pptx" | jq '{id, title, parser, wordCount, imageCount}'
 ```
 
-可选表单字段：`title` `categoryId` `teamId` `authorId` `tags` `remark` `createBy`。
+可选表单字段：`title` `categoryId` `teamId` `tags` `remark`（作者 / 创建人取登录用户）。
 
 上传成功后：
 
