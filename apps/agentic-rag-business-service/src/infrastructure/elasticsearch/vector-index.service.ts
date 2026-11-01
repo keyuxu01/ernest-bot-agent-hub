@@ -107,18 +107,28 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
 
     await this.createIndexIfNotExists();
 
-    // bulk 协议：action 行 + source 行成对出现
+    // bulk 协议：一次请求写多条，每条由「动作行 + 数据行」两行成对组成
+    // - 动作行：指令，告诉 ES 对下一行数据做什么、写到哪里（本身不存储）
+    // - 数据行：真正要存的文档字段
+    // flatMap 把每个块的 [动作, 数据] 拍平成 [动作1, 数据1, 动作2, 数据2, ...]
     const operations = chunks.flatMap((chunk) => [
+      // 动作行：index = 写入，_id 已存在则整条覆盖（类比 INSERT ... ON CONFLICT DO UPDATE）
+      // _index = 写到 kh_chunk 索引（类比表名）；_id = chunkId（类比主键，同一文档重建时不变）
       { index: { _index: CHUNK_INDEX, _id: chunk.chunkId } },
+      // 数据行：驼峰字段转成 ES 的下划线字段（chunk_id、content、embedding 等）
       buildChunkDocument(chunk),
     ]);
 
+    // POST /_bulk：客户端把 operations 转成「一行一个 JSON」的请求体发出
     const response = await this.es.bulk({
+      // 写完立即刷新索引，返回后马上能搜到（否则要等索引的 refresh_interval）
       refresh: true,
       operations,
     });
 
+    // 部分失败时 bulk 仍返回 200、不抛异常，必须自己检查 errors
     if (response.errors) {
+      // items 与请求里的块一一对应，挑出失败的条目，记录「_id: 失败原因」
       const failed = response.items
         .filter((item) => item.index?.error)
         .map(
