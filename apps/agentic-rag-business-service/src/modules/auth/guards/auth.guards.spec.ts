@@ -12,6 +12,8 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { PERMISSIONS_KEY } from '../decorators/require-permission.decorator';
+import { PermissionsGuard } from './permissions.guard';
 import { RolesGuard } from './roles.guard';
 
 const user: AuthUser = {
@@ -21,6 +23,7 @@ const user: AuthUser = {
   email: null,
   avatar: null,
   roles: ['ROLE_USER'],
+  permissions: ['document:list'],
 };
 
 function httpContext(request: Record<string, unknown>): ExecutionContext {
@@ -139,5 +142,60 @@ describe('RolesGuard', () => {
     expect(() =>
       guard.canActivate(httpContext({ user: { ...user, roles: [] } })),
     ).toThrow(ForbiddenException);
+  });
+});
+
+describe('PermissionsGuard', () => {
+  const reflector = new Reflector();
+  const guard = new PermissionsGuard(reflector);
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function requirePermissions(permissions: string[] | undefined) {
+    vi.spyOn(reflector, 'getAllAndOverride').mockImplementation((key) =>
+      key === PERMISSIONS_KEY ? permissions : undefined,
+    );
+  }
+
+  it('allows routes without @RequirePermission()', () => {
+    requirePermissions(undefined);
+
+    expect(guard.canActivate(httpContext({}))).toBe(true);
+  });
+
+  it('allows a user holding one of the required permissions', () => {
+    requirePermissions(['document:review', 'document:list']);
+
+    expect(guard.canActivate(httpContext({ user }))).toBe(true);
+  });
+
+  it('lets ROLE_ADMIN through without the permission code', () => {
+    requirePermissions(['system:team']);
+
+    expect(
+      guard.canActivate(
+        httpContext({
+          user: { ...user, roles: ['ROLE_ADMIN'], permissions: [] },
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('throws ForbiddenException when the permission is missing', () => {
+    requirePermissions(['system:team']);
+
+    expect(() => guard.canActivate(httpContext({ user }))).toThrow(
+      ForbiddenException,
+    );
+  });
+
+  it('throws ForbiddenException when there is no user', () => {
+    requirePermissions(['document:list']);
+
+    expect(() => guard.canActivate(httpContext({}))).toThrow(
+      ForbiddenException,
+    );
   });
 });

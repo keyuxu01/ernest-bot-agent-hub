@@ -15,15 +15,23 @@ import type { QueryUserDto } from './dto/query-user.dto';
 import type { UpdateUserDto } from './dto/update-user.dto';
 import type { RoleEntity } from './entities/role.entity';
 import { UserEntity } from './entities/user.entity';
+import { PermissionService } from './permission.service';
 import { UserRepository } from './repository/user.repository';
 import type { AuthUser, UserVO } from './type/user.types';
 
 /** 用户服务：凭据校验、注册、用户 / 角色管理、个人资料与统计；数据访问经 Repository */
 @Injectable()
 class UserService {
+  /**
+   * @description 注入用户、文档数据访问层和权限服务
+   * @param userRepo UserRepository，用户与角色关联的读写
+   * @param documentRepo DocumentRepository，个人文档统计
+   * @param permissionService PermissionService，计算用户的生效权限编码
+   */
   constructor(
     private readonly userRepo: UserRepository,
     private readonly documentRepo: DocumentRepository,
+    private readonly permissionService: PermissionService,
   ) {}
 
   async findByEmail(email: string): Promise<UserEntity | null> {
@@ -73,7 +81,18 @@ class UserService {
     };
   }
 
-  toAuthUser(user: UserEntity, roles: string[]): AuthUser {
+  /**
+   * @description 把用户实体、角色、权限拼成注入到请求里的当前用户对象（不含密码）
+   * @param user UserEntity，用户实体
+   * @param roles string[]，用户的角色编码，如 ['ROLE_USER']
+   * @param permissions string[]，用户的生效权限编码，如 ['document:list']
+   * @returns AuthUser，当前用户对象，Controller 里通过 @CurrentUser() 拿到
+   */
+  toAuthUser(
+    user: UserEntity,
+    roles: string[],
+    permissions: string[],
+  ): AuthUser {
     return {
       userId: user.id,
       username: user.username,
@@ -81,18 +100,34 @@ class UserService {
       email: user.email,
       avatar: user.avatar,
       roles,
+      permissions,
     };
   }
 
+  /**
+   * @description 按用户 ID 重新读取用户、角色和生效权限；JWT 校验通过后每次请求都会调用（JwtStrategy.validate）
+   * @param userId string，用户 ID（来自 token 的 sub）
+   * @returns Promise<AuthUser>，当前用户对象，含 roles 与 permissions
+   * @throws NotFoundException 用户不存在；UnauthorizedException 账户已禁用
+   */
   async buildAuthUser(userId: string): Promise<AuthUser> {
     const user = await this.findByIdOrThrow(userId);
     if (user.status !== 1) {
       throw new UnauthorizedException('账户已禁用');
     }
     const roles = await this.getRoleCodes(userId);
-    return this.toAuthUser(user, roles);
+    const permissions =
+      await this.permissionService.getUserPermissionCodes(userId);
+    return this.toAuthUser(user, roles, permissions);
   }
 
+  /**
+   * @description 登录时校验用户名和密码，通过后返回带角色与权限的当前用户
+   * @param username string，登录用户名
+   * @param password string，明文密码，与库里的 bcrypt 哈希比对
+   * @returns Promise<AuthUser>，当前用户对象，含 roles 与 permissions
+   * @throws UnauthorizedException 用户名或密码错误、账户未激活、账户已禁用
+   */
   async validateCredentials(
     username: string,
     password: string,
@@ -113,7 +148,10 @@ class UserService {
       throw new UnauthorizedException('用户名或密码错误');
     }
     const roles = await this.getRoleCodes(user.id);
-    return this.toAuthUser(user, roles);
+    const permissions = await this.permissionService.getUserPermissionCodes(
+      user.id,
+    );
+    return this.toAuthUser(user, roles, permissions);
   }
 
   async register(input: {

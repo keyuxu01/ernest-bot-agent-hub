@@ -12,6 +12,7 @@ import type {
   ResetPasswordByEmailDto,
   SendResetCodeDto,
 } from '../user/dto/extra.dto';
+import { TeamService } from '../team/team.service';
 import type { AuthUser } from '../user/type/user.types';
 import { UserService } from '../user/user.service';
 import {
@@ -35,9 +36,14 @@ class AuthService implements OnModuleInit {
     private readonly emailService: EmailService,
     private readonly emailActivation: EmailActivationService,
     private readonly passwordReset: PasswordResetService,
+    private readonly teamService: TeamService,
   ) {}
 
-  /** 配置了 AUTH_BOOTSTRAP_ADMIN_* 时确保初始管理员存在（已存在则不改） */
+  /**
+   * @description 服务启动时执行：配置了 AUTH_BOOTSTRAP_ADMIN_USERNAME / PASSWORD / EMAIL 时确保初始管理员存在（已存在则不改）；
+   * 本次新建时再让其担任 init 预置团队的负责人（init 脚本没有账号，无法预置团队成员）
+   * @returns Promise<void>，无返回值；三项配置缺任意一项时直接返回
+   */
   async onModuleInit(): Promise<void> {
     const username = this.config.get<string>('AUTH_BOOTSTRAP_ADMIN_USERNAME');
     const password = this.config.get<string>('AUTH_BOOTSTRAP_ADMIN_PASSWORD');
@@ -48,6 +54,10 @@ class AuthService implements OnModuleInit {
     if (
       await this.userService.ensureBootstrapAdmin(username, password, email)
     ) {
+      const admin = await this.userService.findByUsername(username);
+      if (admin) {
+        await this.teamService.assignSeedTeamLeader(admin.id);
+      }
       this.logger.log(`已创建初始管理员：username=${username}`);
     }
   }

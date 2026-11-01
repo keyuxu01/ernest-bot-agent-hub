@@ -60,6 +60,7 @@ const reviewer: AuthUser = {
   email: null,
   avatar: null,
   roles: ['ROLE_REVIEWER'],
+  permissions: [],
 };
 
 const documentRepo = { findActiveById: vi.fn() };

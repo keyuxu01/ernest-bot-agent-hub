@@ -223,6 +223,7 @@ describe('DocumentService.create', () => {
       email: null,
       avatar: null,
       roles: [],
+      permissions: [],
     };
 
     // createBy 以登录用户为准；authorId 可代填

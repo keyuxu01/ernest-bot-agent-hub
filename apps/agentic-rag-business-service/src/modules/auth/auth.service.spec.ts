@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AuthUser } from '../user/type/user.types';
 import type { UserService } from '../user/user.service';
+import type { TeamService } from '../team/team.service';
 import { AuthService } from './auth.service';
 import type { EmailActivationService } from './email-activation.service';
 import type { EmailService } from './email.service';
@@ -16,6 +17,7 @@ const user: AuthUser = {
   email: null,
   avatar: null,
   roles: ['ROLE_USER'],
+  permissions: [],
 };
 
 const userService = {
@@ -28,6 +30,10 @@ const userService = {
   touchLastLogin: vi.fn(),
   getUserIdsByRoleCode: vi.fn(),
   ensureBootstrapAdmin: vi.fn(),
+  findByUsername: vi.fn(),
+};
+const teamService = {
+  assignSeedTeamLeader: vi.fn(),
 };
 const configValues: Record<string, unknown> = {};
 const config = {
@@ -70,6 +76,7 @@ beforeEach(() => {
     emailService as unknown as EmailService,
     emailActivation as unknown as EmailActivationService,
     passwordReset as unknown as PasswordResetService,
+    teamService as unknown as TeamService,
   );
 });
 
@@ -347,5 +354,28 @@ describe('AuthService.onModuleInit', () => {
       'strong-password',
       'admin@example.com',
     );
+  });
+
+  it('makes a newly created bootstrap admin the seed team leader', async () => {
+    configValues.AUTH_BOOTSTRAP_ADMIN_USERNAME = 'admin';
+    configValues.AUTH_BOOTSTRAP_ADMIN_PASSWORD = 'strong-password';
+    configValues.AUTH_BOOTSTRAP_ADMIN_EMAIL = 'admin@example.com';
+    userService.ensureBootstrapAdmin.mockResolvedValue(true);
+    userService.findByUsername.mockResolvedValue({ id: '90001' });
+
+    await service.onModuleInit();
+
+    expect(teamService.assignSeedTeamLeader).toHaveBeenCalledWith('90001');
+  });
+
+  it('leaves teams alone when the bootstrap admin already exists', async () => {
+    configValues.AUTH_BOOTSTRAP_ADMIN_USERNAME = 'admin';
+    configValues.AUTH_BOOTSTRAP_ADMIN_PASSWORD = 'strong-password';
+    configValues.AUTH_BOOTSTRAP_ADMIN_EMAIL = 'admin@example.com';
+    userService.ensureBootstrapAdmin.mockResolvedValue(false);
+
+    await service.onModuleInit();
+
+    expect(teamService.assignSeedTeamLeader).not.toHaveBeenCalled();
   });
 });

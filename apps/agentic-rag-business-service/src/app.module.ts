@@ -15,6 +15,7 @@ import { DocumentModule } from './modules/document/document.module';
 import { GreetingModule } from './modules/greeting/greeting.module';
 import { HealthModule } from './modules/health/health.module';
 import { PipelineModule } from './modules/pipeline/pipeline.module';
+import { TeamModule } from './modules/team/team.module';
 
 @Module({
   imports: [
@@ -38,7 +39,7 @@ import { PipelineModule } from './modules/pipeline/pipeline.module';
     // 协议 / 平台
     ORPCModule.forRoot({}),
     ApiDocsModule,
-    // 认证：注册全局 JWT / 角色守卫，接口默认需登录
+    // 认证：注册全局 JWT / 角色 / 权限码守卫，接口默认需登录
     AuthModule,
 
     // 业务 feature
@@ -46,6 +47,7 @@ import { PipelineModule } from './modules/pipeline/pipeline.module';
     HealthModule,
     DocumentModule,
     PipelineModule,
+    TeamModule,
   ],
 })
 export class AppModule {}

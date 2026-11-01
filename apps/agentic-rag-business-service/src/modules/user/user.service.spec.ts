@@ -7,6 +7,7 @@ import { hash } from 'bcryptjs';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { UserEntity } from './entities/user.entity';
 import type { DocumentRepository } from '../document/repository/document.repository';
+import type { PermissionService } from './permission.service';
 import type { UserRepository } from './repository/user.repository';
 import { UserService } from './user.service';
 
@@ -48,6 +49,10 @@ const documentRepo = {
   sumStatsByAuthor: vi.fn(),
 };
 
+const permissionService = {
+  getUserPermissionCodes: vi.fn(),
+};
+
 let service: UserService;
 
 beforeAll(async () => {
@@ -64,14 +69,16 @@ beforeEach(() => {
   userRepo.findUserRole.mockResolvedValue(null);
   userRepo.findByEmail.mockResolvedValue(null);
   userRepo.save.mockImplementation(async (u: UserEntity) => u);
+  permissionService.getUserPermissionCodes.mockResolvedValue(['document:list']);
   service = new UserService(
     userRepo as unknown as UserRepository,
     documentRepo as unknown as DocumentRepository,
+    permissionService as unknown as PermissionService,
   );
 });
 
 describe('UserService.validateCredentials', () => {
-  it('returns the auth user with roles', async () => {
+  it('returns the auth user with roles and permissions', async () => {
     userRepo.findByUsername.mockResolvedValue(userRow());
 
     await expect(
@@ -83,7 +90,11 @@ describe('UserService.validateCredentials', () => {
       email: null,
       avatar: null,
       roles: ['ROLE_USER'],
+      permissions: ['document:list'],
     });
+    expect(permissionService.getUserPermissionCodes).toHaveBeenCalledWith(
+      '10001',
+    );
   });
 
   it.each([

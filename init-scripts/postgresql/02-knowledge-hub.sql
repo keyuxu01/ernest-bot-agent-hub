@@ -44,7 +44,7 @@ CREATE INDEX IF NOT EXISTS idx_kh_document_review_document_id
 CREATE UNIQUE INDEX IF NOT EXISTS uq_kh_document_review_pending
     ON kh_document_review (document_id) WHERE review_result IS NULL;
 
--- ==================== 用户与角色（第一期：简化注册，注册后立即可登录） ====================
+-- ==================== 用户与角色 ====================
 
 CREATE TABLE IF NOT EXISTS kh_user (
     id BIGINT PRIMARY KEY,                          -- 用户 ID（雪花）
@@ -90,3 +90,121 @@ INSERT INTO kh_role (id, role_name, role_code, description) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- 不预置账号（同一 init 目录也用于 docker:up:prod）：初始管理员由 AUTH_BOOTSTRAP_ADMIN_* 在启动时创建
+
+-- ==================== 权限 RBAC ====================
+
+-- 权限表：菜单 / 按钮 / 接口三类权限组成一棵树；接口上 @RequirePermission 校验的是 permission_code
+CREATE TABLE IF NOT EXISTS kh_permission (          -- 表不存在才创建，重复执行不报错
+    id BIGINT PRIMARY KEY,                          -- 权限 ID（雪花），主键
+    parent_id BIGINT NOT NULL DEFAULT 0,            -- 父权限 ID，0 为根；不设外键，靠程序维护
+    permission_name VARCHAR(50) NOT NULL,           -- 权限名称，展示用，如「文档列表」
+    permission_code VARCHAR(100) NOT NULL UNIQUE,   -- 权限编码，全表唯一（含已软删的行），如 document:list
+    permission_type SMALLINT NOT NULL,              -- 权限类型：1 菜单 2 按钮 3 接口
+    menu_url VARCHAR(200),                          -- 菜单对应的前端路由，可空
+    api_url VARCHAR(500),                           -- 接口 URL 模式，只做记录，不参与校验，可空
+    method VARCHAR(10),                             -- 接口 HTTP 方法，只做记录，可空
+    icon VARCHAR(50),                               -- 菜单图标名，可空
+    sort INT NOT NULL DEFAULT 0,                    -- 同级排序，越小越靠前
+    status SMALLINT NOT NULL DEFAULT 1,             -- 0 禁用 1 启用；禁用的权限不生效
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- 创建时间（带时区）
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- 更新时间（带时区）
+    deleted BOOLEAN NOT NULL DEFAULT false          -- 软删标记，true 表示已删除
+);                                                  -- kh_permission 结束
+
+-- 角色-权限关联表：一行表示「某角色拥有某权限」
+CREATE TABLE IF NOT EXISTS kh_role_permission (     -- 表不存在才创建
+    id BIGINT PRIMARY KEY,                          -- 关联 ID（雪花），主键
+    role_id BIGINT NOT NULL REFERENCES kh_role(id), -- 角色 ID，外键：角色必须存在
+    permission_id BIGINT NOT NULL REFERENCES kh_permission(id), -- 权限 ID，外键：权限必须存在
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- 绑定时间
+    UNIQUE (role_id, permission_id)                 -- 同一角色不能重复绑同一权限
+);                                                  -- kh_role_permission 结束
+
+-- 用户直接权限表：一行表示「某用户直接拥有某权限」，与角色权限合并生效
+CREATE TABLE IF NOT EXISTS kh_user_permission (     -- 表不存在才创建
+    id BIGINT PRIMARY KEY,                          -- 关联 ID（雪花），主键
+    user_id BIGINT NOT NULL REFERENCES kh_user(id), -- 用户 ID，外键：用户必须存在
+    permission_id BIGINT NOT NULL REFERENCES kh_permission(id), -- 权限 ID，外键：权限必须存在
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- 绑定时间
+    UNIQUE (user_id, permission_id)                 -- 同一用户不能重复绑同一权限
+);                                                  -- kh_user_permission 结束
+
+-- 预置一级菜单（parent_id = 0，类型 1 菜单）
+INSERT INTO kh_permission (id, parent_id, permission_name, permission_code, permission_type, menu_url, icon, sort) VALUES -- 要写入的列
+    (4000000000000000001, 0, '首页', 'dashboard', 1, '/dashboard', 'DashboardOutlined', 1),           -- 首页菜单
+    (4000000000000000002, 0, '文档中心', 'document', 1, '/documents', 'FileTextOutlined', 2),         -- 文档中心菜单
+    (4000000000000000003, 0, '搜索', 'search', 1, '/search', 'SearchOutlined', 3),                    -- 搜索菜单
+    (4000000000000000004, 0, '个人中心', 'profile', 1, '/profile', 'UserOutlined', 4),                -- 个人中心菜单
+    (4000000000000000005, 0, '系统管理', 'system', 1, '/admin', 'SettingOutlined', 5)                 -- 系统管理菜单
+ON CONFLICT (id) DO NOTHING;                        -- id 已存在则跳过，重复执行不报错
+
+-- 预置「文档中心」下的按钮权限（parent_id = 文档中心，类型 2 按钮）
+INSERT INTO kh_permission (id, parent_id, permission_name, permission_code, permission_type, sort) VALUES -- 要写入的列
+    (4000000000000000011, 4000000000000000002, '文档列表', 'document:list', 2, 1),     -- 查看文档列表
+    (4000000000000000012, 4000000000000000002, '创建文档', 'document:create', 2, 2),   -- 创建文档
+    (4000000000000000013, 4000000000000000002, '编辑文档', 'document:edit', 2, 3),     -- 编辑文档
+    (4000000000000000014, 4000000000000000002, '删除文档', 'document:delete', 2, 4),   -- 删除文档
+    (4000000000000000015, 4000000000000000002, '文档审核', 'document:review', 2, 5)    -- 审核文档
+ON CONFLICT (id) DO NOTHING;                        -- id 已存在则跳过
+
+-- 预置「系统管理」下的子菜单（parent_id = 系统管理，类型 1 菜单）
+INSERT INTO kh_permission (id, parent_id, permission_name, permission_code, permission_type, menu_url, sort) VALUES -- 要写入的列
+    (4000000000000000021, 4000000000000000005, '用户管理', 'system:user', 1, '/admin/users', 1),             -- 用户管理（/users 部分接口校验）
+    (4000000000000000022, 4000000000000000005, '角色管理', 'system:role', 1, '/admin/roles', 2),             -- 角色管理（/roles/:id/permissions 校验）
+    (4000000000000000023, 4000000000000000005, '权限管理', 'system:permission', 1, '/admin/permissions', 3), -- 权限管理（/permissions 读接口校验）
+    (4000000000000000024, 4000000000000000005, '团队管理', 'system:team', 1, '/admin/teams', 4)              -- 团队管理（/teams 接口校验）
+ON CONFLICT (id) DO NOTHING;                        -- id 已存在则跳过
+
+-- 预置「权限管理」下的按钮权限（parent_id = 权限管理，类型 2 按钮）
+INSERT INTO kh_permission (id, parent_id, permission_name, permission_code, permission_type, sort) VALUES -- 要写入的列
+    (4000000000000000041, 4000000000000000023, '新增权限', 'system:permission:create', 2, 1), -- POST /permissions 校验
+    (4000000000000000042, 4000000000000000023, '编辑权限', 'system:permission:edit', 2, 2),   -- PUT /permissions/:id 校验
+    (4000000000000000043, 4000000000000000023, '删除权限', 'system:permission:delete', 2, 3)  -- DELETE /permissions/:id 校验
+ON CONFLICT (id) DO NOTHING;                        -- id 已存在则跳过
+
+-- 预置角色权限：审核员（2000…002）、普通用户（2000…003）；管理员不用绑，代码里自动拥有全部操作权限
+INSERT INTO kh_role_permission (id, role_id, permission_id) VALUES -- 要写入的列
+    (4100000000000000001, 2000000000000000002, 4000000000000000011), -- 审核员 → 文档列表
+    (4100000000000000002, 2000000000000000002, 4000000000000000015), -- 审核员 → 文档审核
+    (4100000000000000003, 2000000000000000003, 4000000000000000001), -- 普通用户 → 首页
+    (4100000000000000004, 2000000000000000003, 4000000000000000002), -- 普通用户 → 文档中心
+    (4100000000000000005, 2000000000000000003, 4000000000000000011), -- 普通用户 → 文档列表
+    (4100000000000000006, 2000000000000000003, 4000000000000000012), -- 普通用户 → 创建文档
+    (4100000000000000007, 2000000000000000003, 4000000000000000003), -- 普通用户 → 搜索
+    (4100000000000000008, 2000000000000000003, 4000000000000000004)  -- 普通用户 → 个人中心
+ON CONFLICT (id) DO NOTHING;                        -- id 已存在则跳过
+
+-- ==================== 团队 ====================
+
+-- 团队表：parent_id 组成团队树
+CREATE TABLE IF NOT EXISTS kh_team (                -- 表不存在才创建
+    id BIGINT PRIMARY KEY,                          -- 团队 ID（雪花），主键
+    team_name VARCHAR(100) NOT NULL,                -- 团队名称
+    team_code VARCHAR(50),                          -- 团队编码，可空，不要求唯一
+    description VARCHAR(500),                       -- 描述，可空
+    leader_id BIGINT,                               -- 负责人 → kh_user.id，可空；不设外键
+    parent_id BIGINT NOT NULL DEFAULT 0,            -- 父团队 ID，0 为根；不设外键
+    sort INT NOT NULL DEFAULT 0,                    -- 同级排序，越小越靠前
+    status SMALLINT NOT NULL DEFAULT 1,             -- 0 禁用 1 启用；禁用的团队不出现在团队树
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- 创建时间
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- 更新时间
+    deleted BOOLEAN NOT NULL DEFAULT false          -- 软删标记
+);                                                  -- kh_team 结束
+CREATE INDEX IF NOT EXISTS idx_kh_team_parent_id ON kh_team(parent_id); -- 按父团队查子团队用的索引
+
+-- 团队成员表：一行表示「某用户在某团队里」
+CREATE TABLE IF NOT EXISTS kh_team_member (         -- 表不存在才创建
+    id BIGINT PRIMARY KEY,                          -- 关联 ID（雪花），主键
+    team_id BIGINT NOT NULL REFERENCES kh_team(id), -- 团队 ID，外键：团队必须存在
+    user_id BIGINT NOT NULL REFERENCES kh_user(id), -- 用户 ID，外键：用户必须存在（所以 init 时无法预置成员）
+    member_role VARCHAR(20) NOT NULL DEFAULT 'member', -- 成员身份：leader 负责人 / member 普通成员
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- 加入时间
+    UNIQUE (team_id, user_id)                       -- 同一用户在同一团队只能有一行
+);                                                  -- kh_team_member 结束
+CREATE INDEX IF NOT EXISTS idx_kh_team_member_user_id ON kh_team_member(user_id); -- 按用户查所在团队用的索引
+
+-- 预置团队；init 时还没有任何账号：负责人与 leader 成员行由服务在新建初始管理员（AUTH_BOOTSTRAP_ADMIN_*）时写入
+INSERT INTO kh_team (id, team_name, team_code, description, leader_id, parent_id, sort) VALUES -- 要写入的列
+    (8000000000000000001, '技术中心', 'TECH_CENTER', '研发与技术团队', NULL, 0, 1),                    -- 根团队，负责人先留空
+    (8000000000000000002, '后端开发组', 'BACKEND_TEAM', '后端开发', NULL, 8000000000000000001, 1)      -- 技术中心的子团队
+ON CONFLICT (id) DO NOTHING;                        -- id 已存在则跳过

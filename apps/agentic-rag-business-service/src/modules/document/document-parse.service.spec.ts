@@ -94,6 +94,7 @@ describe('DocumentParseService', () => {
       email: null,
       avatar: null,
       roles: ['ROLE_USER'],
+      permissions: [],
     };
     const result = await service.uploadAndParse(
       upload('notes.md', '\ufeff# 笔记\n\n正文', 'text/markdown'),

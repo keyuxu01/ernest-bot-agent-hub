@@ -272,11 +272,17 @@ in PostgreSQL, username + bcrypt password login, and HS256 access / refresh JWTs
 from PostgreSQL. Admins manage users and roles through `/users` and `/roles`; users edit their profile
 and password. Optional email activation and forgotten-password codes use Redis
 (`src/infrastructure/redis`) for short-lived tokens and SMTP (`src/infrastructure/mail`) for delivery.
-Authorization is role-only; there is no document ownership check, tokens are not revocable and login /
-reset codes have no rate limit. This is separate from UserPlatform (ADR-0018). Token verification uses
+On top of roles, `kh_permission` / `kh_role_permission` / `kh_user_permission` give each user a set of
+permission codes (direct ∪ role; `ROLE_ADMIN` also gets a fixed admin set), returned as
+`AuthUser.permissions` and checked by a third global `PermissionsGuard` on `@RequirePermission()` routes
+(admins bypass it). Admins manage permissions through `/permissions`, role / user bindings through
+`/roles/:id/permissions` and `/users/:id/permissions`, and teams (`kh_team` / `kh_team_member`) through
+`/teams` (admin only). Document and review routes are still role-only; there is no document
+ownership check, tokens are not revocable and login / reset codes have no rate limit. This is separate from UserPlatform (ADR-0018). Token verification uses
 passport-jwt (`JwtStrategy`), and user resolution is isolated in `AuthService.buildAuthUser()` so it can
 later move to UserPlatform-issued tokens. See
-[ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md).
+[ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md) and
+[ADR-0025](./decisions/0025-rag-business-permission-codes-and-teams.md).
 
 ## Document Publish and RAG Index Boundary
 
@@ -326,6 +332,7 @@ is no graph query API yet. See [ADR-0022](./decisions/0022-use-neo4j-for-knowled
 | [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md)            | Neo4j knowledge graph built from published documents | Accepted   |
 | [ADR-0023](./decisions/0023-document-publish-review-workflow.md)         | Publish review workflow and status-driven index sync | Accepted   |
 | [ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md)     | RagBusiness built-in accounts, JWT auth and roles    | Accepted   |
+| [ADR-0025](./decisions/0025-rag-business-permission-codes-and-teams.md)  | RagBusiness permission-code RBAC and teams           | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

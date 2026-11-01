@@ -9,7 +9,7 @@ import type { AuthUser, RoleCodeValue } from '../../user/type/user.types';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 /**
- * 角色守卫（RBAC 简化版）
+ * 角色守卫
  *
  * 在 JwtAuthGuard 之后执行（同为 APP_GUARD，按注册顺序：先 JWT、后 Roles）。
  *

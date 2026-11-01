@@ -80,6 +80,8 @@ describe('Business service (e2e)', () => {
   let app: INestApplication;
   let createdUserIds: string[] = [];
   let createdDocumentIds: string[] = [];
+  let createdPermissionIds: string[] = [];
+  let createdTeamIds: string[] = [];
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -394,6 +396,181 @@ describe('Business service (e2e)', () => {
     );
   });
 
+  it('resolves permissions and lets admins manage them', async () => {
+    const admin = await loginAsNewUser(['ROLE_ADMIN']);
+    const normal = await loginAsNewUser();
+    const server = app.getHttpServer();
+    const as = (token: string) => ({ Authorization: `Bearer ${token}` });
+
+    // 普通用户经 ROLE_USER 预置绑定获得权限码；管理员追加全部操作权限
+    const me = await request(server)
+      .get('/auth/me')
+      .set(as(normal.token))
+      .expect(200);
+    expect(me.body.permissions).toEqual(
+      expect.arrayContaining(['document:list', 'document:create', 'search']),
+    );
+    expect(me.body.permissions).not.toContain('document:review');
+    const adminMe = await request(server)
+      .get('/auth/me')
+      .set(as(admin.token))
+      .expect(200);
+    expect(adminMe.body.permissions).toEqual(
+      expect.arrayContaining(['system:permission', 'system:team']),
+    );
+
+    await request(server)
+      .get('/permissions/tree')
+      .set(as(normal.token))
+      .expect(403);
+    const tree = await request(server)
+      .get('/permissions/tree')
+      .set(as(admin.token))
+      .expect(200);
+    const documentNode = tree.body.find(
+      (n: { permissionCode: string }) => n.permissionCode === 'document',
+    );
+    expect(
+      documentNode.children.map(
+        (c: { permissionCode: string }) => c.permissionCode,
+      ),
+    ).toEqual(expect.arrayContaining(['document:list', 'document:review']));
+
+    const reviewerPerms = await request(server)
+      .get('/roles/2000000000000000002/permissions')
+      .set(as(admin.token))
+      .expect(200);
+    expect(reviewerPerms.body.permissionIds.sort()).toEqual([
+      '4000000000000000011',
+      '4000000000000000015',
+    ]);
+
+    const code = `e2e:perm:${Date.now()}`;
+    const created = await request(server)
+      .post('/permissions')
+      .set(as(admin.token))
+      .send({
+        permissionName: 'e2e 权限',
+        permissionCode: code,
+        permissionType: 2,
+        parentId: '4000000000000000002',
+      })
+      .expect(201);
+    const permissionId: string = created.body.id;
+    createdPermissionIds.push(permissionId);
+    await request(server)
+      .post('/permissions')
+      .set(as(admin.token))
+      .send({ permissionName: '重复', permissionCode: code, permissionType: 2 })
+      .expect(409);
+
+    // 用户直接权限：替换后当前 token 下一次请求即生效（每次请求重读）
+    await request(server)
+      .put(`/users/${normal.userId}/permissions`)
+      .set(as(admin.token))
+      .send({ permissionIds: [permissionId] })
+      .expect(200);
+    const userPerms = await request(server)
+      .get(`/users/${normal.userId}/permissions`)
+      .set(as(admin.token))
+      .expect(200);
+    expect(userPerms.body.directPermissionIds).toEqual([permissionId]);
+    expect(userPerms.body.permissionCodes).toContain(code);
+    const meAfter = await request(server)
+      .get('/auth/me')
+      .set(as(normal.token))
+      .expect(200);
+    expect(meAfter.body.permissions).toContain(code);
+
+    // 仍有绑定不能删；解绑后软删
+    const bound = await request(server)
+      .delete(`/permissions/${permissionId}`)
+      .set(as(admin.token))
+      .expect(400);
+    expect(bound.body.message).toBe('权限仍有关联角色或用户，无法删除');
+    await request(server)
+      .put(`/users/${normal.userId}/permissions`)
+      .set(as(admin.token))
+      .send({ permissionIds: [] })
+      .expect(200);
+    await request(server)
+      .delete(`/permissions/${permissionId}`)
+      .set(as(admin.token))
+      .expect(200);
+    await request(server)
+      .get(`/permissions/${permissionId}`)
+      .set(as(admin.token))
+      .expect(404);
+  });
+
+  it('lets admins manage teams and members', async () => {
+    const admin = await loginAsNewUser(['ROLE_ADMIN']);
+    const member = await loginAsNewUser();
+    const server = app.getHttpServer();
+    const as = (token: string) => ({ Authorization: `Bearer ${token}` });
+
+    // 团队树需登录且为管理员
+    await request(server).get('/teams/tree').expect(401);
+    await request(server).get('/teams/tree').set(as(member.token)).expect(403);
+    const tree = await request(server)
+      .get('/teams/tree')
+      .set(as(admin.token))
+      .expect(200);
+    expect(tree.body.map((t: { teamCode: string }) => t.teamCode)).toContain(
+      'TECH_CENTER',
+    );
+
+    await request(server).get('/teams/page').set(as(member.token)).expect(403);
+
+    const created = await request(server)
+      .post('/teams')
+      .set(as(admin.token))
+      .send({
+        teamName: 'e2e 团队',
+        teamCode: `E2E_${Date.now()}`,
+        parentId: '8000000000000000001',
+      })
+      .expect(201);
+    const teamId: string = created.body.id;
+    createdTeamIds.push(teamId);
+
+    await request(server)
+      .post(`/teams/${teamId}/members`)
+      .set(as(admin.token))
+      .send([member.userId])
+      .expect(201);
+    const members = await request(server)
+      .get(`/teams/${teamId}/members`)
+      .set(as(admin.token))
+      .expect(200);
+    expect(members.body).toEqual([
+      expect.objectContaining({
+        userId: member.userId,
+        memberRole: 'member',
+        username: member.username,
+      }),
+    ]);
+    const detail = await request(server)
+      .get(`/teams/${teamId}`)
+      .set(as(admin.token))
+      .expect(200);
+    expect(detail.body.memberCount).toBe(1);
+
+    await request(server)
+      .delete(`/teams/${teamId}/members`)
+      .set(as(admin.token))
+      .send([member.userId])
+      .expect(200);
+    await request(server)
+      .delete(`/teams/${teamId}`)
+      .set(as(admin.token))
+      .expect(200);
+    await request(server)
+      .get(`/teams/${teamId}`)
+      .set(as(admin.token))
+      .expect(404);
+  });
+
   it('updates the profile, statistics and password of the current user', async () => {
     const me = await loginAsNewUser();
     const server = app.getHttpServer();
@@ -452,7 +629,9 @@ describe('Business service (e2e)', () => {
       .send({ email })
       .expect(400);
 
-    const mail = sentMails.find((m) => m.to === email);
+    const mail = sentMails.find(
+      (m) => m.to === email && m.text.includes('验证码'),
+    );
     const code = /验证码是：(\d{6})/.exec(mail?.text ?? '')?.[1];
     expect(code).toMatch(/^\d{6}$/);
 
@@ -479,7 +658,9 @@ describe('Business service (e2e)', () => {
       .post('/auth/password/reset/send-code')
       .send({ email })
       .expect(201);
-    const mail = sentMails.find((m) => m.to === email);
+    const mail = sentMails.find(
+      (m) => m.to === email && m.text.includes('验证码'),
+    );
     const code = /验证码是：(\d{6})/.exec(mail?.text ?? '')?.[1];
     const wrong = code === '000000' ? '111111' : '000000';
 
@@ -551,7 +732,25 @@ describe('Business service (e2e)', () => {
         [createdDocumentIds],
       );
     }
+    if (createdTeamIds.length) {
+      await dataSource.query(
+        'DELETE FROM kh_team_member WHERE team_id = ANY($1::bigint[])',
+        [createdTeamIds],
+      );
+      await dataSource.query(
+        'DELETE FROM kh_team WHERE id = ANY($1::bigint[])',
+        [createdTeamIds],
+      );
+    }
     if (createdUserIds.length) {
+      await dataSource.query(
+        'DELETE FROM kh_team_member WHERE user_id = ANY($1::bigint[])',
+        [createdUserIds],
+      );
+      await dataSource.query(
+        'DELETE FROM kh_user_permission WHERE user_id = ANY($1::bigint[])',
+        [createdUserIds],
+      );
       await dataSource.query(
         'DELETE FROM kh_user_role WHERE user_id = ANY($1::bigint[])',
         [createdUserIds],
@@ -561,8 +760,24 @@ describe('Business service (e2e)', () => {
         [createdUserIds],
       );
     }
+    if (createdPermissionIds.length) {
+      await dataSource.query(
+        'DELETE FROM kh_role_permission WHERE permission_id = ANY($1::bigint[])',
+        [createdPermissionIds],
+      );
+      await dataSource.query(
+        'DELETE FROM kh_user_permission WHERE permission_id = ANY($1::bigint[])',
+        [createdPermissionIds],
+      );
+      await dataSource.query(
+        'DELETE FROM kh_permission WHERE id = ANY($1::bigint[])',
+        [createdPermissionIds],
+      );
+    }
     createdDocumentIds = [];
     createdUserIds = [];
+    createdPermissionIds = [];
+    createdTeamIds = [];
     await app.close();
   });
 
@@ -575,6 +790,19 @@ describe('Business service (e2e)', () => {
       .expect(201);
     const userId: string = registered.body.userId;
     createdUserIds.push(userId);
+
+    // REQUIRE_EMAIL_VERIFICATION=true 时带邮箱注册须先点激活链接才能登录
+    if (registered.body.emailVerificationRequired) {
+      const mail = sentMails.find(
+        (m) => m.to === email && m.text.includes('verify-email'),
+      );
+      const token = /verify-email\?token=(\S+)/.exec(mail?.text ?? '')?.[1];
+      expect(token).toBeDefined();
+      await request(app.getHttpServer())
+        .get('/auth/verify-email')
+        .query({ token })
+        .expect(200);
+    }
 
     for (const roleCode of extraRoles) {
       await app.get(DataSource).query(
