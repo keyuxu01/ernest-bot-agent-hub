@@ -1,0 +1,128 @@
+apps/agentic-rag-business-service/src/modules/document/document-review.service.ts
+  s_648aabf0f6e214::t_ba36b1889dceba 73-75,77,95
+apps/agentic-rag-business-service/src/modules/document/dto/upload-parse-document.dto.ts
+  s_648aabf0f6e214::t_9a8ee70eb22f1e 3
+docs/architecture/README.md
+  s_648aabf0f6e214::t_80b82877f00ef1 349
+  s_648aabf0f6e214::t_28bdd91cf6d2e8 280-282
+  s_648aabf0f6e214::t_0cd28b84afdf4f 309-322
+apps/agentic-rag-business-service/src/infrastructure/rabbitmq/document-pipeline.publisher.ts
+  s_648aabf0f6e214::t_a1911c9bb46dae 147-151
+  s_648aabf0f6e214::t_f6c5bfa771c7f0 9,38-40,42,44-46,126-129,131-132,135,143,153
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/search-index.service.ts
+  s_648aabf0f6e214::t_2ae5263788b639 9-17,23-24,26-27,34-37,40-43,61-64,70-73,75,90-94,110-146,148,150-153,155-162,164,166,168-177,179-190,192-213,217,219-221,223-224,226-228,230-233,235-238,240,242-244,246,248,250-251,253-263,265
+  s_648aabf0f6e214::t_770e42f70b2db0 147,149,154,163,165,167,178,191,215,218,222,229,234,239,241,245,247,249,252
+apps/agentic-rag-business-service/src/modules/search/search.module.ts
+  s_648aabf0f6e214::t_ed58d25ade4e62 1-12
+apps/agentic-rag-business-service/src/modules/graph/dto/graph-query.dto.ts
+  s_648aabf0f6e214::t_e09468a9e33177 1-41
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/search-index.service.spec.ts
+  s_648aabf0f6e214::t_494a03f2d5b91d 5-11,30-36,43,56,82-163,169-183
+  s_648aabf0f6e214::t_95b1f23993ef70 164-168
+apps/agentic-rag-business-service/src/modules/document/document.service.ts
+  s_648aabf0f6e214::t_8f287e6ee3db97 64-70,187-192,290-294,334-340,353-359,377-381,402-411
+  s_648aabf0f6e214::t_82cccada8b144a 72,121,130-131,142,194,264,276,289,296,318,325,328,341,344,360,363,383,390,414,428
+apps/agentic-rag-business-service/src/modules/document/document-parse.service.ts
+  s_648aabf0f6e214::t_f49be0d88206ec 57
+  s_648aabf0f6e214::t_a1911c9bb46dae 47-51
+apps/agentic-rag-business-service/src/modules/document/document-review.controller.ts
+  s_648aabf0f6e214::t_3ec750b39448df 24-27,30-32,34,42-43,45,53-59,71-77,89-94,101-105,112-116
+  s_648aabf0f6e214::t_9743408e3de36c 44
+  s_648aabf0f6e214::t_a1911c9bb46dae 33
+  s_648aabf0f6e214::t_ba36b1889dceba 3,5,19,37,48,62,80,96-98,107,118
+apps/agentic-rag-business-service/src/app.module.ts
+  s_648aabf0f6e214::t_95b1f23993ef70 17,19,53-54
+apps/agentic-rag-business-service/src/modules/user/constants/permission.constants.ts
+  s_648aabf0f6e214::t_bde4cc72c8248b 3-12,24,45-50
+apps/agentic-rag-business-service/src/infrastructure/chat-model/chat-model.service.ts
+  s_648aabf0f6e214::t_5abf1d3d98fb63 17
+apps/agentic-rag-business-service/src/infrastructure/rabbitmq/document-pipeline.publisher.spec.ts
+  s_648aabf0f6e214::t_8ed4487a215bb7 2,49,57,71-76
+apps/agentic-rag-business-service/src/infrastructure/neo4j/type/graph-store.types.ts
+  s_648aabf0f6e214::t_78820362496800 60-95,99,102,104
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_648aabf0f6e214::t_0456b1ada9f842 460,462
+  s_648aabf0f6e214::t_3ee8411397f26f 101-106,120-124,286-291,593-640
+apps/agentic-rag-business-service/.env.example
+  s_648aabf0f6e214::t_bde4cc72c8248b 50
+apps/agentic-rag-business-service/src/modules/pipeline/pipeline.orchestrator.ts
+  s_648aabf0f6e214::t_bc21df5a5adb84 11,18,67-89,91-92
+packages/contracts/src/index.ts
+  s_648aabf0f6e214::t_365bc4ad76ffbf 293,297-298
+apps/agentic-rag-business-service/src/modules/pipeline/document-pipeline.consumer.ts
+  s_648aabf0f6e214::t_bc21df5a5adb84 66
+  s_648aabf0f6e214::t_a1911c9bb46dae 53-58
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/constants/search-index.constants.ts
+  s_648aabf0f6e214::t_6d96b3a9bc310a 6
+packages/contracts/src/rag-business/search-index.spec.ts
+  s_648aabf0f6e214::t_7a01b63c19689c 4,6,8,10,24-34,36-38
+apps/agentic-rag-business-service/src/infrastructure/neo4j/graph-store.service.ts
+  s_648aabf0f6e214::t_78820362496800 13,15-16,33,273-426
+apps/agentic-rag-business-service/src/modules/graph/graph.controller.ts
+  s_648aabf0f6e214::t_ac1035539f1ba0 1-45
+apps/agentic-rag-business-service/src/modules/search/search.controller.ts
+  s_648aabf0f6e214::t_8316166f669449 1-34
+apps/agentic-rag-business-service/__tests__/document-api.curl.md
+  s_648aabf0f6e214::t_11c3d423226f57 26,30,34,38
+  s_648aabf0f6e214::t_22e11c8eef4683 41
+apps/agentic-rag-business-service/src/modules/document/dto/update-document.dto.ts
+  s_648aabf0f6e214::t_9a8ee70eb22f1e 1,4-5
+apps/agentic-rag-business-service/__tests__/document-api.sh
+  s_648aabf0f6e214::t_11c3d423226f57 70
+  s_648aabf0f6e214::t_22e11c8eef4683 166
+packages/contracts/src/rag-business/search-index.ts
+  s_648aabf0f6e214::t_14e12c17e6f9f0 3-4,6-18,20-23,27-33
+docs/architecture/decisions/0026-rag-business-search-and-graph-read-apis.md
+  s_648aabf0f6e214::t_c6e78767014a63 1-77
+apps/agentic-rag-business-service/src/modules/document/document-parse.service.spec.ts
+  s_648aabf0f6e214::t_c5ce6753b19c99 183
+  s_648aabf0f6e214::t_c39dacea42fe7d 1,12-22,152,190-192,201-203,216-218
+  s_648aabf0f6e214::t_fd315701688e29 179,231
+apps/agentic-rag-business-service/src/modules/search/dto/search.dto.ts
+  s_648aabf0f6e214::t_da04fdb73be1c4 1-42
+apps/agentic-rag-business-service/src/modules/pipeline/pipeline.orchestrator.spec.ts
+  s_648aabf0f6e214::t_b0dcdff6b6be2d 21-24,40,122-156
+apps/agentic-rag-business-service/src/modules/document/document.controller.ts
+  s_648aabf0f6e214::t_3ec750b39448df 32-36,42-47,60-64,83-87,94-99,106-111,118-123,130-134,141-147,158-163
+  s_648aabf0f6e214::t_ba36b1889dceba 25-26,29,49,67,89,101-103,113-115,125-127,136,149,165-167
+apps/agentic-rag-business-service/src/modules/document/document-index-sync.service.ts
+  s_648aabf0f6e214::t_f49be0d88206ec 15,18-20,22,24
+apps/agentic-rag-business-service/src/modules/graph/graph.module.ts
+  s_648aabf0f6e214::t_81992b797588e8 1-12
+apps/agentic-rag-business-service/src/modules/document/document.service.spec.ts
+  s_648aabf0f6e214::t_c1ce6d32a150e1 363,366,377,399
+  s_648aabf0f6e214::t_c39dacea42fe7d 1,17-27,215-221,227-228,301-308
+  s_648aabf0f6e214::t_a2f7e1824033ce 138,147
+  s_648aabf0f6e214::t_fd315701688e29 118,132,144,155,166,173,194,208,239,249,264,276,289,321,331,345,394
+  s_648aabf0f6e214::t_c5ce6753b19c99 123-124,196,323
+  s_648aabf0f6e214::t_92d9500b50238a 224
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/type/search-document.types.ts
+  s_648aabf0f6e214::t_760e4825b29d97 1-65
+apps/agentic-rag-business-service/src/modules/pipeline/helpers/to-search-index-document.ts
+  s_648aabf0f6e214::t_4d085046f34241 1-3,5-10,12-26,30
+init-scripts/postgresql/02-knowledge-hub.sql
+  s_648aabf0f6e214::t_bde4cc72c8248b 174-177
+apps/agentic-rag-business-service/__tests__/search-graph-api.curl.md
+  s_648aabf0f6e214::t_28d55e6bab70ef 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.51-trip",
+  "base_commit_sha": "898ffa79248001dbad5022d85a1426e991db71dd",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_648aabf0f6e214": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_61150004-3e58-4fd6-a33f-cdc940b25f65",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
