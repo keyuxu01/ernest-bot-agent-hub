@@ -1,0 +1,43 @@
+apps/agentic-rag-client/app/_components/chat-session-sidebar.tsx
+  s_1e8562629bd9f5::t_e8d4ad863cfd83 54
+  s_1e8562629bd9f5::t_f706236891c33a 1-37,39-53,55-62
+  s_1e8562629bd9f5::t_21b6775b3f5bb5 38
+apps/agentic-rag-client/app/globals.css
+  s_1e8562629bd9f5::t_0d347abd689657 128-129,210-220,223-284
+apps/agentic-rag-client/app/_components/chat-conversation.tsx
+  s_1e8562629bd9f5::t_a15bfd0d039b81 1-22,25-35,40-88,95-102
+  s_1e8562629bd9f5::t_8652f33ddc2596 23-24,36-39,89-94
+apps/agentic-rag-client/app/_views/ChatPage.tsx
+  s_1e8562629bd9f5::t_4eda2850b9be80 3-6,8-26,29-46,49-51
+apps/agentic-rag-client/app/(protected)/chat/page.tsx
+  s_1e8562629bd9f5::t_1f909639412bcd 1,8-9
+  s_1e8562629bd9f5::t_da27d73e5e807a 7
+apps/agentic-rag-client/app/_types/knowledge-hub.ts
+  s_1e8562629bd9f5::t_2f3adc774d47bb 84,89-108
+apps/agentic-rag-client/app/_lib/api.ts
+  s_1e8562629bd9f5::t_1d82dc3400e98f 3,5,78-79,82-88
+apps/agentic-rag-client/app/_hooks/use-chat-page.ts
+  s_1e8562629bd9f5::t_396656f61025b0 1-36,44-160
+  s_1e8562629bd9f5::t_9b1e7e3b79e36b 37-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "bb5c227b2d0e44f188bc80747f10b573c10e8fac",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_1e8562629bd9f5": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_9610568c-0b01-4347-a79e-a1e2f3740dca",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
