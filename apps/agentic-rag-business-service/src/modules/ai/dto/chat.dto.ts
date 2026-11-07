@@ -10,6 +10,11 @@ import {
 
 /** RAG 对话请求 */
 export class ChatDto {
+  /** 已有会话 ID；不传则新建会话 */
+  @IsOptional()
+  @IsString()
+  sessionId?: string;
+
   /** 用户问题 */
   @IsString()
   @IsNotEmpty()

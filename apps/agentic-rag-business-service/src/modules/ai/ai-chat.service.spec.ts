@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ChatModelService } from '../../infrastructure/chat-model/chat-model.service';
 import type { ChunkHit } from '../../infrastructure/elasticsearch/type/chunk-hit.types';
 import { AiChatService } from './ai-chat.service';
+import type { ChatSessionService } from './chat-session.service';
 import type { HybridRetrievalService } from './hybrid-retrieval.service';
 
 function hit(n: number, content = `正文${n}`): ChunkHit {
@@ -17,6 +18,7 @@ function hit(n: number, content = `正文${n}`): ChunkHit {
 
 const invoke = vi.fn();
 const retrieval = { retrieve: vi.fn() };
+const sessions = { appendTurn: vi.fn() };
 let service: AiChatService;
 
 beforeEach(() => {
@@ -24,17 +26,20 @@ beforeEach(() => {
   service = new AiChatService(
     { answerModel: { invoke } } as unknown as ChatModelService,
     retrieval as unknown as HybridRetrievalService,
+    sessions as unknown as ChatSessionService,
   );
 });
 
 describe('AiChatService.chat', () => {
   it('returns hints without calling the LLM for blank questions or no hits', async () => {
     await expect(service.chat('  ')).resolves.toEqual({
+      sessionId: null,
       answer: '请输入问题。',
       sources: [],
     });
     retrieval.retrieve.mockResolvedValue([]);
     await expect(service.chat('问题')).resolves.toEqual({
+      sessionId: null,
       answer: '知识库里没有相关内容。',
       sources: [],
     });

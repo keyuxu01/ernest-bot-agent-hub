@@ -211,3 +211,30 @@ INSERT INTO kh_team (id, team_name, team_code, description, leader_id, parent_id
     (8000000000000000001, '技术中心', 'TECH_CENTER', '研发与技术团队', NULL, 0, 1),                    -- 根团队，负责人先留空
     (8000000000000000002, '后端开发组', 'BACKEND_TEAM', '后端开发', NULL, 8000000000000000001, 1)      -- 技术中心的子团队
 ON CONFLICT (id) DO NOTHING;                        -- id 已存在则跳过
+
+-- ==================== AI 会话 ====================
+
+-- AI 会话表：一行表示某个用户的一次连续问答
+CREATE TABLE IF NOT EXISTS kh_ai_session (                    -- 表不存在才创建，重复执行不报错
+    id BIGINT PRIMARY KEY,                                    -- 会话 ID（雪花），主键
+    user_id BIGINT NOT NULL,                                  -- 所属用户 ID；不设外键，与源实现一致
+    title VARCHAR(80) NOT NULL,                               -- 会话标题，最多 80 字
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),            -- 会话创建时间（带时区）
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()             -- 最后问答或重命名时间（带时区）
+);                                                            -- kh_ai_session 结束
+-- 按用户查询会话列表时直接按更新时间倒序扫描索引
+CREATE INDEX IF NOT EXISTS idx_kh_ai_session_user_updated     -- 索引不存在才创建
+    ON kh_ai_session(user_id, updated_at DESC);               -- 先按用户过滤，再按更新时间倒序
+
+-- AI 消息表：一行表示用户问题或助手回答
+CREATE TABLE IF NOT EXISTS kh_ai_message (                    -- 表不存在才创建，重复执行不报错
+    id BIGINT PRIMARY KEY,                                    -- 消息 ID（雪花），主键
+    session_id BIGINT NOT NULL REFERENCES kh_ai_session(id) ON DELETE CASCADE, -- 所属会话；删会话时级联删消息
+    role VARCHAR(16) NOT NULL,                                -- 消息角色：user / assistant
+    content TEXT NOT NULL,                                    -- 用户问题或助手完整回答
+    sources JSONB,                                            -- 助手回答引用的资料摘录；用户消息为空
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()             -- 消息创建时间（带时区）
+);                                                            -- kh_ai_message 结束
+-- 按会话读取完整消息时间线
+CREATE INDEX IF NOT EXISTS idx_kh_ai_message_session_id       -- 索引不存在才创建
+    ON kh_ai_message(session_id, created_at);                 -- 先按会话过滤，再按创建时间正序

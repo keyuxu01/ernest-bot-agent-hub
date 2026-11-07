@@ -703,6 +703,7 @@ describe('Business service (e2e)', () => {
       .send({ content: '金丝雀怎么做' })
       .expect(201);
     expect(chat.body).toEqual({
+      sessionId: expect.any(String),
       answer: '先做金丝雀 [1]。',
       sources: [
         {
@@ -722,6 +723,7 @@ describe('Business service (e2e)', () => {
       .send({ content: '无关' })
       .expect(201);
     expect(empty.body).toEqual({
+      sessionId: expect.any(String),
       answer: '知识库里没有相关内容。',
       sources: [],
     });

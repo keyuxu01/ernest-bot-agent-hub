@@ -332,8 +332,12 @@ in `VectorIndexService`, results are fused with Reciprocal Rank Fusion, then rer
 `text-rerank` through `src/infrastructure/rerank`. Embedding failure falls back to keyword-only; rerank
 failure keeps RRF order. Chat numbers the retrieved chunks, asks the Qwen model
 (`ChatModelService.answerModel`) to answer only from them with `[n]` citations, and returns the cited
-sources as excerpts. Retrieval has no visibility, author or team filter. See
-[ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md).
+sources as excerpts. Each authenticated chat turn is stored in PostgreSQL under the user's `kh_ai_session` and
+`kh_ai_message` rows. `POST /ai/chat` accepts an optional `sessionId` and returns the resulting session ID;
+`/ai/sessions` endpoints list, create, rename and delete only the current user's sessions. Stored history is not
+sent back to the model as conversational context. Retrieval has no visibility, author or team filter. See
+[ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md) and
+[ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md).
 
 ## Architecture Decision Records
 
@@ -363,6 +367,7 @@ sources as excerpts. Retrieval has no visibility, author or team filter. See
 | [ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md)  | RagBusiness full-text search and graph read APIs     | Accepted   |
 | [ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md)   | RagBusiness hybrid retrieval and RAG chat            | Accepted   |
 | [ADR-0028](./decisions/0028-rag-business-graph-overview-and-cors.md)     | Graph overview, tag nodes and CORS allowlist         | Accepted   |
+| [ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md)            | User-owned persistent AI chat sessions               | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

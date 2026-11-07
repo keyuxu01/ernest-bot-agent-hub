@@ -13,6 +13,8 @@ type ChatSource = {
 
 /** POST /ai/chat 响应 */
 type ChatResult = {
+  /** 本次问答所属会话；未提供用户上下文时为 null */
+  sessionId: string | null;
   answer: string;
   sources: ChatSource[];
 };
