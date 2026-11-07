@@ -1,0 +1,58 @@
+apps/agentic-rag-business-service/src/modules/ai/chat-session.service.ts
+  s_cad6ff28dbe944::t_41b069fde47945 1-165
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_cad6ff28dbe944::t_9f1b9e0987944b 726
+  s_cad6ff28dbe944::t_387cccc3778b77 706
+apps/agentic-rag-business-service/src/modules/ai/helpers/title-from-question.ts
+  s_cad6ff28dbe944::t_c31d60d2beaaed 1-14
+docs/architecture/README.md
+  s_cad6ff28dbe944::t_bb543a2f17962f 335-340,370
+apps/agentic-rag-business-service/src/modules/ai/dto/session.dto.ts
+  s_cad6ff28dbe944::t_53fcbd1a612ac4 1-44
+init-scripts/postgresql/02-knowledge-hub.sql
+  s_cad6ff28dbe944::t_479c8a7327b8fc 214-240
+apps/agentic-rag-business-service/src/modules/ai/type/ai-chat.types.ts
+  s_cad6ff28dbe944::t_6b7df163046cb8 16-17
+apps/agentic-rag-business-service/src/modules/ai/dto/chat.dto.ts
+  s_cad6ff28dbe944::t_4d61c2c94a2d48 13-17
+apps/agentic-rag-business-service/src/modules/ai/ai.controller.ts
+  s_cad6ff28dbe944::t_9915e36e7516e5 1-11,14,16,19-23,26,30-31,33,38,53-56,60-129
+apps/agentic-rag-business-service/src/modules/ai/ai-chat.service.ts
+  s_cad6ff28dbe944::t_23cf4705fbb0ee 2,4-5,9,12-13,20,23,28,32,35-38,40-45,48-52,58-71,92-103
+apps/agentic-rag-business-service/src/modules/ai/entities/ai-message.entity.ts
+  s_cad6ff28dbe944::t_1c45a62f70c271 1-37
+apps/agentic-rag-business-service/src/modules/ai/repository/chat-session.repository.ts
+  s_cad6ff28dbe944::t_b061f888d857e3 72
+  s_cad6ff28dbe944::t_7d12fd357fc57a 1-71,73-124
+docs/architecture/decisions/0029-rag-business-ai-chat-sessions.md
+  s_cad6ff28dbe944::t_5a3b5f69fe1e8b 1-51
+apps/agentic-rag-business-service/src/modules/ai/ai.module.ts
+  s_cad6ff28dbe944::t_be659e7f9f15e5 2,9-11,13,15,18,25-30
+apps/agentic-rag-business-service/src/modules/ai/entities/ai-session.entity.ts
+  s_cad6ff28dbe944::t_577b018ed1ea28 1-38
+apps/agentic-rag-business-service/src/modules/ai/ai-chat.service.spec.ts
+  h_329e897ccf6193 5
+  s_cad6ff28dbe944::t_e7b328ceeb67b9 36,42
+  s_cad6ff28dbe944::t_ec9bdbeded6f33 21,29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "7278b1639020dae497361360aa36195a2f495bd8",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_cad6ff28dbe944": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_189688a3-a58b-40e2-b76c-f60b8ed86164",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
