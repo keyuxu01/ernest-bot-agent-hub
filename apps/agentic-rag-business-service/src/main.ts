@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
 
 /** 应用入口：创建 Nest 实例、注册全局校验、监听 HTTP 端口 */
 async function bootstrap() {
