@@ -1,10 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
 
 /** 应用入口：创建 Nest 实例、注册全局校验、监听 HTTP 端口 */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const config = app.get(ConfigService);
+  const corsOrigins = config
+    .get<string>('CORS_ORIGINS', 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim());
+
+  // 允许配置中的 Web 来源携带凭据访问；不反射任意 Origin。
+  app.enableCors({ origin: corsOrigins, credentials: true });
 
   // 全局 DTO 校验（class-validator），作用于 @Body() / @Query() 等
   app.useGlobalPipes(

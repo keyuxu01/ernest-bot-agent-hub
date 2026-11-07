@@ -13,6 +13,11 @@ import type {
   GraphEdgeVO,
   GraphExtraction,
   GraphNodeVO,
+  GraphOverviewEdge,
+  GraphOverviewEdgeKind,
+  GraphOverviewNode,
+  GraphOverviewParams,
+  GraphOverviewResponse,
   GraphSearchHitVO,
 } from './type/graph-store.types';
 
@@ -79,8 +84,8 @@ class GraphStoreService implements OnModuleInit, OnModuleDestroy {
         MERGE (d:KnowledgeDocument {id: $id})
         // 每次重建都刷新可变元数据；createdAt 仅首次写入
         SET d.title = $title, d.summary = $summary, d.categoryId = $categoryId,
-            d.authorId = $authorId, d.status = $status, d.updatedAt = $now,
-            d.createdAt = coalesce(d.createdAt, $now)
+            d.authorId = $authorId, d.status = $status, d.tags = $tags,
+            d.updatedAt = $now, d.createdAt = coalesce(d.createdAt, $now)
         `,
         {
           id: doc.id,
@@ -89,6 +94,7 @@ class GraphStoreService implements OnModuleInit, OnModuleDestroy {
           categoryId: doc.categoryId ?? null,
           authorId: doc.authorId ?? null,
           status: doc.status,
+          tags: doc.tags ?? '',
           now,
         },
       );
@@ -407,6 +413,291 @@ class GraphStoreService implements OnModuleInit, OnModuleDestroy {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(`图谱检索失败：keyword=${kw}, ${message}`);
       return [];
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
+   * @description GET /graph/overview：返回文档、文档提及的实体、标签及画布统计，不返回过细的 chunk 节点；
+   * 查询失败只记日志并返回空全景
+   * @param params GraphOverviewParams，关键词、实体类型、更新时间范围与文档上限
+   * @returns Promise<GraphOverviewResponse>，力导向图节点、边、统计、热门实体、最近文档和实体类型
+   */
+  async getOverview(
+    params: GraphOverviewParams,
+  ): Promise<GraphOverviewResponse> {
+    const empty: GraphOverviewResponse = {
+      nodes: [],
+      edges: [],
+      stats: {
+        nodeCount: 0,
+        edgeCount: 0,
+        documentCount: 0,
+        entityCount: 0,
+        tagCount: 0,
+        mentionCount: 0,
+        relatedCount: 0,
+        entityTypes: [],
+      },
+      topEntities: [],
+      recentNodes: [],
+      entityTypes: [],
+    };
+
+    const kw = params.keyword?.trim() ?? '';
+    const entityType = params.entityType?.trim() || null;
+    const from = params.from?.trim() || null;
+    const to = params.to?.trim() || null;
+    const docLimit = Math.min(Math.max(params.docLimit ?? 24, 1), 80);
+    const session = this.driver.session();
+
+    try {
+      // 分段 WITH 聚合各类全库计数，避免多个 OPTIONAL MATCH 形成笛卡尔积。
+      const statsResult = await session.run(
+        `
+        OPTIONAL MATCH (d:KnowledgeDocument)
+        WITH count(d) AS documentCount
+        OPTIONAL MATCH (e:KnowledgeEntity)
+        WITH documentCount, count(e) AS entityCount
+        OPTIONAL MATCH ()-[rel:RELATED_TO]->()
+        WITH documentCount, entityCount, count(rel) AS relatedCount
+        OPTIONAL MATCH (:KnowledgeDocument)-[:HAS_CHUNK]->(:DocumentChunk)-[:MENTIONS]->(e0:KnowledgeEntity)
+        RETURN documentCount, entityCount, relatedCount, count(e0) AS mentionCount
+        `,
+      );
+      const statsRow = statsResult.records[0];
+      const documentCount = this.toNumber(statsRow?.get('documentCount'), 0);
+      const entityCount = this.toNumber(statsRow?.get('entityCount'), 0);
+      const relatedCount = this.toNumber(statsRow?.get('relatedCount'), 0);
+      const mentionCount = this.toNumber(statsRow?.get('mentionCount'), 0);
+
+      // 按实体 type 分组计数，供前端筛选。
+      const typeRows = await session.run(
+        `
+        MATCH (e:KnowledgeEntity)
+        WHERE e.type IS NOT NULL AND e.type <> ''
+        RETURN e.type AS type, count(*) AS count
+        ORDER BY count DESC
+        `,
+      );
+      const entityTypes = typeRows.records.map((record) => ({
+        type: String(record.get('type')),
+        count: this.toNumber(record.get('count'), 0),
+      }));
+
+      // 被文档块 MENTIONS 最多的 5 个实体，degree 为提及次数。
+      const topRows = await session.run(
+        `
+        MATCH (e:KnowledgeEntity)<-[:MENTIONS]-(:DocumentChunk)
+        RETURN e.name AS name, e.type AS type, count(*) AS degree
+        ORDER BY degree DESC
+        LIMIT 5
+        `,
+      );
+      const topEntities = topRows.records.map((record) => ({
+        name: String(record.get('name')),
+        type: (record.get('type') as string) ?? null,
+        degree: this.toNumber(record.get('degree'), 0),
+      }));
+
+      // 最近更新的 8 篇文档不受关键词、时间和类型过滤。
+      const recentRows = await session.run(
+        `
+        MATCH (d:KnowledgeDocument)
+        RETURN d.id AS id, d.title AS name, d.updatedAt AS updatedAt
+        ORDER BY d.updatedAt DESC
+        LIMIT 8
+        `,
+      );
+      const recentNodes = recentRows.records.map((record) => ({
+        id: `doc:${record.get('id') as string}`,
+        name: String(record.get('name') ?? ''),
+        kind: 'document',
+        updatedAt: (record.get('updatedAt') as string) ?? null,
+      }));
+
+      // 先按标题、摘要、标签和更新时间筛文档，再挂上 MENTIONS 实体。
+      const docRows = await session.run(
+        `
+        MATCH (d:KnowledgeDocument)
+        WHERE ($kw = '' OR toLower(coalesce(d.title, '')) CONTAINS toLower($kw)
+              OR toLower(coalesce(d.summary, '')) CONTAINS toLower($kw)
+              OR toLower(coalesce(d.tags, '')) CONTAINS toLower($kw))
+          AND ($from IS NULL OR d.updatedAt >= $from)
+          AND ($to IS NULL OR d.updatedAt <= $to)
+        WITH d ORDER BY d.updatedAt DESC LIMIT $docLimit
+        OPTIONAL MATCH (d)-[:HAS_CHUNK]->(:DocumentChunk)-[:MENTIONS]->(e:KnowledgeEntity)
+        WHERE $entityType IS NULL OR e.type = $entityType
+        RETURN d.id AS docId, d.title AS docTitle, d.summary AS summary,
+               d.tags AS tags, d.updatedAt AS updatedAt,
+               collect(DISTINCT CASE WHEN e IS NULL THEN NULL ELSE {
+                 name: e.name, type: e.type, description: e.description
+               } END) AS entities
+        `,
+        {
+          kw,
+          entityType,
+          from,
+          to,
+          docLimit: neo4j.int(docLimit),
+        },
+      );
+      const docRecords = [...docRows.records];
+
+      // 关键词命中实体但未命中文档属性时，把提及该实体的文档补进画布。
+      if (kw) {
+        const extra = await session.run(
+          `
+          MATCH (e:KnowledgeEntity)<-[:MENTIONS]-(:DocumentChunk)<-[:HAS_CHUNK]-(d:KnowledgeDocument)
+          WHERE toLower(coalesce(e.name, '')) CONTAINS toLower($kw)
+             OR toLower(coalesce(e.description, '')) CONTAINS toLower($kw)
+          WITH DISTINCT d
+          WHERE ($from IS NULL OR d.updatedAt >= $from)
+            AND ($to IS NULL OR d.updatedAt <= $to)
+          OPTIONAL MATCH (d)-[:HAS_CHUNK]->(:DocumentChunk)-[:MENTIONS]->(e2:KnowledgeEntity)
+          WHERE $entityType IS NULL OR e2.type = $entityType
+          RETURN d.id AS docId, d.title AS docTitle, d.summary AS summary,
+                 d.tags AS tags, d.updatedAt AS updatedAt,
+                 collect(DISTINCT CASE WHEN e2 IS NULL THEN NULL ELSE {
+                   name: e2.name, type: e2.type, description: e2.description
+                 } END) AS entities
+          LIMIT $docLimit
+          `,
+          { kw, entityType, from, to, docLimit: neo4j.int(docLimit) },
+        );
+        const seen = new Set(
+          docRecords.map((record) => String(record.get('docId'))),
+        );
+        for (const record of extra.records) {
+          const id = String(record.get('docId'));
+          if (!seen.has(id)) docRecords.push(record);
+        }
+      }
+
+      const nodeMap = new Map<string, GraphOverviewNode>();
+      const edgeMap = new Map<string, GraphOverviewEdge>();
+      const entityNames = new Set<string>();
+
+      /**
+       * @description 按边类型、起终点和关系名称去重后加入当前画布
+       * @param source string，起点节点 ID
+       * @param target string，终点节点 ID
+       * @param relation string，前端展示的关系名称
+       * @param kind GraphOverviewEdgeKind，边的业务类型
+       * @returns void，无返回值
+       */
+      const addEdge = (
+        source: string,
+        target: string,
+        relation: string,
+        kind: GraphOverviewEdgeKind,
+      ): void => {
+        const key = `${kind}|${source}|${target}|${relation}`;
+        if (!edgeMap.has(key)) {
+          edgeMap.set(key, { source, target, relation, kind });
+        }
+      };
+
+      /**
+       * @description 将数据库中的中英文逗号分隔标签拆成非空标签
+       * @param raw unknown，Neo4j 返回的标签原值
+       * @returns string[]，去除前后空白后的标签
+       */
+      const splitTags = (raw: unknown): string[] =>
+        String(raw ?? '')
+          .split(/[,，]/)
+          .map((tag) => tag.trim())
+          .filter(Boolean);
+
+      for (const record of docRecords) {
+        const docId = String(record.get('docId'));
+        const docNodeId = `doc:${docId}`;
+        nodeMap.set(docNodeId, {
+          id: docNodeId,
+          name: String(record.get('docTitle') ?? ''),
+          kind: 'document',
+          type: 'DOCUMENT',
+          documentId: docId,
+          updatedAt: (record.get('updatedAt') as string) ?? null,
+          description: (record.get('summary') as string) ?? null,
+        });
+        for (const tag of splitTags(record.get('tags'))) {
+          const tagId = `tag:${tag}`;
+          nodeMap.set(tagId, {
+            id: tagId,
+            name: tag,
+            kind: 'tag',
+            type: 'TAG',
+          });
+          addEdge(docNodeId, tagId, '标注', 'tagged');
+        }
+
+        const entities = record.get('entities') as Array<{
+          name?: string;
+          type?: string;
+          description?: string;
+        } | null>;
+        for (const entity of entities ?? []) {
+          if (!entity?.name) continue;
+          const entityId = `entity:${entity.name}`;
+          entityNames.add(entity.name);
+          nodeMap.set(entityId, {
+            id: entityId,
+            name: entity.name,
+            kind: 'entity',
+            type: entity.type ?? 'CONCEPT',
+            description: entity.description ?? null,
+          });
+          addEdge(docNodeId, entityId, '提及', 'mentions');
+        }
+      }
+
+      if (entityNames.size > 0) {
+        // 只取当前画布实体之间的 RELATED_TO，避免拉取全库关系。
+        const relatedRows = await session.run(
+          `
+          MATCH (a:KnowledgeEntity)-[r:RELATED_TO]->(b:KnowledgeEntity)
+          WHERE a.name IN $names AND b.name IN $names
+          RETURN a.name AS source, b.name AS target,
+                 r.relation AS relation, r.weight AS weight
+          LIMIT 400
+          `,
+          { names: [...entityNames] },
+        );
+        for (const record of relatedRows.records) {
+          const source = `entity:${record.get('source') as string}`;
+          const target = `entity:${record.get('target') as string}`;
+          const relation = (record.get('relation') as string) || '关联';
+          addEdge(source, target, relation, 'related');
+        }
+      }
+
+      const nodes = [...nodeMap.values()];
+      const edges = [...edgeMap.values()];
+      const tagCount = nodes.filter((node) => node.kind === 'tag').length;
+
+      return {
+        nodes,
+        edges,
+        stats: {
+          nodeCount: nodes.length,
+          edgeCount: edges.length,
+          documentCount,
+          entityCount,
+          tagCount,
+          mentionCount,
+          relatedCount,
+          entityTypes,
+        },
+        topEntities,
+        recentNodes,
+        entityTypes: entityTypes.map((item) => item.type),
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`图谱全景查询失败：${message}`);
+      return empty;
     } finally {
       await session.close();
     }

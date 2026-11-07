@@ -13,6 +13,8 @@ type GraphDocumentNode = {
   categoryId?: string | null;
   authorId?: string | null;
   status: number;
+  /** 逗号分隔的文档标签，用于全景图生成标签节点 */
+  tags?: string | null;
 };
 
 /**
@@ -77,6 +79,60 @@ type GraphEdgeVO = {
   weight: number;
 };
 
+/** GET /graph/overview 的过滤参数 */
+type GraphOverviewParams = {
+  keyword?: string;
+  entityType?: string;
+  /** 文档 updatedAt 下界，ISO 字符串 */
+  from?: string;
+  /** 文档 updatedAt 上界，ISO 字符串 */
+  to?: string;
+  docLimit?: number;
+};
+
+type GraphOverviewNodeKind = 'document' | 'entity' | 'tag';
+type GraphOverviewEdgeKind = 'mentions' | 'related' | 'tagged';
+
+type GraphOverviewNode = {
+  id: string;
+  name: string;
+  kind: GraphOverviewNodeKind;
+  type?: string | null;
+  documentId?: string | null;
+  updatedAt?: string | null;
+  description?: string | null;
+};
+
+type GraphOverviewEdge = {
+  source: string;
+  target: string;
+  relation: string;
+  kind: GraphOverviewEdgeKind;
+};
+
+type GraphOverviewResponse = {
+  nodes: GraphOverviewNode[];
+  edges: GraphOverviewEdge[];
+  stats: {
+    nodeCount: number;
+    edgeCount: number;
+    documentCount: number;
+    entityCount: number;
+    tagCount: number;
+    mentionCount: number;
+    relatedCount: number;
+    entityTypes: Array<{ type: string; count: number }>;
+  };
+  topEntities: Array<{ name: string; type: string | null; degree: number }>;
+  recentNodes: Array<{
+    id: string;
+    name: string;
+    kind: string;
+    updatedAt: string | null;
+  }>;
+  entityTypes: string[];
+};
+
 /** GET /graph/search 返回的命中节点（实体 / 文档 / 块） */
 type GraphSearchHitVO = {
   id: string;
@@ -100,6 +156,12 @@ export type {
   GraphEntity,
   GraphExtraction,
   GraphNodeVO,
+  GraphOverviewEdge,
+  GraphOverviewEdgeKind,
+  GraphOverviewNode,
+  GraphOverviewNodeKind,
+  GraphOverviewParams,
+  GraphOverviewResponse,
   GraphRelation,
   GraphSearchHitVO,
 };

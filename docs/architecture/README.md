@@ -109,7 +109,7 @@ Railway API and Consumer ----------> DB / Object Storage / Vector DB
 
 Browser business API calls go directly from `know-research.ernestbot.com` to
 `know-research-api.ernestbot.com`; they do not use a Vercel same-origin rewrite. The Railway NestJS API owns
-an exact production CORS allowlist and preflight handling. Cloudflare remains the authoritative DNS provider
+an exact production CORS allowlist through `CORS_ORIGINS` and handles credentialed preflight requests. Cloudflare remains the authoritative DNS provider
 but is not a required application runtime or proxy in this topology.
 
 The API and Consumer are separate Railway services sourced from the same backend workspace. API replicas can
@@ -307,9 +307,12 @@ relations per chunk with the Qwen chat model from `src/infrastructure/chat-model
 `KnowledgeDocument` / `DocumentChunk` / `KnowledgeEntity` nodes through `GraphStoreService` in
 `src/infrastructure/neo4j`. Each build deletes the document's previous graph first. Neo4j is required at
 startup like RabbitMQ and Elasticsearch. Delivery has the same no-outbox / no-DLQ limits as RAG.
-Logged-in users can read the graph through `GET /graph/search|nodes|edges`. See
-[ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md) and
-[ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md).
+Logged-in users with the `search` permission can read the graph through
+`GET /graph/search|nodes|edges|overview`. The overview endpoint returns document, entity and request-derived tag
+nodes, their display edges, aggregate counts, popular entities and recent documents. See
+[ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md),
+[ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md) and
+[ADR-0028](./decisions/0028-rag-business-graph-overview-and-cors.md).
 
 ## Document Search Boundary
 
@@ -359,6 +362,7 @@ sources as excerpts. Retrieval has no visibility, author or team filter. See
 | [ADR-0025](./decisions/0025-rag-business-permission-codes-and-teams.md)  | RagBusiness permission-code RBAC and teams           | Accepted   |
 | [ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md)  | RagBusiness full-text search and graph read APIs     | Accepted   |
 | [ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md)   | RagBusiness hybrid retrieval and RAG chat            | Accepted   |
+| [ADR-0028](./decisions/0028-rag-business-graph-overview-and-cors.md)     | Graph overview, tag nodes and CORS allowlist         | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

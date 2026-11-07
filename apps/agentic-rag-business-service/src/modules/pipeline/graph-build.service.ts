@@ -52,6 +52,7 @@ class GraphBuildService {
       categoryId: doc.categoryId,
       authorId: doc.authorId,
       status: doc.status,
+      tags: doc.tags,
     });
 
     const chunks = await this.chunkingService.chunk({

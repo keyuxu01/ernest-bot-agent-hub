@@ -1,15 +1,38 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { GraphStoreService } from '../../infrastructure/neo4j/graph-store.service';
-import { GraphQueryDto, GraphSearchDto } from './dto/graph-query.dto';
+import { RequirePermission } from '../auth/decorators/require-permission.decorator';
+import { PermissionCode } from '../user/constants/permission.constants';
+import {
+  GraphOverviewDto,
+  GraphQueryDto,
+  GraphSearchDto,
+} from './dto/graph-query.dto';
 
-/** 知识图谱只读查询（需登录）；Neo4j 出错时返回空数组 */
+/** 知识图谱只读查询（需 search 权限）；Neo4j 出错时返回空结果 */
 @Controller('graph')
+@RequirePermission(PermissionCode.search)
 class GraphController {
   /**
    * @description 注入图谱存储服务
    * @param graph GraphStoreService，查询 Neo4j
    */
   constructor(private readonly graph: GraphStoreService) {}
+
+  /**
+   * @description GET /graph/overview：查询文档、实体、标签及统计组成的全景图
+   * @param query GraphOverviewDto，关键词、实体类型、更新时间范围与文档上限
+   * @returns Promise<GraphOverviewResponse>，力导向图所需节点、边和统计信息
+   */
+  @Get('overview')
+  overview(@Query() query: GraphOverviewDto) {
+    return this.graph.getOverview({
+      keyword: query.keyword,
+      entityType: query.entityType,
+      from: query.from,
+      to: query.to,
+      docLimit: query.docLimit,
+    });
+  }
 
   /**
    * @description GET /graph/search：按关键词搜实体 / 文档 / 块节点
