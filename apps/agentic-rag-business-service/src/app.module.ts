@@ -9,6 +9,7 @@ import { MailModule } from './infrastructure/mail/mail.module';
 import { RabbitmqModule } from './infrastructure/rabbitmq/rabbitmq.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { RustfsModule } from './infrastructure/rustfs/rustfs.module';
+import { AiModule } from './modules/ai/ai.module';
 import { ApiDocsModule } from './modules/api-docs/api-docs.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { DocumentModule } from './modules/document/document.module';
@@ -51,6 +52,7 @@ import { TeamModule } from './modules/team/team.module';
     PipelineModule,
     TeamModule,
     SearchModule,
+    AiModule,
     GraphModule,
   ],
 })

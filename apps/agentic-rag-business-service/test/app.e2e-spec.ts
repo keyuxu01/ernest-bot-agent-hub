@@ -12,6 +12,9 @@ import { DataSource } from 'typeorm';
 import request from 'supertest';
 import { VectorIndexService } from './../src/infrastructure/elasticsearch/vector-index.service';
 import { GraphStoreService } from './../src/infrastructure/neo4j/graph-store.service';
+import { ChatModelService } from './../src/infrastructure/chat-model/chat-model.service';
+import { EmbeddingService } from './../src/infrastructure/embedding/embedding.service';
+import { RerankerService } from './../src/infrastructure/rerank/reranker.service';
 import { MailerService } from '@nestjs-modules/mailer';
 import { nextSnowflakeId } from './../src/common/helpers/snowflake-id';
 import { RabbitMqService } from './../src/infrastructure/rabbitmq/rabbitmq.service';
@@ -109,6 +112,39 @@ describe('Business service (e2e)', () => {
       .useValue({
         deleteByDocId: async () => undefined,
         indexChunks: async () => undefined,
+        // 混合检索粗排：「无关」问题返回空，其余返回两块
+        searchHybrid: async (params: { query: string }) =>
+          params.query === '无关'
+            ? []
+            : [
+                {
+                  chunkId: 'c1',
+                  documentId: '1',
+                  documentTitle: '灰度发布 SOP',
+                  content: '先金丝雀 1%',
+                  heading: '金丝雀',
+                  score: 0.03,
+                },
+                {
+                  chunkId: 'c2',
+                  documentId: '2',
+                  documentTitle: '故障应急',
+                  content: 'P0 由王芳指挥',
+                  heading: null,
+                  score: 0.02,
+                },
+              ],
+      })
+      // 外部模型：不调 DashScope
+      .overrideProvider(EmbeddingService)
+      .useValue({ embed: async () => [0.1, 0.2] })
+      .overrideProvider(RerankerService)
+      .useValue({ rerank: async () => null })
+      .overrideProvider(ChatModelService)
+      .useValue({
+        // KgExtractionService 构造时会调 model.withStructuredOutput
+        model: { withStructuredOutput: () => ({ invoke: async () => ({}) }) },
+        answerModel: { invoke: async () => ({ content: '先做金丝雀 [1]。' }) },
       })
       // Neo4j 启动时会连库并建约束；e2e 只验 HTTP 面，替换为空实现
       .overrideProvider(GraphStoreService)
@@ -638,6 +674,62 @@ describe('Business service (e2e)', () => {
     await request(server).get('/graph/search').set(as).expect(400);
     await request(server).get('/graph/nodes').set(as).expect(200);
     await request(server).get('/graph/edges').set(as).expect(200);
+  });
+
+  it('retrieves chunks and answers with cited sources', async () => {
+    const user = await loginAsNewUser();
+    const server = app.getHttpServer();
+    const as = { Authorization: `Bearer ${user.token}` };
+
+    await request(server).post('/rag/search').send({ query: 'x' }).expect(401);
+    await request(server).post('/rag/search').set(as).send({}).expect(400);
+    await request(server)
+      .post('/rag/search')
+      .set(as)
+      .send({ query: 'x', topK: 21 })
+      .expect(400);
+
+    // rerank 不可用时按 RRF 顺序截取 topK
+    const found = await request(server)
+      .post('/rag/search')
+      .set(as)
+      .send({ query: '金丝雀怎么做', topK: 1 })
+      .expect(201);
+    expect(found.body).toEqual([expect.objectContaining({ chunkId: 'c1' })]);
+
+    const chat = await request(server)
+      .post('/ai/chat')
+      .set(as)
+      .send({ content: '金丝雀怎么做' })
+      .expect(201);
+    expect(chat.body).toEqual({
+      answer: '先做金丝雀 [1]。',
+      sources: [
+        {
+          index: 1,
+          documentId: '1',
+          documentTitle: '灰度发布 SOP',
+          heading: '金丝雀',
+          excerpt: '先金丝雀 1%',
+          score: 0.03,
+        },
+      ],
+    });
+
+    const empty = await request(server)
+      .post('/ai/chat')
+      .set(as)
+      .send({ content: '无关' })
+      .expect(201);
+    expect(empty.body).toEqual({
+      answer: '知识库里没有相关内容。',
+      sources: [],
+    });
+    await request(server)
+      .post('/ai/chat')
+      .set(as)
+      .send({ content: 'x', topK: 11 })
+      .expect(400);
   });
 
   it('updates the profile, statistics and password of the current user', async () => {

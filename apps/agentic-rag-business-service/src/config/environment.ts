@@ -25,6 +25,9 @@ const REQUIRED_ENVIRONMENT_KEYS = [
   // KG 建图：LLM 抽取（与 Embedding 共用 QWEN_LLM_API_KEY / BASE_URL）
   'CHAT_MODEL_NAME',
   'CHAT_MODEL_TIMEOUT_MS',
+  // RAG 精排：DashScope text-rerank（复用 QWEN_LLM_API_KEY）
+  'QWEN_RERANK_MODEL_NAME',
+  'QWEN_RERANK_URL',
   // KG 建图：Neo4j 图存储，启动强依赖
   'NEO4J_URI',
   'NEO4J_USER',
@@ -48,6 +51,11 @@ const NUMERIC_ENVIRONMENT_KEYS = [
 /**
  * 启动前确认基建变量在场；数字项在这里转成 number，布尔开关转成 boolean，业务侧直接取。
  * 协议、URI 格式交给连接失败时排查。
+ * @description ConfigModule 的 validate 钩子：校验必填项，转换数字与布尔开关
+ * （DOCUMENT_REQUIRE_APPROVAL，缺省 true）
+ * @param config Environment，从 .env 文件与进程环境读到的原始键值（都是字符串）
+ * @returns Environment，转换后的配置，ConfigService 从这里取值
+ * @throws Error 必填项缺失或为空、初始管理员配置不完整、布尔开关不是 true / false
  */
 function validateEnvironment(config: Environment): Environment {
   for (const key of REQUIRED_ENVIRONMENT_KEYS) {
@@ -72,11 +80,15 @@ function validateEnvironment(config: Environment): Environment {
     config.DOCUMENT_REQUIRE_APPROVAL,
     true,
   );
-
   return normalized;
 }
 
-/** 初始管理员（可选）：用户名、密码、邮箱须同时配置，密码不短于注册要求 */
+/**
+ * @description 初始管理员（可选）：用户名、密码、邮箱须同时配置，密码不短于注册要求
+ * @param config Environment，原始配置
+ * @returns void，校验通过时正常返回
+ * @throws Error 三项只配了一部分，或密码少于 6 位
+ */
 function validateBootstrapAdmin(config: Environment): void {
   const username = config.AUTH_BOOTSTRAP_ADMIN_USERNAME;
   const password = config.AUTH_BOOTSTRAP_ADMIN_PASSWORD;
@@ -96,7 +108,14 @@ function validateBootstrapAdmin(config: Environment): void {
   }
 }
 
-/** 未配置取缺省值；只接受 true / false，其他值直接报错，避免开关静默失效 */
+/**
+ * @description 解析布尔开关：未配置取缺省值；只接受 true / false，其他值直接报错，避免开关静默失效
+ * @param key string，变量名（用于报错信息）
+ * @param value unknown，原始值
+ * @param fallback boolean，未配置时的缺省值
+ * @returns boolean，解析结果
+ * @throws Error 值不是 'true' / 'false'
+ */
 function parseBoolean(key: string, value: unknown, fallback: boolean): boolean {
   if (value === undefined) return fallback;
   if (value === 'true') return true;

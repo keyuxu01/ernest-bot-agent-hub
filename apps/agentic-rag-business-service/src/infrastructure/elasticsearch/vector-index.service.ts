@@ -8,7 +8,28 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { CHUNK_INDEX } from './constants/vector-index.constants';
 import { buildChunkDocument } from './helpers/build-chunk-document';
+import { mapChunkHits } from './helpers/map-chunk-hits';
+import { rrfFuse } from './helpers/rrf-fuse';
+import type { ChunkHit, HybridSearchParams } from './type/chunk-hit.types';
 import type { IndexableChunk } from './type/indexable-chunk.types';
+
+/** 检索 kh_chunk 时回传的字段（不含 embedding） */
+const CHUNK_HIT_SOURCE_FIELDS = [
+  'chunk_id',
+  'document_id',
+  'document_title',
+  'content',
+  'heading',
+];
+
+/**
+ * @description 把召回条数限制在 1-50
+ * @param topK number，调用方传入的条数
+ * @returns number，限制后的条数
+ */
+function clampTopK(topK: number): number {
+  return Math.min(Math.max(topK, 1), 50);
+}
 
 /**
  * 向量索引存储
@@ -19,6 +40,7 @@ import type { IndexableChunk } from './type/indexable-chunk.types';
  * - 启动时确保索引 mapping 存在（含 dense_vector）
  * - 按 document_id 删除旧块（重建前先清）
  * - bulk 写入带 embedding 的 chunk
+ * - 检索：BM25 关键词、kNN 向量、两路 RRF 融合（供 /rag/search、/ai/chat）；查询失败只记日志并返回 []
  *
  * 连不上集群会阻断启动，与 Postgres / Mongo / RabbitMQ 一样视为本服务基建。
  */
@@ -28,10 +50,18 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
   private es!: Client;
   private readonly embeddingDims: number;
 
+  /**
+   * @description 注入配置并读取向量维度
+   * @param config ConfigService，读取 EMBEDDING_DIMENSION、ELASTICSEARCH_NODE
+   */
   constructor(private readonly config: ConfigService) {
     this.embeddingDims = this.config.getOrThrow<number>('EMBEDDING_DIMENSION');
   }
 
+  /**
+   * @description 启动时连 ES、检查集群并确保 kh_chunk 索引存在；失败释放连接并阻断启动
+   * @returns Promise<void>，无返回值
+   */
   async onModuleInit(): Promise<void> {
     const node = this.config.getOrThrow<string>('ELASTICSEARCH_NODE');
     this.es = new Client({ node });
@@ -49,6 +79,10 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /**
+   * @description 进程退出时关闭 ES 连接
+   * @returns Promise<void>，无返回值
+   */
   async onModuleDestroy(): Promise<void> {
     await this.es?.close();
   }
@@ -63,15 +97,20 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
    * - 索引尚未创建时视为无旧块，吞掉 `index_not_found` 后返回
    * - 其余失败必须抛出，避免「删失败却继续写入」造成新旧块并存
    * - `refresh: true` 让后续 bulk 立刻看不到已删文档，而不是等 refresh_interval
+   * @description 按 document_id 删除该文档在 kh_chunk 里的全部块
+   * @param documentId string，文档 ID（雪花 ID 字符串）
+   * @returns Promise<void>，索引不存在视为成功；其他失败向上抛
    */
   async deleteByDocId(documentId: string): Promise<void> {
     try {
+      // POST /kh_chunk/_delete_by_query：删除所有匹配条件的文档
       await this.es.deleteByQuery({
         index: CHUNK_INDEX,
         query: {
           // term：精确匹配 keyword，不会误删其它文档的块
           term: { document_id: documentId },
         },
+        // 删完立即刷新，后续写入看不到旧块
         refresh: true,
       });
       this.logger.log(`已从 ES 删除文档向量块：documentId=${documentId}`);
@@ -99,6 +138,9 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
    * - 写入前确保索引存在（冷启动或索引被删后的兜底）
    * - bulk 本身不抛部分失败：必须检查 `response.errors`，有失败则整批视为失败并抛出
    * - `refresh: true` 覆盖索引级 5s refresh_interval，写完即可被检索
+   * @description bulk 写入 / 覆盖带 embedding 的块
+   * @param chunks IndexableChunk[]，分块 + 向量化后的块；空数组直接返回
+   * @returns Promise<void>，有任意一条失败就抛错
    */
   async indexChunks(chunks: IndexableChunk[]): Promise<void> {
     if (!chunks.length) {
@@ -145,16 +187,126 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * 创建 kh_chunk 索引（含 dense_vector）。
+   * @description BM25 关键词检索 kh_chunk：匹配块正文与文档标题（ik_smart 分词）；ES 查询失败只记日志并返回 []
+   * @param query string，用户问题原文（前后空白会去掉，空串直接返回 []）
+   * @param topK number，最多返回条数，默认 20，限制 1-50
+   * @returns Promise<ChunkHit[]>，按 BM25 得分降序的块
+   */
+  async keywordSearch(query: string, topK = 20): Promise<ChunkHit[]> {
+    // 空问题不查
+    const trimmed = query.trim();
+    if (!trimmed) return [];
+
+    const k = clampTopK(topK);
+    try {
+      // POST /kh_chunk/_search
+      const response = await this.es.search({
+        index: CHUNK_INDEX,
+        // 返回条数
+        size: k,
+        query: {
+          // 一个关键词同时查多个字段
+          multi_match: {
+            query: trimmed,
+            // 文档标题命中权重 2，块正文权重 1
+            fields: ['document_title^2', 'content'],
+            // 检索时用粗粒度中文分词
+            analyzer: 'ik_smart',
+          },
+        },
+        // 只取需要的字段，不回传 embedding（1024 维太大）
+        _source: CHUNK_HIT_SOURCE_FIELDS,
+      });
+      // hits.hits：按 _score（BM25 分）降序的命中
+      return mapChunkHits(response.hits.hits);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`关键词检索失败：${message}`);
+      return [];
+    }
+  }
+
+  /**
+   * @description kNN 向量检索 kh_chunk（余弦相似度）；ES 查询失败只记日志并返回 []
+   * @param queryVector number[]，问题向量（与 EMBEDDING_DIMENSION 同维）；空数组直接返回 []
+   * @param topK number，最多返回条数，默认 20，限制 1-50
+   * @returns Promise<ChunkHit[]>，按相似度降序的块
+   */
+  async knnSearch(queryVector: number[], topK = 20): Promise<ChunkHit[]> {
+    if (!queryVector.length) return [];
+
+    const k = clampTopK(topK);
+    try {
+      // POST /kh_chunk/_search
+      const response = await this.es.search({
+        index: CHUNK_INDEX,
+        // 返回条数
+        size: k,
+        knn: {
+          // 在 dense_vector 字段 embedding 上做近似最近邻
+          field: 'embedding',
+          // 问题向量
+          query_vector: queryVector,
+          // 最终取最相近的 k 个
+          k,
+          // 每个分片先粗选的候选数，越大越准越慢
+          num_candidates: Math.max(k * 10, 50),
+        },
+        // 只取需要的字段，不回传 embedding
+        _source: CHUNK_HIT_SOURCE_FIELDS,
+      });
+      // hits.hits：按 _score（余弦相似度换算的分）降序的命中
+      return mapChunkHits(response.hits.hits);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`向量检索失败：${message}`);
+      return [];
+    }
+  }
+
+  /**
+   * @description 混合检索粗排：关键词与向量两路并行召回，再按 chunkId 做 RRF 融合；
+   * 没有问题向量（嵌入失败）时只走关键词
+   * @param params HybridSearchParams，query 必填；queryVector 可空；hybridTopK 默认 20；rrfC 默认 60
+   * @returns Promise<ChunkHit[]>，按 RRF 分降序的去重结果
+   */
+  async searchHybrid(params: HybridSearchParams): Promise<ChunkHit[]> {
+    // 每一路召回条数
+    const hybridTopK = clampTopK(params.hybridTopK ?? 20);
+    // RRF 常数非法（<= 0）时用 60
+    const rrfC = params.rrfC && params.rrfC > 0 ? params.rrfC : 60;
+
+    // 两路并行：关键词总是查；有问题向量才查 kNN，否则这一路为空
+    const [keywordHits, vectorHits] = await Promise.all([
+      this.keywordSearch(params.query, hybridTopK),
+      params.queryVector?.length
+        ? this.knnSearch(params.queryVector, hybridTopK)
+        : Promise.resolve([] as ChunkHit[]),
+    ]);
+
+    // 按 chunkId 合并两路，按 RRF 分降序
+    const fused = rrfFuse(keywordHits, vectorHits, rrfC);
+    this.logger.log(
+      `混合检索 RRF：keyword=${keywordHits.length}, vector=${vectorHits.length}, fused=${fused.length}`,
+    );
+    return fused;
+  }
+
+  /**
+   * 创建 kh_chunk 索引（dense_vector + IK）。
    * document_id 用 keyword：雪花 ID 以字符串传递，避免 JS long 精度问题。
+   * @description 索引不存在才创建（标题 / 正文用 IK 分词，embedding 为 dense_vector）；已存在不动，旧索引不会自动改成 IK
+   * @returns Promise<void>，并发创建导致的「已存在」忽略，其他失败向上抛
    */
   private async createIndexIfNotExists(): Promise<void> {
+    // HEAD /kh_chunk：索引是否存在；已存在不动
     const exists = await this.es.indices.exists({ index: CHUNK_INDEX });
     if (exists) {
       return;
     }
 
     try {
+      // PUT /kh_chunk：建索引（settings + mapping）
       await this.es.indices.create({
         index: CHUNK_INDEX,
         // 索引配置
@@ -176,10 +328,17 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
             // text 供标题全文检索；keyword 子字段供精确过滤 / 聚合
             document_title: {
               type: 'text',
+              // 写入细切、检索粗切（IK 中文分词）
+              analyzer: 'ik_max_word',
+              search_analyzer: 'ik_smart',
               fields: { keyword: { type: 'keyword' } },
             },
             // BM25 / 混合检索正文
-            content: { type: 'text' },
+            content: {
+              type: 'text',
+              analyzer: 'ik_max_word',
+              search_analyzer: 'ik_smart',
+            },
             // 章节标题按原文精确过滤，不做分词
             heading: { type: 'keyword' },
             chunk_index: { type: 'integer' },

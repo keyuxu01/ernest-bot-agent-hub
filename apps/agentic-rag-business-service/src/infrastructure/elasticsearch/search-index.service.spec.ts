@@ -80,17 +80,16 @@ describe('SearchIndexService', () => {
     await expect(service.deleteDocument('1')).rejects.toThrow('forbidden');
   });
 
-  it('keeps an existing IK index and rebuilds one created without IK', async () => {
+  it('leaves an existing index alone and creates a missing one with IK', async () => {
     await service.onModuleInit();
+    expect(es.indices.getMapping).not.toHaveBeenCalled();
     expect(es.indices.delete).not.toHaveBeenCalled();
     expect(es.indices.create).not.toHaveBeenCalled();
 
-    es.indices.getMapping.mockResolvedValue({
-      kh_document: { mappings: { properties: { title: { type: 'text' } } } },
-    });
+    es.indices.exists.mockResolvedValue(false);
     await service.onModuleInit();
 
-    expect(es.indices.delete).toHaveBeenCalledWith({ index: 'kh_document' });
+    expect(es.indices.delete).not.toHaveBeenCalled();
     expect(es.indices.create).toHaveBeenCalledWith(
       expect.objectContaining({
         index: 'kh_document',

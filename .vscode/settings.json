@@ -32,5 +32,15 @@
       "mode": "auto"
     }
   ],
-  "cSpell.words": ["exceljs", "fflate", "Mineru", "officeparser", "Rustfs"]
+  "cSpell.words": [
+    "exceljs",
+    "fflate",
+    "Mineru",
+    "officeparser",
+    "qwen",
+    "RERANK",
+    "reranked",
+    "reranker",
+    "Rustfs"
+  ]
 }

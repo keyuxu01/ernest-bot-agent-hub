@@ -27,6 +27,9 @@ const validEnvironment = {
   EMBEDDING_BATCH_SIZE: '10',
   CHAT_MODEL_NAME: 'qwen-plus',
   CHAT_MODEL_TIMEOUT_MS: '60000',
+  QWEN_RERANK_MODEL_NAME: 'qwen3-rerank',
+  QWEN_RERANK_URL:
+    'https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank',
   NEO4J_URI: 'bolt://localhost:7687',
   NEO4J_USER: 'neo4j',
   NEO4J_PASSWORD: 'password',
@@ -80,6 +83,13 @@ describe('validateEnvironment', () => {
     ).toThrow('at least 6 characters');
   });
 
+  it('requires the rerank model and URL', () => {
+    const missing: Record<string, unknown> = { ...validEnvironment };
+    delete missing.QWEN_RERANK_URL;
+    expect(() => validateEnvironment(missing)).toThrow(
+      'Environment variable QWEN_RERANK_URL is required',
+    );
+  });
   it('defaults document approval to enabled when unset', () => {
     expect(
       validateEnvironment(validEnvironment).DOCUMENT_REQUIRE_APPROVAL,

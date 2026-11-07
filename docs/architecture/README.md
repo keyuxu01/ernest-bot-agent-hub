@@ -321,6 +321,17 @@ Read failures in Search and Graph queries are logged and return empty results; i
 the message. See [ADR-0021](./decisions/0021-document-search-index.md) and
 [ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md).
 
+## RAG Retrieval and Chat Boundary
+
+`POST /rag/search` and `POST /ai/chat` (permission code `search`) read `kh_chunk` through
+`HybridRetrievalService` in `src/modules/ai`: the question is embedded, BM25 (IK) and kNN run in parallel
+in `VectorIndexService`, results are fused with Reciprocal Rank Fusion, then reranked by DashScope
+`text-rerank` through `src/infrastructure/rerank`. Embedding failure falls back to keyword-only; rerank
+failure keeps RRF order. Chat numbers the retrieved chunks, asks the Qwen model
+(`ChatModelService.answerModel`) to answer only from them with `[n]` citations, and returns the cited
+sources as excerpts. Retrieval has no visibility, author or team filter. See
+[ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md).
+
 ## Architecture Decision Records
 
 | ADR                                                                      | Decision                                             | Status     |
@@ -347,6 +358,7 @@ the message. See [ADR-0021](./decisions/0021-document-search-index.md) and
 | [ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md)     | RagBusiness built-in accounts, JWT auth and roles    | Accepted   |
 | [ADR-0025](./decisions/0025-rag-business-permission-codes-and-teams.md)  | RagBusiness permission-code RBAC and teams           | Accepted   |
 | [ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md)  | RagBusiness full-text search and graph read APIs     | Accepted   |
+| [ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md)   | RagBusiness hybrid retrieval and RAG chat            | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

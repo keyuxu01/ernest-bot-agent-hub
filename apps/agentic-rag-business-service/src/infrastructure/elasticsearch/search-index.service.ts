@@ -207,29 +207,13 @@ class SearchIndexService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * @description 索引不存在则按 IK 分词创建；已存在但 title 未用 ik_max_word（旧版本建的）则删除重建。
-   * mapping 的分词器建好后不能原地修改，只能重建；重建后需重新发布文档才能搜到
+   * @description 索引不存在则创建（title / summary / content 用 IK 分词）；已存在则不动
    * @returns Promise<void>，无返回值
    */
   private async ensureEsIndex() {
-    // HEAD /kh_document：索引是否存在
+    // HEAD /kh_document：索引是否存在；已存在则不动
     const exists = await this.es.indices.exists({ index: ES_INDEX });
-    if (exists) {
-      // GET /kh_document/_mapping：读字段定义，看 title 用的是哪个分词器
-      const mapping = await this.es.indices.getMapping({ index: ES_INDEX });
-      const title = mapping[ES_INDEX]?.mappings?.properties?.title as
-        { analyzer?: string } | undefined;
-      // 已是 IK：不动
-      if (title?.analyzer === IK_TEXT_FIELD.analyzer) {
-        return;
-      }
-      this.logger.warn(
-        `索引 ${ES_INDEX} 未使用 IK，将删除并重建（请重新发布文档）`,
-      );
-      // DELETE /kh_document：删除整个索引（含全部数据）
-      await this.es.indices.delete({ index: ES_INDEX });
-    }
-
+    if (exists) return;
     try {
       // PUT /kh_document：建索引并定义字段类型（mapping）
       await this.es.indices.create({
@@ -262,7 +246,7 @@ class SearchIndexService implements OnModuleInit, OnModuleDestroy {
       ))
         throw error;
     }
-    this.logger.log(`已创建 ES 索引：${ES_INDEX}（ik_max_word / ik_smart）`);
+    this.logger.log(`已创建 ES 索引：${ES_INDEX}`);
   }
 }
 
