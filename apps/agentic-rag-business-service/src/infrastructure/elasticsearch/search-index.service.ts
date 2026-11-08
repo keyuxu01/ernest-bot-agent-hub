@@ -6,6 +6,11 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { DocumentVisibility } from '../../common/type/document-access.types';
+import {
+  buildEsVisibilityFilter,
+  ES_DOCUMENT_VISIBILITY_FIELDS,
+} from './helpers/document-visibility';
 import {
   SEARCH_DOCUMENT_INDEX as ES_INDEX,
   IK_TEXT_FIELD,
@@ -50,6 +55,7 @@ class SearchIndexService implements OnModuleInit, OnModuleDestroy {
         `SearchIndex ES 已连接：${node}, status=${health.status}`,
       );
       await this.ensureEsIndex();
+      await this.ensureVisibilityMapping();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.error(`搜索索引初始化失败：${message}`);
@@ -88,6 +94,36 @@ class SearchIndexService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
+   * @description 已发布文档只改公开或团队时，更新 kh_document 的可见性字段，不重写正文
+   * @param documentId string，文档 ID，即 ES _id
+   * @param visibility DocumentVisibility，公开、团队与作者字段
+   * @returns Promise<void>，失败只记 warn，不回滚文档保存
+   */
+  async updateVisibility(
+    documentId: string,
+    visibility: DocumentVisibility,
+  ): Promise<void> {
+    try {
+      await this.es.update({
+        index: ES_INDEX,
+        id: documentId,
+        doc: {
+          isPublic: visibility.isPublic,
+          teamId: visibility.teamId,
+          authorId: visibility.authorId,
+        },
+        refresh: true,
+      });
+      this.logger.log(`搜索索引可见性已更新：documentId=${documentId}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `搜索索引可见性更新失败：documentId=${documentId}, ${message}`,
+      );
+    }
+  }
+
+  /**
    * @description 下架 / 删除时从 ES 移除；文档本就不在索引中（404）视为成功
    * @param documentId string，文档 ID（即 ES _id）
    * @returns Promise<void>，非 404 的失败向上抛
@@ -123,6 +159,10 @@ class SearchIndexService implements OnModuleInit, OnModuleDestroy {
 
     // filter 条件：精确匹配 keyword 字段，只筛选不参与打分
     const filters: Record<string, unknown>[] = [];
+    const visibilityFilter = params.scope
+      ? buildEsVisibilityFilter(params.scope, ES_DOCUMENT_VISIBILITY_FIELDS)
+      : null;
+    if (visibilityFilter) filters.push(visibilityFilter);
     if (params.categoryId) {
       filters.push({ term: { categoryId: params.categoryId } });
     }
@@ -186,6 +226,8 @@ class SearchIndexService implements OnModuleInit, OnModuleDestroy {
           categoryId: src.categoryId ?? null,
           tags: src.tags ?? null,
           authorId: src.authorId ?? null,
+          teamId: src.teamId ?? null,
+          isPublic: src.isPublic ?? null,
           status: src.status ?? null,
           publishTime: src.publishTime ?? null,
           // _score：相关度得分，越高越相关（结果默认按它降序）
@@ -203,6 +245,26 @@ class SearchIndexService implements OnModuleInit, OnModuleDestroy {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(`搜索查询失败：keyword=${keyword}, ${message}`);
       return { items: [], total: 0, page, pageSize };
+    }
+  }
+
+  /**
+   * @description 为已有 kh_document 索引补充可见性 mapping；重复执行幂等
+   * @returns Promise<void>，更新失败只记 warn，查询仍按现有 mapping 运行
+   */
+  private async ensureVisibilityMapping(): Promise<void> {
+    try {
+      await this.es.indices.putMapping({
+        index: ES_INDEX,
+        properties: {
+          isPublic: { type: 'boolean' },
+          teamId: { type: 'keyword' },
+          authorId: { type: 'keyword' },
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`kh_document 可见性 mapping 更新失败：${message}`);
     }
   }
 
@@ -230,9 +292,12 @@ class SearchIndexService implements OnModuleInit, OnModuleDestroy {
             tags: { type: 'keyword' },
             // 文档状态码
             status: { type: 'integer' },
-            // 分类 / 作者 ID：keyword，供 term 过滤
+            // 分类 / 作者 / 团队 ID：keyword，供 term / terms 过滤
             categoryId: { type: 'keyword' },
             authorId: { type: 'keyword' },
+            teamId: { type: 'keyword' },
+            // 文档公开标记，供可见性过滤
+            isPublic: { type: 'boolean' },
             // 发布时间：ISO-8601 字符串
             publishTime: { type: 'date' },
           },

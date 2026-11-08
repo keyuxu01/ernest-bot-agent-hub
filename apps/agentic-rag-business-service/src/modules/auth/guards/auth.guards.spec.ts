@@ -24,6 +24,7 @@ const user: AuthUser = {
   avatar: null,
   roles: ['ROLE_USER'],
   permissions: ['document:list'],
+  teamIds: [],
 };
 
 function httpContext(request: Record<string, unknown>): ExecutionContext {

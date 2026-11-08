@@ -18,6 +18,7 @@ const actor: AuthUser = {
   avatar: null,
   roles: ['ROLE_USER'],
   permissions: [],
+  teamIds: [],
 };
 
 const { convertDocument } = vi.hoisted(() => ({

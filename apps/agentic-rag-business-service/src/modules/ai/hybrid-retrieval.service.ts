@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { accessFromUser } from '../document/helpers/document-access';
+import type { AuthUser } from '../user/type/user.types';
 import type { ChunkHit } from '../../infrastructure/elasticsearch/type/chunk-hit.types';
 import { VectorIndexService } from '../../infrastructure/elasticsearch/vector-index.service';
 import { EmbeddingService } from '../../infrastructure/embedding/embedding.service';
@@ -44,17 +46,26 @@ class HybridRetrievalService {
    * @description 混合检索：召回 → RRF → rerank → 最低相关度过滤，返回最相关的 topK 块
    * @param query string，用户问题
    * @param topK number，最终返回条数，默认 5
+   * @param user AuthUser | undefined，当前用户；不传时只检索公开文档
    * @returns Promise<ChunkHit[]>，精排成功时 score 为 rerank 分，否则为 RRF 分；没有命中返回 []
    */
-  async retrieve(query: string, topK = 5): Promise<ChunkHit[]> {
+  async retrieve(
+    query: string,
+    topK = 5,
+    user?: AuthUser,
+  ): Promise<ChunkHit[]> {
     // ① 问题向量化（失败为 null）
     const queryVector = await this.embedQuery(query);
+    const scope = user
+      ? accessFromUser(user)
+      : { unrestricted: false, userId: '', teamIds: [] };
     // ② 关键词 + 向量召回，RRF 粗排
     const fused = await this.vectorIndex.searchHybrid({
       query,
       queryVector,
       hybridTopK: this.hybridTopK,
       rrfC: this.rrfC,
+      scope,
     });
     if (!fused.length) {
       this.logger.log(`混合检索无结果：queryLength=${query.length}`);

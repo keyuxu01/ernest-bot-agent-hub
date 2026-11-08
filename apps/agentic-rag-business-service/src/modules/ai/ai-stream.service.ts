@@ -123,7 +123,7 @@ class AiStreamService {
 
         let hits: ChunkHit[] = [];
         try {
-          hits = await this.retrieval.retrieve(question, topK);
+          hits = await this.retrieval.retrieve(question, topK, user);
         } catch (error) {
           const detail = error instanceof Error ? error.message : String(error);
           this.logger.warn(`RAG 检索失败：${detail}`);

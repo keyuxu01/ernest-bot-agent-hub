@@ -18,10 +18,11 @@ import {
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Avatar, Badge, Dropdown, Layout, Menu, theme } from 'antd';
+import { Avatar, Badge, Dropdown, Layout, Menu, Tag, theme } from 'antd';
 import type { MenuProps } from 'antd';
-import { authApi } from '../_lib/api';
+import { authApi, teamApi } from '../_lib/api';
 import { clearAuth, updateUser, useAuth } from '../_lib/auth';
+import type { TeamItem } from '../_types/knowledge-hub';
 import { can, displayName, isAdmin, isReviewer } from '../_utils/knowledge-hub';
 import { BrandLogo } from './brand-logo';
 
@@ -34,6 +35,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const [myTeams, setMyTeams] = useState<TeamItem[]>([]);
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -42,6 +44,10 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     authApi
       .me()
       .then(updateUser)
+      .catch(() => undefined);
+    teamApi
+      .mine()
+      .then(setMyTeams)
       .catch(() => undefined);
   }, []);
 
@@ -84,7 +90,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const side = useMemo(() => {
     if (topKey === '/documents') {
       const items: MenuItem[] = [
-        { key: '/documents', icon: <ReadOutlined />, label: '全部文档' },
+        { key: '/documents', icon: <ReadOutlined />, label: '可见文档' },
         { key: '/documents/new', icon: <FileTextOutlined />, label: '新建文档' },
       ];
       if (isReviewer(user)) {
@@ -180,6 +186,11 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="kh-user">
               <Avatar size={28} icon={<UserOutlined />} src={user?.avatar || undefined} />
               <span>{displayName(user)}</span>
+              {myTeams.slice(0, 2).map(team => (
+                <Tag key={team.id} style={{ marginInlineEnd: 0 }}>
+                  {team.teamName}
+                </Tag>
+              ))}
             </div>
           </Dropdown>
         </div>

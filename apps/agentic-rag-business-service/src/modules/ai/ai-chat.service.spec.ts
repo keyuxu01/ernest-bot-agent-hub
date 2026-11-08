@@ -52,7 +52,7 @@ describe('AiChatService.chat', () => {
 
     const result = await service.chat(' 怎么发布 ', 3);
 
-    expect(retrieval.retrieve).toHaveBeenCalledWith('怎么发布', 3);
+    expect(retrieval.retrieve).toHaveBeenCalledWith('怎么发布', 3, undefined);
     const human = invoke.mock.calls[0]![0][1].content as string;
     expect(human).toContain('[1] 文档1 / 章节\n正文1');
     expect(human).toContain('[3] 文档3\n正文3');

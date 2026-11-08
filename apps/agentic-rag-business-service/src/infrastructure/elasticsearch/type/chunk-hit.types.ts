@@ -1,3 +1,5 @@
+import type { DocumentAccessScope } from '../../../common/type/document-access.types';
+
 /** kh_chunk 检索命中（关键词 / 向量 / RRF 融合 / rerank 后共用） */
 type ChunkHit = {
   chunkId: string;
@@ -24,6 +26,8 @@ type HybridSearchParams = {
   hybridTopK?: number;
   /** RRF 平滑常数 C，默认 60 */
   rrfC?: number;
+  /** 当前用户文档可见范围 */
+  scope?: DocumentAccessScope;
 };
 
 export type { ChunkHit, HybridSearchParams };

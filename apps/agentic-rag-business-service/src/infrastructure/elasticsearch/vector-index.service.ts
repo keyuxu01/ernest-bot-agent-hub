@@ -1,4 +1,4 @@
-import { Client } from '@elastic/elasticsearch';
+import { Client, type estypes } from '@elastic/elasticsearch';
 import {
   Injectable,
   Logger,
@@ -6,8 +6,17 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type {
+  DocumentAccessScope,
+  DocumentVisibility,
+} from '../../common/type/document-access.types';
 import { CHUNK_INDEX } from './constants/vector-index.constants';
 import { buildChunkDocument } from './helpers/build-chunk-document';
+import {
+  buildEsVisibilityFilter,
+  ES_CHUNK_VISIBILITY_FIELDS,
+  wrapEsQueryWithVisibility,
+} from './helpers/document-visibility';
 import { mapChunkHits } from './helpers/map-chunk-hits';
 import { rrfFuse } from './helpers/rrf-fuse';
 import type { ChunkHit, HybridSearchParams } from './type/chunk-hit.types';
@@ -71,6 +80,7 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
         `VectorIndex ES 已连接：${node}, status=${health.status}`,
       );
       await this.createIndexIfNotExists();
+      await this.ensureVisibilityMapping();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.error(`Elasticsearch 初始化失败：${message}`);
@@ -85,6 +95,42 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
    */
   async onModuleDestroy(): Promise<void> {
     await this.es?.close();
+  }
+
+  /**
+   * @description 已发布文档只改公开或团队时，批量更新全部向量块的可见性字段，不重算 embedding
+   * @param documentId string，文档 ID
+   * @param visibility DocumentVisibility，公开、团队与作者字段
+   * @returns Promise<void>，失败只记 warn，不回滚文档保存
+   */
+  async updateVisibility(
+    documentId: string,
+    visibility: DocumentVisibility,
+  ): Promise<void> {
+    try {
+      const result = await this.es.updateByQuery({
+        index: CHUNK_INDEX,
+        refresh: true,
+        query: { term: { document_id: documentId } },
+        script: {
+          source:
+            'ctx._source.is_public = params.is_public; ctx._source.team_id = params.team_id; ctx._source.author_id = params.author_id;',
+          params: {
+            is_public: visibility.isPublic,
+            team_id: visibility.teamId,
+            author_id: visibility.authorId,
+          },
+        },
+      });
+      this.logger.log(
+        `向量块可见性已更新：documentId=${documentId}, updated=${result.updated ?? 0}`,
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `向量块可见性更新失败：documentId=${documentId}, ${message}`,
+      );
+    }
   }
 
   /**
@@ -190,30 +236,41 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
    * @description BM25 关键词检索 kh_chunk：匹配块正文与文档标题（ik_smart 分词）；ES 查询失败只记日志并返回 []
    * @param query string，用户问题原文（前后空白会去掉，空串直接返回 []）
    * @param topK number，最多返回条数，默认 20，限制 1-50
+   * @param scope DocumentAccessScope | undefined，当前用户可见范围
    * @returns Promise<ChunkHit[]>，按 BM25 得分降序的块
    */
-  async keywordSearch(query: string, topK = 20): Promise<ChunkHit[]> {
+  async keywordSearch(
+    query: string,
+    topK = 20,
+    scope?: DocumentAccessScope,
+  ): Promise<ChunkHit[]> {
     // 空问题不查
     const trimmed = query.trim();
     if (!trimmed) return [];
 
     const k = clampTopK(topK);
+    const visibilityFilter = scope
+      ? buildEsVisibilityFilter(scope, ES_CHUNK_VISIBILITY_FIELDS)
+      : null;
     try {
       // POST /kh_chunk/_search
       const response = await this.es.search({
         index: CHUNK_INDEX,
         // 返回条数
         size: k,
-        query: {
-          // 一个关键词同时查多个字段
-          multi_match: {
-            query: trimmed,
-            // 文档标题命中权重 2，块正文权重 1
-            fields: ['document_title^2', 'content'],
-            // 检索时用粗粒度中文分词
-            analyzer: 'ik_smart',
+        query: wrapEsQueryWithVisibility(
+          {
+            // 一个关键词同时查多个字段
+            multi_match: {
+              query: trimmed,
+              // 文档标题命中权重 2，块正文权重 1
+              fields: ['document_title^2', 'content'],
+              // 检索时用粗粒度中文分词
+              analyzer: 'ik_smart',
+            },
           },
-        },
+          visibilityFilter,
+        ) as estypes.QueryDslQueryContainer,
         // 只取需要的字段，不回传 embedding（1024 维太大）
         _source: CHUNK_HIT_SOURCE_FIELDS,
       });
@@ -230,28 +287,36 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
    * @description kNN 向量检索 kh_chunk（余弦相似度）；ES 查询失败只记日志并返回 []
    * @param queryVector number[]，问题向量（与 EMBEDDING_DIMENSION 同维）；空数组直接返回 []
    * @param topK number，最多返回条数，默认 20，限制 1-50
+   * @param scope DocumentAccessScope | undefined，当前用户可见范围
    * @returns Promise<ChunkHit[]>，按相似度降序的块
    */
-  async knnSearch(queryVector: number[], topK = 20): Promise<ChunkHit[]> {
+  async knnSearch(
+    queryVector: number[],
+    topK = 20,
+    scope?: DocumentAccessScope,
+  ): Promise<ChunkHit[]> {
     if (!queryVector.length) return [];
 
     const k = clampTopK(topK);
+    const visibilityFilter = scope
+      ? buildEsVisibilityFilter(scope, ES_CHUNK_VISIBILITY_FIELDS)
+      : null;
     try {
+      const knn: estypes.KnnSearch = {
+        field: 'embedding',
+        query_vector: queryVector,
+        k,
+        num_candidates: Math.max(k * 10, 50),
+      };
+      if (visibilityFilter) {
+        knn.filter = visibilityFilter as estypes.QueryDslQueryContainer;
+      }
       // POST /kh_chunk/_search
       const response = await this.es.search({
         index: CHUNK_INDEX,
         // 返回条数
         size: k,
-        knn: {
-          // 在 dense_vector 字段 embedding 上做近似最近邻
-          field: 'embedding',
-          // 问题向量
-          query_vector: queryVector,
-          // 最终取最相近的 k 个
-          k,
-          // 每个分片先粗选的候选数，越大越准越慢
-          num_candidates: Math.max(k * 10, 50),
-        },
+        knn,
         // 只取需要的字段，不回传 embedding
         _source: CHUNK_HIT_SOURCE_FIELDS,
       });
@@ -267,7 +332,7 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
   /**
    * @description 混合检索粗排：关键词与向量两路并行召回，再按 chunkId 做 RRF 融合；
    * 没有问题向量（嵌入失败）时只走关键词
-   * @param params HybridSearchParams，query 必填；queryVector 可空；hybridTopK 默认 20；rrfC 默认 60
+   * @param params HybridSearchParams，query、可选问题向量、召回参数和文档可见范围
    * @returns Promise<ChunkHit[]>，按 RRF 分降序的去重结果
    */
   async searchHybrid(params: HybridSearchParams): Promise<ChunkHit[]> {
@@ -278,9 +343,9 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
 
     // 两路并行：关键词总是查；有问题向量才查 kNN，否则这一路为空
     const [keywordHits, vectorHits] = await Promise.all([
-      this.keywordSearch(params.query, hybridTopK),
+      this.keywordSearch(params.query, hybridTopK, params.scope),
       params.queryVector?.length
-        ? this.knnSearch(params.queryVector, hybridTopK)
+        ? this.knnSearch(params.queryVector, hybridTopK, params.scope)
         : Promise.resolve([] as ChunkHit[]),
     ]);
 
@@ -290,6 +355,26 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
       `混合检索 RRF：keyword=${keywordHits.length}, vector=${vectorHits.length}, fused=${fused.length}`,
     );
     return fused;
+  }
+
+  /**
+   * @description 为已有 kh_chunk 索引补充可见性 mapping；重复执行幂等
+   * @returns Promise<void>，更新失败只记 warn，查询仍按现有 mapping 运行
+   */
+  private async ensureVisibilityMapping(): Promise<void> {
+    try {
+      await this.es.indices.putMapping({
+        index: CHUNK_INDEX,
+        properties: {
+          is_public: { type: 'boolean' },
+          author_id: { type: 'keyword' },
+          team_id: { type: 'keyword' },
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`kh_chunk 可见性 mapping 更新失败：${message}`);
+    }
   }
 
   /**
@@ -347,6 +432,7 @@ class VectorIndexService implements OnModuleInit, OnModuleDestroy {
             category_id: { type: 'keyword' },
             author_id: { type: 'keyword' },
             team_id: { type: 'keyword' },
+            is_public: { type: 'boolean' },
             doc_status: { type: 'integer' },
             publish_time: { type: 'date' },
             indexed_at: { type: 'date' },

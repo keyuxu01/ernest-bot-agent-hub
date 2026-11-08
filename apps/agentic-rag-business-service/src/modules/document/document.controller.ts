@@ -83,12 +83,13 @@ export class DocumentController {
   /**
    * @description GET /documents：分页查询文档列表，仅元数据（document:list）
    * @param query QueryDocumentDto，分页与筛选条件
+   * @param user AuthUser，当前登录用户，用于限制可见文档
    * @returns Promise<{ items: DocumentEntity[]; total: number; ... }>，分页结果
    */
   @Get()
   @RequirePermission(PermissionCode.documentList)
-  findAll(@Query() query: QueryDocumentDto) {
-    return this.documentService.findAll(query);
+  findAll(@Query() query: QueryDocumentDto, @CurrentUser() user: AuthUser) {
+    return this.documentService.findAll(query, user);
   }
 
   /**
@@ -130,12 +131,13 @@ export class DocumentController {
   /**
    * @description GET /documents/:id：文档详情，含正文（document:list）
    * @param id string，路径参数，文档 ID
-   * @returns Promise<DocumentEntity & { content: string }>，文档元数据加正文；不存在返回 404
+   * @param user AuthUser，当前登录用户，用于校验文档可见性
+   * @returns Promise<DocumentEntity & { content: string }>，文档元数据加正文；不存在返回 404，不可见返回 403
    */
   @Get(':id')
   @RequirePermission(PermissionCode.documentList)
-  findOne(@Param('id') id: string) {
-    return this.documentService.findOne(id);
+  findOne(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    return this.documentService.findOne(id, true, user);
   }
 
   /**

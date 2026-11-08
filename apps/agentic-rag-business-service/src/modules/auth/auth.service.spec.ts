@@ -18,6 +18,7 @@ const user: AuthUser = {
   avatar: null,
   roles: ['ROLE_USER'],
   permissions: [],
+  teamIds: [],
 };
 
 const userService = {

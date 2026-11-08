@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { nextSnowflakeId } from '../../common/helpers/snowflake-id';
 import type { AuthUser } from '../user/type/user.types';
@@ -19,6 +20,11 @@ import { DocumentEntity, DocumentStatus } from './entities/document.entity';
 import { buildContentSummary } from './helpers/build-content-summary';
 import { countWords } from './helpers/count-words';
 import { documentLifecycleError } from './helpers/document-lifecycle-error';
+import {
+  accessFromUser,
+  canReadDocument,
+  canWriteDocument,
+} from './helpers/document-access';
 import {
   canArchiveFrom,
   canPublishFrom,
@@ -145,21 +151,30 @@ export class DocumentService {
   }
 
   /**
-   * 分页查询文档列表（只返回 Postgres 元数据，不含正文）
-   * 支持按标题模糊、分类 / 团队 / 作者 / 状态筛选
+   * @description 分页查询当前用户可见文档：本人文档，以及已发布的公开或本人团队文档；管理员/审核员不限制
+   * @param query QueryDocumentDto，分页与筛选条件
+   * @param user AuthUser，当前登录用户
+   * @returns Promise，当前页可见文档元数据与总数
    */
-  async findAll(query: QueryDocumentDto) {
-    return this.documentRepo.findPage(query);
+  async findAll(query: QueryDocumentDto, user: AuthUser) {
+    return this.documentRepo.findPage(query, accessFromUser(user));
   }
 
   /**
-   * 查询文档详情
-   * @param withContent 是否附带 Mongo 正文，默认 true
+   * @description 查询文档详情；传入用户时按作者、公开状态和团队校验可见性
+   * @param id string，文档 ID
+   * @param withContent boolean，是否附带 Mongo 正文，默认 true
+   * @param user AuthUser | undefined，传入时校验文档可见性；内部管线调用可不传
+   * @returns Promise，文档元数据或元数据加正文
+   * @throws NotFoundException 文档不存在；ForbiddenException 当前用户不可读
    */
-  async findOne(id: string, withContent = true) {
+  async findOne(id: string, withContent = true, user?: AuthUser) {
     const doc = await this.documentRepo.findActiveById(id);
     if (!doc) {
       throw new NotFoundException(`Document ${id} not found`);
+    }
+    if (user && !canReadDocument(doc, accessFromUser(user))) {
+      throw new ForbiddenException('无权查看该文档');
     }
 
     if (!withContent) {
@@ -196,9 +211,12 @@ export class DocumentService {
     if (!doc) {
       throw new NotFoundException(`Document ${id} not found`);
     }
+    this.assertWritable(doc, actor);
 
     // —— 状态与编辑权限：先校验，再写任何一侧存储 ——
     const oldStatus = doc.status;
+    const oldIsPublic = doc.isPublic;
+    const oldTeamId = doc.teamId ?? null;
     let nextStatus = doc.status;
     if (dto.status !== undefined && dto.status !== doc.status) {
       if (
@@ -266,7 +284,10 @@ export class DocumentService {
     const saved = await this.documentRepo.save(doc);
     const content = await this.resolveContent(doc.contentId, dto.content);
 
-    // —— 索引：离开 Published 清理；仍为 Published 且改了标题 / 正文则重建（只可能是免审）——
+    const visibilityChanged =
+      saved.isPublic !== oldIsPublic || (saved.teamId ?? null) !== oldTeamId;
+
+    // —— 索引：离开 Published 清理；改标题/正文重建；只改公开/团队时直接刷新可见性字段 ——
     if (
       oldStatus === DocumentStatus.Published &&
       nextStatus !== DocumentStatus.Published
@@ -274,6 +295,8 @@ export class DocumentService {
       await this.indexSync.unpublish(id);
     } else if (nextStatus === DocumentStatus.Published && editsBody) {
       await this.indexSync.publish(saved);
+    } else if (nextStatus === DocumentStatus.Published && visibilityChanged) {
+      await this.indexSync.updateVisibility(saved);
     }
 
     return { ...saved, content };
@@ -300,6 +323,7 @@ export class DocumentService {
     if (!doc) {
       throw new NotFoundException(`Document ${id} not found`);
     }
+    this.assertWritable(doc, actor);
     if (doc.status === DocumentStatus.PendingReview) {
       throw documentLifecycleError(
         'DOCUMENT_UNDER_REVIEW',
@@ -385,6 +409,7 @@ export class DocumentService {
     if (!doc) {
       throw new NotFoundException(`Document ${id} not found`);
     }
+    this.assertWritable(doc, actor);
 
     doc.deleted = true;
     doc.updateBy = actor.userId;
@@ -420,6 +445,7 @@ export class DocumentService {
     if (!doc) {
       throw new NotFoundException(`Document ${id} not found`);
     }
+    this.assertWritable(doc, actor);
     if (!allowed(doc.status)) {
       throw documentLifecycleError('DOCUMENT_TRANSITION_NOT_ALLOWED', message);
     }
@@ -429,6 +455,19 @@ export class DocumentService {
     const saved = await this.documentRepo.save(doc);
     await this.indexSync.unpublish(id);
     return saved;
+  }
+
+  /**
+   * @description 校验当前用户能否修改文档；管理员可改全部，其他角色只能改本人文档
+   * @param document DocumentEntity，待修改文档
+   * @param actor AuthUser，当前登录用户
+   * @returns void，允许修改时正常返回
+   * @throws ForbiddenException 当前用户不是管理员且不是文档作者
+   */
+  private assertWritable(document: DocumentEntity, actor: AuthUser): void {
+    if (!canWriteDocument(document, actor)) {
+      throw new ForbiddenException('无权修改该文档');
+    }
   }
 
   /** 本次已带新正文则直接用；否则按 contentId 读 Mongo */

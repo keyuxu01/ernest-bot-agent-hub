@@ -2,10 +2,7 @@ import { createHash } from 'crypto';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
-import {
-  CHARS_PER_TOKEN,
-  HEADING_LINE,
-} from './constants/chunking.constants';
+import { CHARS_PER_TOKEN, HEADING_LINE } from './constants/chunking.constants';
 import { extractHeading } from './helpers/extract-heading';
 import type { ChunkDocumentParams } from './type/chunk-params.types';
 import type { DocumentChunk } from './type/pipeline.types';
@@ -91,6 +88,7 @@ class ChunkingService {
         categoryId: params.categoryId,
         authorId: params.authorId,
         teamId: params.teamId,
+        isPublic: params.isPublic,
         docStatus: params.docStatus,
         publishTime: params.publishTime,
       });

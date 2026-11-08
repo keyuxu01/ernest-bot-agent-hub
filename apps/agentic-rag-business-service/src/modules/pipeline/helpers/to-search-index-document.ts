@@ -21,6 +21,7 @@ function toSearchIndexDocument(doc: PipelineDocument): SearchIndexDocument {
     likeCount: doc.likeCount,
     commentCount: doc.commentCount,
     authorId: doc.authorId ?? null,
+    teamId: doc.teamId ?? null,
     publishTime: toIsoDate(doc.publishTime),
     createdAt: toIsoDate(doc.createdAt),
     updatedAt: toIsoDate(doc.updatedAt),

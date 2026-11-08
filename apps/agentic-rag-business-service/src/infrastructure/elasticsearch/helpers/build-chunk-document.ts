@@ -13,6 +13,7 @@ function buildChunkDocument(chunk: IndexableChunk): Record<string, unknown> {
     category_id: chunk.categoryId ?? null,
     author_id: chunk.authorId ?? null,
     team_id: chunk.teamId ?? null,
+    is_public: chunk.isPublic ?? false,
     doc_status: chunk.docStatus ?? null,
     publish_time: chunk.publishTime ?? null,
     indexed_at: new Date().toISOString(),

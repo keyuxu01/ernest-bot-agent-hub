@@ -1,6 +1,9 @@
 import type { AuthUser } from '../user/type/user.types';
 import { HttpException, NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SearchIndexService } from '../../infrastructure/elasticsearch/search-index.service';
+import type { VectorIndexService } from '../../infrastructure/elasticsearch/vector-index.service';
+import type { GraphStoreService } from '../../infrastructure/neo4j/graph-store.service';
 import type { DocumentPipelinePublisher } from '../../infrastructure/rabbitmq/document-pipeline.publisher';
 import { DocumentIndexSyncService } from './document-index-sync.service';
 import type { DocumentReviewService } from './document-review.service';
@@ -23,6 +26,7 @@ const actor: AuthUser = {
   avatar: null,
   roles: ['ROLE_USER'],
   permissions: [],
+  teamIds: [],
 };
 
 function draftDoc(overrides: Partial<DocumentEntity> = {}): DocumentEntity {
@@ -30,6 +34,7 @@ function draftDoc(overrides: Partial<DocumentEntity> = {}): DocumentEntity {
     id: '10001',
     title: '草稿',
     contentId: '507f1f77bcf86cd799439011',
+    authorId: actor.userId,
     status: DocumentStatus.Draft,
     wordCount: 1,
     isPublic: false,
@@ -81,6 +86,9 @@ const pipelinePublisher = {
   afterPublish: vi.fn(),
   afterUnpublish: vi.fn(),
 };
+const searchIndex = { updateVisibility: vi.fn() };
+const vectorIndex = { updateVisibility: vi.fn() };
+const graphStore = { updateVisibility: vi.fn() };
 
 let service: DocumentService;
 
@@ -101,6 +109,9 @@ beforeEach(() => {
   // 索引同步用真实实现，断言最终投递到 publisher 的命令
   const indexSync = new DocumentIndexSyncService(
     pipelinePublisher as unknown as DocumentPipelinePublisher,
+    searchIndex as unknown as SearchIndexService,
+    vectorIndex as unknown as VectorIndexService,
+    graphStore as unknown as GraphStoreService,
   );
   service = new DocumentService(
     documentRepo as unknown as DocumentRepository,

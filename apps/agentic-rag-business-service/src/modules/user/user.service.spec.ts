@@ -7,6 +7,7 @@ import { hash } from 'bcryptjs';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { UserEntity } from './entities/user.entity';
 import type { DocumentRepository } from '../document/repository/document.repository';
+import type { TeamService } from '../team/team.service';
 import type { PermissionService } from './permission.service';
 import type { UserRepository } from './repository/user.repository';
 import { UserService } from './user.service';
@@ -52,6 +53,9 @@ const documentRepo = {
 const permissionService = {
   getUserPermissionCodes: vi.fn(),
 };
+const teamService = {
+  listAccessibleTeamIds: vi.fn(),
+};
 
 let service: UserService;
 
@@ -70,10 +74,12 @@ beforeEach(() => {
   userRepo.findByEmail.mockResolvedValue(null);
   userRepo.save.mockImplementation(async (u: UserEntity) => u);
   permissionService.getUserPermissionCodes.mockResolvedValue(['document:list']);
+  teamService.listAccessibleTeamIds.mockResolvedValue(['80001']);
   service = new UserService(
     userRepo as unknown as UserRepository,
     documentRepo as unknown as DocumentRepository,
     permissionService as unknown as PermissionService,
+    teamService as unknown as TeamService,
   );
 });
 
@@ -91,10 +97,12 @@ describe('UserService.validateCredentials', () => {
       avatar: null,
       roles: ['ROLE_USER'],
       permissions: ['document:list'],
+      teamIds: ['80001'],
     });
     expect(permissionService.getUserPermissionCodes).toHaveBeenCalledWith(
       '10001',
     );
+    expect(teamService.listAccessibleTeamIds).toHaveBeenCalledWith('10001');
   });
 
   it.each([

@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
+import type { DocumentAccessScope } from '../../../common/type/document-access.types';
 import { QueryDocumentDto } from '../dto/query-document.dto';
-import { DocumentEntity } from '../entities/document.entity';
+import { DocumentEntity, DocumentStatus } from '../entities/document.entity';
 import { CreateDocumentMetaInput } from '../type/create-document-meta.input';
 
 /**
@@ -58,8 +59,14 @@ export class DocumentRepository {
    * - 默认排除软删
    * - 标题 ILIKE 模糊；分类 / 团队 / 作者 / 状态可选筛选
    * - `status` 为 0（Draft）时也要能筛，故用 `!== undefined`
+   * @param query QueryDocumentDto，分页与业务筛选条件
+   * @param scope DocumentAccessScope，当前用户可见范围
+   * @returns Promise，当前页、总数与分页参数
    */
-  async findPage(query: QueryDocumentDto): Promise<{
+  async findPage(
+    query: QueryDocumentDto,
+    scope: DocumentAccessScope,
+  ): Promise<{
     items: DocumentEntity[];
     total: number;
     page: number;
@@ -72,6 +79,26 @@ export class DocumentRepository {
     const qb = this.repo
       .createQueryBuilder('doc')
       .where('doc.deleted = :deleted', { deleted: false });
+
+    if (!scope.unrestricted) {
+      if (scope.teamIds.length) {
+        // AND：本人文档 OR（已发布 AND（公开 OR 属于本人团队））
+        qb.andWhere(
+          '(doc.author_id = :me OR (doc.status = :published AND (doc.is_public = true OR doc.team_id IN (:...teamIds))))',
+          {
+            me: scope.userId,
+            published: DocumentStatus.Published,
+            teamIds: scope.teamIds,
+          },
+        );
+      } else {
+        // 无团队时：本人文档 OR（已发布 AND 公开）
+        qb.andWhere(
+          '(doc.author_id = :me OR (doc.status = :published AND doc.is_public = true))',
+          { me: scope.userId, published: DocumentStatus.Published },
+        );
+      }
+    }
 
     // 标题模糊匹配（不区分大小写）
     if (query.title) {

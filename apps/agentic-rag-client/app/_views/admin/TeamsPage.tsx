@@ -1,8 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button, Form, Input, Modal, Space, Table, message } from 'antd';
-import { teamApi } from '../../_lib/api';
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Select,
+  Space,
+  Table,
+  message,
+} from 'antd';
+import { teamApi, userApi } from '../../_lib/api';
 import { ApiError } from '../../_lib/api-client';
 import type { TeamItem } from '../../_types/knowledge-hub';
 
@@ -21,30 +31,78 @@ export default function TeamsPage() {
   const [open, setOpen] = useState(false);
   const [membersFor, setMembersFor] = useState<TeamItem | null>(null);
   const [members, setMembers] = useState<MemberRow[]>([]);
-  const [memberIds, setMemberIds] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState<string>();
+  const [userOptions, setUserOptions] = useState<Array<{ value: string; label: string }>>(
+    [],
+  );
+  const [searching, setSearching] = useState(false);
   const [form] = Form.useForm();
 
-  async function load(nextPage = page) {
+  const load = async (nextPage = page) => {
     try {
-      const res = await teamApi.page({
+      const result = await teamApi.page({
         page: nextPage,
         pageSize: 10,
         keyword: keyword.trim() || undefined,
       });
-      setItems(res.items);
-      setTotal(res.total);
+      setItems(result.items);
+      setTotal(result.total);
       setPage(nextPage);
     } catch (error) {
       message.error(error instanceof ApiError ? error.message : '加载失败');
     }
-  }
+  };
+
+  const loadMembers = async (teamId: string) => {
+    const rows = (await teamApi.members(teamId)) as MemberRow[];
+    setMembers(rows);
+    setItems(previous =>
+      previous.map(team =>
+        team.id === teamId ? { ...team, memberCount: rows.length } : team,
+      ),
+    );
+    return rows;
+  };
+
+  const searchUsers = async (query: string) => {
+    const keywordLowerCase = query.trim().toLowerCase();
+    if (!keywordLowerCase) {
+      setUserOptions([]);
+      return;
+    }
+    setSearching(true);
+    try {
+      const result = await userApi.page({
+        keyword: query.trim(),
+        page: 1,
+        pageSize: 20,
+      });
+      const taken = new Set(members.map(row => row.userId));
+      setUserOptions(
+        result.items
+          .filter(
+            user =>
+              !taken.has(user.id) &&
+              user.username.toLowerCase().includes(keywordLowerCase),
+          )
+          .map(user => ({
+            value: user.id,
+            label: user.realName ? `${user.username}（${user.realName}）` : user.username,
+          })),
+      );
+    } catch (error) {
+      message.error(error instanceof ApiError ? error.message : '搜索用户失败');
+    } finally {
+      setSearching(false);
+    }
+  };
 
   useEffect(() => {
     teamApi
       .page({ page: 1, pageSize: 10 })
-      .then(res => {
-        setItems(res.items);
-        setTotal(res.total);
+      .then(result => {
+        setItems(result.items);
+        setTotal(result.total);
         setPage(1);
       })
       .catch(error => {
@@ -58,7 +116,7 @@ export default function TeamsPage() {
         <Input
           placeholder="团队名称"
           value={keyword}
-          onChange={e => setKeyword(e.target.value)}
+          onChange={event => setKeyword(event.target.value)}
           onPressEnter={() => void load(1)}
         />
         <Button onClick={() => void load(1)}>查询</Button>
@@ -69,7 +127,12 @@ export default function TeamsPage() {
       <Table
         rowKey="id"
         dataSource={items}
-        pagination={{ current: page, pageSize: 10, total, onChange: p => void load(p) }}
+        pagination={{
+          current: page,
+          pageSize: 10,
+          total,
+          onChange: value => void load(value),
+        }}
         columns={[
           { title: '名称', dataIndex: 'teamName' },
           { title: '编码', dataIndex: 'teamCode' },
@@ -81,8 +144,10 @@ export default function TeamsPage() {
               <a
                 onClick={async () => {
                   setMembersFor(row);
+                  setSelectedUserId(undefined);
+                  setUserOptions([]);
                   try {
-                    setMembers((await teamApi.members(row.id)) as MemberRow[]);
+                    await loadMembers(row.id);
                   } catch (error) {
                     message.error(
                       error instanceof ApiError ? error.message : '加载成员失败',
@@ -140,26 +205,33 @@ export default function TeamsPage() {
         footer={null}
         width={640}
       >
-        <Space style={{ marginBottom: 12 }}>
-          <Input
-            placeholder="用户 ID，逗号分隔"
-            value={memberIds}
-            onChange={e => setMemberIds(e.target.value)}
+        <Space style={{ marginBottom: 12 }} wrap>
+          <Select
+            showSearch={{
+              filterOption: false,
+              onSearch: value => void searchUsers(value),
+            }}
+            allowClear
+            placeholder="按用户名搜索"
+            value={selectedUserId}
+            options={userOptions}
+            loading={searching}
+            onChange={setSelectedUserId}
             style={{ width: 280 }}
+            notFoundContent={searching ? '搜索中…' : '输入用户名搜索'}
           />
           <Button
             type="primary"
             onClick={async () => {
-              if (!membersFor) return;
-              const ids = memberIds
-                .split(',')
-                .map(s => s.trim())
-                .filter(Boolean);
-              if (!ids.length) return;
+              if (!membersFor || !selectedUserId) {
+                message.warning('请先按用户名搜索并选择成员');
+                return;
+              }
               try {
-                await teamApi.addMembers(membersFor.id, ids);
-                setMembers((await teamApi.members(membersFor.id)) as MemberRow[]);
-                setMemberIds('');
+                await teamApi.addMembers(membersFor.id, [selectedUserId]);
+                await loadMembers(membersFor.id);
+                setSelectedUserId(undefined);
+                setUserOptions([]);
                 message.success('已添加');
               } catch (error) {
                 message.error(error instanceof ApiError ? error.message : '添加失败');
@@ -174,10 +246,35 @@ export default function TeamsPage() {
           dataSource={members}
           pagination={false}
           columns={[
-            { title: '用户 ID', dataIndex: 'userId' },
             { title: '用户名', dataIndex: 'username' },
             { title: '姓名', dataIndex: 'realName' },
             { title: '角色', dataIndex: 'memberRole' },
+            {
+              title: '操作',
+              width: 80,
+              render: (_: unknown, row: MemberRow) => (
+                <Popconfirm
+                  title={`确定将 ${row.username} 移出团队？`}
+                  okText="踢出"
+                  okType="danger"
+                  cancelText="取消"
+                  onConfirm={async () => {
+                    if (!membersFor) return;
+                    try {
+                      await teamApi.removeMembers(membersFor.id, [row.userId]);
+                      await loadMembers(membersFor.id);
+                      message.success('已移出');
+                    } catch (error) {
+                      message.error(
+                        error instanceof ApiError ? error.message : '移出失败',
+                      );
+                    }
+                  }}
+                >
+                  <a style={{ color: '#ff4d4f' }}>踢出</a>
+                </Popconfirm>
+              ),
+            },
           ]}
         />
       </Modal>

@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ElasticsearchModule } from '../../infrastructure/elasticsearch/elasticsearch.module';
+import { Neo4jModule } from '../../infrastructure/neo4j/neo4j.module';
 import { RabbitmqModule } from '../../infrastructure/rabbitmq/rabbitmq.module';
 import { RustfsModule } from '../../infrastructure/rustfs/rustfs.module';
 import { DocumentIndexSyncService } from './document-index-sync.service';
@@ -33,6 +35,8 @@ import {
     ]),
     RustfsModule,
     RabbitmqModule,
+    ElasticsearchModule,
+    Neo4jModule,
   ],
   controllers: [DocumentController, DocumentReviewController],
   providers: [

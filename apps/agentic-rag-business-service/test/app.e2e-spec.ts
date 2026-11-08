@@ -101,6 +101,7 @@ describe('Business service (e2e)', () => {
       .overrideProvider(SearchIndexService)
       .useValue({
         indexDocument: async () => undefined,
+        updateVisibility: async () => undefined,
         deleteDocument: async () => undefined,
         searchDocuments: async (params: { keyword: string }) => ({
           items: [{ id: '1', title: params.keyword }],
@@ -112,6 +113,7 @@ describe('Business service (e2e)', () => {
       .overrideProvider(VectorIndexService)
       .useValue({
         deleteByDocId: async () => undefined,
+        updateVisibility: async () => undefined,
         indexChunks: async () => undefined,
         // 混合检索粗排：「无关」问题返回空，其余返回两块
         searchHybrid: async (params: { query: string }) =>
@@ -154,6 +156,7 @@ describe('Business service (e2e)', () => {
       .overrideProvider(GraphStoreService)
       .useValue({
         upsertDocument: async () => undefined,
+        updateVisibility: async () => undefined,
         upsertChunk: async () => undefined,
         writeExtraction: async () => 0,
         deleteByDocId: async () => undefined,

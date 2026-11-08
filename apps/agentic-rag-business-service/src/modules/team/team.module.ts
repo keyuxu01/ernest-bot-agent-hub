@@ -4,6 +4,7 @@ import { UserEntity } from '../user/entities/user.entity';
 import { TeamMemberEntity } from './entities/team-member.entity';
 import { TeamEntity } from './entities/team.entity';
 import { TeamRepository } from './repository/team.repository';
+import { TeamMineController } from './team-mine.controller';
 import { TeamController } from './team.controller';
 import { TeamService } from './team.service';
 
@@ -12,7 +13,7 @@ import { TeamService } from './team.service';
   imports: [
     TypeOrmModule.forFeature([TeamEntity, TeamMemberEntity, UserEntity]),
   ],
-  controllers: [TeamController],
+  controllers: [TeamMineController, TeamController],
   providers: [TeamRepository, TeamService],
   exports: [TeamService],
 })

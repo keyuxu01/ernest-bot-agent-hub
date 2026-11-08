@@ -47,12 +47,13 @@ class AiController {
   /**
    * @description POST /rag/search：RAG 混合检索（关键词 BM25 + 向量 kNN → RRF → rerank），不调 LLM，只返回 kh_chunk 命中
    * @param dto RagSearchDto，请求体：query 必填，topK 默认 5、最大 20
-   * @returns Promise<ChunkHit[]>，最相关的块（含 chunkId、documentId、documentTitle、content、heading、score）
+   * @param user AuthUser，当前登录用户，用于限制可见文档
+   * @returns Promise<ChunkHit[]>，最相关的可见块
    */
   @Post('rag/search')
   @RequirePermission(PermissionCode.search)
-  search(@Body() dto: RagSearchDto) {
-    return this.retrieval.retrieve(dto.query.trim(), dto.topK ?? 5);
+  search(@Body() dto: RagSearchDto, @CurrentUser() user: AuthUser) {
+    return this.retrieval.retrieve(dto.query.trim(), dto.topK ?? 5, user);
   }
 
   /**

@@ -2,12 +2,28 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from '../_lib/navigation';
-import { Button, Input, Select, Space, Table, Tag, Upload, message } from 'antd';
+import {
+  Button,
+  Checkbox,
+  Input,
+  Select,
+  Space,
+  Table,
+  Tag,
+  Upload,
+  message,
+} from 'antd';
 import { documentApi } from '../_lib/api';
 import { ApiError } from '../_lib/api-client';
 import type { DocumentItem } from '../_types/knowledge-hub';
 import { useAuth } from '../_lib/auth';
-import { DOC_STATUS, can, formatTime } from '../_utils/knowledge-hub';
+import {
+  DOC_STATUS,
+  can,
+  canWriteDocument,
+  formatTime,
+  visibilityMeta,
+} from '../_utils/knowledge-hub';
 import { FileTypeIcon, fileTypeLabel } from '../_components/file-type-icon';
 
 export default function DocumentsPage() {
@@ -15,6 +31,7 @@ export default function DocumentsPage() {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [status, setStatus] = useState<number | undefined>();
+  const [mineOnly, setMineOnly] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [items, setItems] = useState<DocumentItem[]>([]);
@@ -29,6 +46,7 @@ export default function DocumentsPage() {
         pageSize,
         title: title.trim() || undefined,
         status,
+        authorId: mineOnly ? user?.userId : undefined,
       });
       setItems(res.items);
       setTotal(res.total);
@@ -56,6 +74,10 @@ export default function DocumentsPage() {
 
   return (
     <div className="kh-page">
+      <p className="kh-access-hint">
+        列表只展示你能看的文档：公开、所在团队，以及自己写的。编辑 /
+        发布仅作者或管理员可用。
+      </p>
       <Space style={{ marginBottom: 16 }} wrap>
         <Input
           allowClear
@@ -76,6 +98,12 @@ export default function DocumentsPage() {
             label: v.label,
           }))}
         />
+        <Checkbox
+          checked={mineOnly}
+          onChange={event => setMineOnly(event.target.checked)}
+        >
+          仅我的
+        </Checkbox>
         <Button onClick={() => void load(1)}>查询</Button>
         {can(user, 'document:create') ? (
           <>
@@ -89,7 +117,7 @@ export default function DocumentsPage() {
                 form.append('file', file);
                 try {
                   const res = await documentApi.uploadParse(form);
-                  message.success('已解析为草稿');
+                  message.success('已解析为草稿，可在编辑页设置公开或团队');
                   navigate(`/documents/${res.id}/edit`);
                 } catch (error) {
                   message.error(error instanceof ApiError ? error.message : '上传失败');
@@ -136,39 +164,44 @@ export default function DocumentsPage() {
             ),
           },
           {
-            title: '公开',
-            dataIndex: 'isPublic',
-            width: 80,
-            render: (v: boolean) => (v ? '是' : '否'),
+            title: '可见性',
+            width: 110,
+            render: (_: unknown, row: DocumentItem) => {
+              const visibility = visibilityMeta(row);
+              return <Tag color={visibility.color}>{visibility.label}</Tag>;
+            },
           },
           { title: '更新时间', dataIndex: 'updatedAt', width: 180, render: formatTime },
           {
             title: '操作',
             width: 160,
-            render: (_: unknown, row: DocumentItem) => (
-              <Space>
-                {can(user, 'document:edit') ? (
-                  <a onClick={() => navigate(`/documents/${row.id}/edit`)}>编辑</a>
-                ) : null}
-                {can(user, 'document:edit') && row.status === 0 ? (
-                  <a
-                    onClick={async () => {
-                      try {
-                        await documentApi.publish(row.id);
-                        message.success('已提交发布');
-                        void load();
-                      } catch (error) {
-                        message.error(
-                          error instanceof ApiError ? error.message : '发布失败',
-                        );
-                      }
-                    }}
-                  >
-                    发布
-                  </a>
-                ) : null}
-              </Space>
-            ),
+            render: (_: unknown, row: DocumentItem) => {
+              const writable = can(user, 'document:edit') && canWriteDocument(user, row);
+              return (
+                <Space>
+                  {writable ? (
+                    <a onClick={() => navigate(`/documents/${row.id}/edit`)}>编辑</a>
+                  ) : null}
+                  {writable && row.status === 0 ? (
+                    <a
+                      onClick={async () => {
+                        try {
+                          await documentApi.publish(row.id);
+                          message.success('已提交发布');
+                          void load();
+                        } catch (error) {
+                          message.error(
+                            error instanceof ApiError ? error.message : '发布失败',
+                          );
+                        }
+                      }}
+                    >
+                      发布
+                    </a>
+                  ) : null}
+                </Space>
+              );
+            },
           },
         ]}
       />

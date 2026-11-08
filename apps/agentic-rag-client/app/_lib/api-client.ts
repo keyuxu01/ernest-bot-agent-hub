@@ -1,7 +1,11 @@
+import { resolveApiBaseUrl } from '../../utils/resolve-api-base-url';
 import { clearAuth, getAccessToken, getRefreshToken, setAuth } from './auth';
 import type { AuthUser } from '../_types/knowledge-hub';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
+const API_BASE = resolveApiBaseUrl({
+  isBrowser: true,
+  publicBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+});
 
 export class ApiError extends Error {
   status: number;

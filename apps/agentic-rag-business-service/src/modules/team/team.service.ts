@@ -24,6 +24,33 @@ class TeamService {
   constructor(private readonly teamRepo: TeamRepository) {}
 
   /**
+   * @description 查询当前用户可访问的团队 ID：成员身份与负责人身份取并集，并过滤已软删团队
+   * @param userId string，用户 ID
+   * @returns Promise<string[]>，去重后的未删除团队 ID
+   */
+  async listAccessibleTeamIds(userId: string): Promise<string[]> {
+    const [memberTeamIds, ledTeams] = await Promise.all([
+      this.teamRepo.findMemberTeamIds(userId),
+      this.teamRepo.findLedTeams(userId),
+    ]);
+    const ids = [
+      ...new Set([...memberTeamIds, ...ledTeams.map((team) => team.id)]),
+    ];
+    const teams = await this.teamRepo.findActiveByIds(ids);
+    return teams.map((team) => team.id);
+  }
+
+  /**
+   * @description 查询当前用户所在或负责的未删除团队
+   * @param userId string，当前用户 ID
+   * @returns Promise<TeamEntity[]>，按团队排序和创建时间升序排列
+   */
+  async listMine(userId: string): Promise<TeamEntity[]> {
+    const ids = await this.listAccessibleTeamIds(userId);
+    return this.teamRepo.findActiveByIds(ids);
+  }
+
+  /**
    * @description 新建团队（不校验父团队、负责人是否存在，负责人也不会写进成员表）
    * @param dto CreateTeamDto，团队名称必填；编码、描述、负责人、父团队、排序、状态可选
    * @returns Promise<TeamEntity>，新建的团队

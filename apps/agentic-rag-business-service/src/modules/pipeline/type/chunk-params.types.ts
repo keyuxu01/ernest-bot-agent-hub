@@ -6,6 +6,7 @@ type ChunkDocumentParams = {
   categoryId?: string | null;
   authorId?: string | null;
   teamId?: string | null;
+  isPublic?: boolean;
   docStatus?: number | null;
   publishTime?: string | null;
 };

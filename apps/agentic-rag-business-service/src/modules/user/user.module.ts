@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DocumentModule } from '../document/document.module';
+import { TeamModule } from '../team/team.module';
 import { PermissionEntity } from './entities/permission.entity';
 import { RolePermissionEntity } from './entities/role-permission.entity';
 import { RoleEntity } from './entities/role.entity';
@@ -33,6 +34,7 @@ import { UserService } from './user.service';
     ]),
     // 个人统计按作者聚合文档，经 DocumentRepository 访问
     DocumentModule,
+    TeamModule,
   ],
   controllers: [UserController, RoleController, PermissionController],
   providers: [

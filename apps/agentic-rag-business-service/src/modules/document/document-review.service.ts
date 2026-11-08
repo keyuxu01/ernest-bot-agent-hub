@@ -1,5 +1,6 @@
 import {
   HttpStatus,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -23,6 +24,7 @@ import {
   type DocumentEntity,
 } from './entities/document.entity';
 import { documentLifecycleError } from './helpers/document-lifecycle-error';
+import { canWriteDocument } from './helpers/document-access';
 import { canSubmitReviewFrom } from './helpers/document-status-rules';
 import { DocumentReviewRepository } from './repository/document-review.repository';
 import { DocumentRepository } from './repository/document.repository';
@@ -49,7 +51,7 @@ const RESULT_BY_FILTER: Record<
  * 但单独的提交审核接口仍可用。
  *
  * 权限：通过 / 驳回由 Controller 的 @Roles 限定为审核员或管理员，审核人取自登录用户（ADR-0024）。
- * 不限制「作者审核自己的文档」，也不校验提审人是否为文档作者。
+ * 提审要求管理员或文档作者；仍不限制作者审核自己的文档。
  */
 @Injectable()
 class DocumentReviewService {
@@ -73,9 +75,13 @@ class DocumentReviewService {
    * @param documentId string，文档 ID
    * @param actor AuthUser | undefined，提交人；传了就写入文档 updateBy
    * @returns Promise<DocumentEntity>，状态已改为 PendingReview 的文档
+   * @throws ForbiddenException 当前用户不是管理员且不是文档作者
    */
   async submit(documentId: string, actor?: AuthUser): Promise<DocumentEntity> {
     const doc = await this.findDocumentOrThrow(documentId);
+    if (actor && !canWriteDocument(doc, actor)) {
+      throw new ForbiddenException('无权提交该文档审核');
+    }
     if (doc.status === DocumentStatus.PendingReview) {
       throw documentLifecycleError(
         'DOCUMENT_REVIEW_ALREADY_PENDING',

@@ -29,6 +29,49 @@ class TeamRepository {
   ) {}
 
   /**
+   * @description 查询用户作为成员加入的全部团队 ID
+   * @param userId string，用户 ID
+   * @returns Promise<string[]>，成员表中的团队 ID
+   */
+  async findMemberTeamIds(userId: string): Promise<string[]> {
+    // SELECT m.team_id AS "teamId" FROM kh_team_member m WHERE m.user_id = :userId
+    const rows = await this.memberRepo
+      .createQueryBuilder('m')
+      .select('m.team_id', 'teamId')
+      .where('m.user_id = :userId', { userId })
+      .getRawMany<{ teamId: string | number }>();
+    return rows.map((row) => String(row.teamId));
+  }
+
+  /**
+   * @description 查询用户担任负责人的全部未删除团队
+   * @param userId string，用户 ID
+   * @returns Promise<TeamEntity[]>，负责人团队
+   */
+  async findLedTeams(userId: string): Promise<TeamEntity[]> {
+    // SELECT id FROM kh_team WHERE leader_id = :userId AND deleted = false
+    return this.teamRepo.find({
+      where: { leaderId: userId, deleted: false },
+      select: { id: true },
+    });
+  }
+
+  /**
+   * @description 按 ID 查询未删除团队，过滤成员表可能残留的软删团队
+   * @param ids string[]，团队 ID
+   * @returns Promise<TeamEntity[]>，未删除团队，按 sort、created_at 升序
+   */
+  async findActiveByIds(ids: string[]): Promise<TeamEntity[]> {
+    if (!ids.length) return [];
+    // SELECT * FROM kh_team WHERE id IN (:...ids) AND deleted = false
+    // ORDER BY sort ASC, created_at ASC
+    return this.teamRepo.find({
+      where: { id: In(ids), deleted: false },
+      order: { sort: 'ASC', createdAt: 'ASC' },
+    });
+  }
+
+  /**
    * @description 新建一个团队
    * @param input Partial<TeamEntity>，团队字段（id、名称、编码、父团队等），未给的字段用列默认值
    * @returns Promise<TeamEntity>，落库后的团队

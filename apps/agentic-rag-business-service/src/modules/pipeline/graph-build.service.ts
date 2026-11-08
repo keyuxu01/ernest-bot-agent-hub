@@ -51,6 +51,8 @@ class GraphBuildService {
       summary: doc.summary,
       categoryId: doc.categoryId,
       authorId: doc.authorId,
+      teamId: doc.teamId,
+      isPublic: doc.isPublic,
       status: doc.status,
       tags: doc.tags,
     });
@@ -62,6 +64,7 @@ class GraphBuildService {
       categoryId: doc.categoryId,
       authorId: doc.authorId,
       teamId: doc.teamId,
+      isPublic: doc.isPublic,
       docStatus: doc.status,
       publishTime: toIsoDate(doc.publishTime),
     });

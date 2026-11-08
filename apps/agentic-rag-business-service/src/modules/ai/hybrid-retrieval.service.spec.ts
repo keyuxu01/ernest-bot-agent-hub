@@ -47,6 +47,7 @@ describe('HybridRetrievalService.retrieve', () => {
       queryVector: [0.1, 0.2],
       hybridTopK: 30,
       rrfC: 40,
+      scope: { unrestricted: false, userId: '', teamIds: [] },
     });
     expect(reranker.rerank).toHaveBeenCalledWith('问题', fused, fused.length);
     expect(result).toEqual([hit('c', 0.9)]);
@@ -70,7 +71,10 @@ describe('HybridRetrievalService.retrieve', () => {
 
     await expect(service.retrieve('问题')).resolves.toEqual([]);
     expect(vectorIndex.searchHybrid).toHaveBeenCalledWith(
-      expect.objectContaining({ queryVector: null }),
+      expect.objectContaining({
+        queryVector: null,
+        scope: { unrestricted: false, userId: '', teamIds: [] },
+      }),
     );
     expect(reranker.rerank).not.toHaveBeenCalled();
   });

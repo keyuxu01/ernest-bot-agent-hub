@@ -13,6 +13,8 @@ interface AuthUser {
   roles: string[];
   /** 生效权限码：直接权限 + 角色权限；管理员追加 ADMIN_OPERATION_PERMISSIONS */
   permissions: string[];
+  /** 所在团队（含担任负责人的团队），用于文档可见性 */
+  teamIds: string[];
 }
 
 /** 用户对外展示（不含 password） */

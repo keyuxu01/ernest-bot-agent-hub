@@ -1,3 +1,5 @@
+import type { DocumentAccessScope } from '../../../common/type/document-access.types';
+
 /**
  * 图谱写入所需的最小结构。
  *
@@ -12,6 +14,8 @@ type GraphDocumentNode = {
   summary?: string | null;
   categoryId?: string | null;
   authorId?: string | null;
+  teamId?: string | null;
+  isPublic?: boolean;
   status: number;
   /** 逗号分隔的文档标签，用于全景图生成标签节点 */
   tags?: string | null;
@@ -88,6 +92,8 @@ type GraphOverviewParams = {
   /** 文档 updatedAt 上界，ISO 字符串 */
   to?: string;
   docLimit?: number;
+  /** 当前用户文档可见范围 */
+  scope?: DocumentAccessScope;
 };
 
 type GraphOverviewNodeKind = 'document' | 'entity' | 'tag';

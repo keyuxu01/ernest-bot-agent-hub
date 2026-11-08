@@ -1,3 +1,5 @@
+import type { DocumentAccessScope } from '../../../common/type/document-access.types';
+
 /** 写入 ES `kh_document` 的整篇文档（Postgres 元数据 + Mongo 全文） */
 type SearchIndexDocument = {
   id: string;
@@ -13,6 +15,7 @@ type SearchIndexDocument = {
   likeCount?: number;
   commentCount?: number;
   authorId: string | null;
+  teamId: string | null;
   publishTime: string | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -27,6 +30,7 @@ type SearchDocumentsParams = {
   pageSize?: number;
   categoryId?: string;
   authorId?: string;
+  scope?: DocumentAccessScope;
 };
 
 /** 关键词检索的单条命中（不含正文，正文只以高亮片段返回） */
@@ -37,6 +41,8 @@ type SearchDocumentHit = {
   categoryId: unknown;
   tags: unknown;
   authorId: unknown;
+  teamId: unknown;
+  isPublic: unknown;
   status: unknown;
   publishTime: unknown;
   /** ES 相关度得分 */

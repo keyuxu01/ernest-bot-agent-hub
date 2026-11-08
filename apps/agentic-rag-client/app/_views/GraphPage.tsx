@@ -95,7 +95,7 @@ export default function GraphPage() {
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-            placeholder="输入关键词检索图谱…"
+            placeholder="输入关键词检索你有权限的图谱…"
             value={keyword}
             onChange={e => setKeyword(e.target.value)}
             onPressEnter={() => void load()}
@@ -139,7 +139,9 @@ export default function GraphPage() {
           <Button type="primary" loading={loading} onClick={() => void load()}>
             检索
           </Button>
-          <div style={{ flex: 1 }} />
+          <div style={{ flex: 1, color: '#8c8c8c', fontSize: 12 }}>
+            仅展示你有权限的文档及其实体
+          </div>
           <Button
             icon={<DownloadOutlined />}
             onClick={() => chartRef.current?.exportPng()}
@@ -160,7 +162,7 @@ export default function GraphPage() {
               {loading ? (
                 <Spin />
               ) : (
-                <Empty description="暂无图谱数据，发布文档后会写入 Neo4j" />
+                <Empty description="暂无你有权限的图谱数据。发布文档后会写入 Neo4j。" />
               )}
             </div>
           )}

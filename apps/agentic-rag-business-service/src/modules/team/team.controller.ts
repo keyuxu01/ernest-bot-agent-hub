@@ -14,9 +14,8 @@ import { RoleCode } from '../user/constants/user.constants';
 import { CreateTeamDto, QueryTeamDto, UpdateTeamDto } from './dto/team.dto';
 import { TeamService } from './team.service';
 
-/** 团队管理（管理员；除团队树外还要求 system:team） */
+/** 团队管理接口；`/teams/mine` 由 TeamMineController 独立提供，其余接口要求管理员 */
 @Controller('teams')
-@Roles(RoleCode.ADMIN)
 class TeamController {
   /**
    * @description 注入团队业务服务
@@ -30,6 +29,7 @@ class TeamController {
    * @returns Promise<TeamEntity>，新建的团队
    */
   @Post()
+  @Roles(RoleCode.ADMIN)
   @RequirePermission('system:team')
   create(@Body() dto: CreateTeamDto) {
     return this.teamService.create(dto);
@@ -42,6 +42,7 @@ class TeamController {
    * @returns Promise<TeamEntity>，修改后的团队
    */
   @Put(':id')
+  @Roles(RoleCode.ADMIN)
   @RequirePermission('system:team')
   update(@Param('id') id: string, @Body() dto: UpdateTeamDto) {
     return this.teamService.update(id, dto);
@@ -53,6 +54,7 @@ class TeamController {
    * @returns Promise<{ message: string }>，固定返回 { message: '删除成功' }
    */
   @Delete(':id')
+  @Roles(RoleCode.ADMIN)
   @RequirePermission('system:team')
   async delete(@Param('id') id: string) {
     await this.teamService.delete(id);
@@ -65,17 +67,20 @@ class TeamController {
    * @returns Promise<{ items: TeamEntity[]; total: number; page: number; pageSize: number }>，分页结果
    */
   @Get('page')
+  @Roles(RoleCode.ADMIN)
   @RequirePermission('system:team')
   page(@Query() query: QueryTeamDto) {
     return this.teamService.page(query);
   }
 
   /**
-   * @description GET /teams/tree：团队树（只受类上的 @Roles(ADMIN) 约束，不要求 system:team）
+   * @description GET /teams/tree：管理员查询团队树
    * @param rootOnly string | undefined，查询参数；为 'true' 时只返回根团队
    * @returns Promise<TeamEntity[] | TeamTreeNode[]>，团队树或根团队列表
    */
   @Get('tree')
+  @Roles(RoleCode.ADMIN)
+  @RequirePermission('system:team')
   getTree(@Query('rootOnly') rootOnly?: string) {
     return this.teamService.getTree(rootOnly === 'true');
   }
@@ -86,6 +91,7 @@ class TeamController {
    * @returns Promise<TeamEntity & { memberCount: number }>，团队详情
    */
   @Get(':id')
+  @Roles(RoleCode.ADMIN)
   @RequirePermission('system:team')
   getDetail(@Param('id') id: string) {
     return this.teamService.getDetail(id);
@@ -98,6 +104,7 @@ class TeamController {
    * @returns Promise<boolean>，成功返回 true
    */
   @Post(':id/members')
+  @Roles(RoleCode.ADMIN)
   @RequirePermission('system:team')
   addMembers(@Param('id') id: string, @Body() userIds: string[]) {
     return this.teamService.addMembers(id, userIds);
@@ -110,6 +117,7 @@ class TeamController {
    * @returns Promise<boolean>，成功返回 true
    */
   @Delete(':id/members')
+  @Roles(RoleCode.ADMIN)
   @RequirePermission('system:team')
   removeMembers(@Param('id') id: string, @Body() userIds: string[]) {
     return this.teamService.removeMembers(id, userIds);
@@ -121,6 +129,7 @@ class TeamController {
    * @returns Promise<TeamMemberVO[]>，成员数组，含 userId、memberRole、username、realName
    */
   @Get(':id/members')
+  @Roles(RoleCode.ADMIN)
   @RequirePermission('system:team')
   listMembers(@Param('id') id: string) {
     return this.teamService.listMembers(id);

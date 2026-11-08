@@ -1,15 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Input, Row, Statistic, message } from 'antd';
-import { userApi } from '../_lib/api';
+import { Button, Card, Col, Form, Input, Row, Statistic, Tag, message } from 'antd';
+import { teamApi, userApi } from '../_lib/api';
 import { ApiError } from '../_lib/api-client';
-import type { UserStats } from '../_types/knowledge-hub';
+import type { TeamItem, UserStats } from '../_types/knowledge-hub';
 import { updateUser, useAuth } from '../_lib/auth';
 
 export default function ProfilePage() {
   const user = useAuth();
   const [stats, setStats] = useState<UserStats | null>(null);
+  const [teams, setTeams] = useState<TeamItem[]>([]);
   const [profileForm] = Form.useForm();
   const [pwdForm] = Form.useForm();
 
@@ -17,6 +18,10 @@ export default function ProfilePage() {
     userApi
       .stats()
       .then(setStats)
+      .catch(() => undefined);
+    teamApi
+      .mine()
+      .then(setTeams)
       .catch(() => undefined);
     profileForm.setFieldsValue({
       realName: user?.realName,
@@ -54,14 +59,32 @@ export default function ProfilePage() {
             }
           }}
         >
-          <Form.Item label="用户名">
-            <Input disabled value={user?.username} />
+          <Form.Item label="用户名" htmlFor="profile-username">
+            <Input
+              id="profile-username"
+              name="profile-username"
+              autoComplete="username"
+              disabled
+              value={user?.username}
+            />
           </Form.Item>
+          <div className="kh-profile-team-field">
+            <div className="kh-profile-team-label">所在团队</div>
+            {teams.length ? (
+              <div>
+                {teams.map(team => (
+                  <Tag key={team.id}>{team.teamName}</Tag>
+                ))}
+              </div>
+            ) : (
+              <span style={{ color: '#8c8c8c' }}>暂未加入团队</span>
+            )}
+          </div>
           <Form.Item name="realName" label="姓名">
-            <Input />
+            <Input autoComplete="name" />
           </Form.Item>
           <Form.Item name="email" label="邮箱">
-            <Input />
+            <Input autoComplete="email" />
           </Form.Item>
           <Button type="primary" htmlType="submit">
             保存资料
@@ -84,14 +107,14 @@ export default function ProfilePage() {
           }}
         >
           <Form.Item name="oldPassword" label="原密码" rules={[{ required: true }]}>
-            <Input.Password />
+            <Input.Password autoComplete="current-password" />
           </Form.Item>
           <Form.Item
             name="newPassword"
             label="新密码"
             rules={[{ required: true, min: 6 }]}
           >
-            <Input.Password />
+            <Input.Password autoComplete="new-password" />
           </Form.Item>
           <Button type="primary" htmlType="submit">
             修改密码

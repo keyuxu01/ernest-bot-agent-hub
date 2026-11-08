@@ -151,6 +151,7 @@ class PipelineOrchestrator {
       categoryId: doc.categoryId,
       authorId: doc.authorId,
       teamId: doc.teamId,
+      isPublic: doc.isPublic,
       docStatus: doc.status,
       publishTime: toIsoDate(doc.publishTime),
     });

@@ -8,6 +8,7 @@ import {
 import { compare, hash } from 'bcryptjs';
 import { nextSnowflakeId } from '../../common/helpers/snowflake-id';
 import { DocumentRepository } from '../document/repository/document.repository';
+import { TeamService } from '../team/team.service';
 import { RoleCode } from './constants/user.constants';
 import type { CreateUserDto } from './dto/create-user.dto';
 import type { UpdateProfileDto } from './dto/profile.dto';
@@ -27,11 +28,13 @@ class UserService {
    * @param userRepo UserRepository，用户与角色关联的读写
    * @param documentRepo DocumentRepository，个人文档统计
    * @param permissionService PermissionService，计算用户的生效权限编码
+   * @param teamService TeamService，查询用户作为成员或负责人的团队
    */
   constructor(
     private readonly userRepo: UserRepository,
     private readonly documentRepo: DocumentRepository,
     private readonly permissionService: PermissionService,
+    private readonly teamService: TeamService,
   ) {}
 
   async findByEmail(email: string): Promise<UserEntity | null> {
@@ -86,13 +89,14 @@ class UserService {
    * @param user UserEntity，用户实体
    * @param roles string[]，用户的角色编码，如 ['ROLE_USER']
    * @param permissions string[]，用户的生效权限编码，如 ['document:list']
-   * @returns AuthUser，当前用户对象，Controller 里通过 @CurrentUser() 拿到
+   * @returns Promise<AuthUser>，当前用户对象，含角色、权限与可访问团队
    */
-  toAuthUser(
+  async toAuthUser(
     user: UserEntity,
     roles: string[],
     permissions: string[],
-  ): AuthUser {
+  ): Promise<AuthUser> {
+    const teamIds = await this.teamService.listAccessibleTeamIds(user.id);
     return {
       userId: user.id,
       username: user.username,
@@ -101,6 +105,7 @@ class UserService {
       avatar: user.avatar,
       roles,
       permissions,
+      teamIds,
     };
   }
 

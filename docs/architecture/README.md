@@ -278,8 +278,11 @@ permission codes (direct ∪ role; `ROLE_ADMIN` also gets a fixed admin set), re
 (admins bypass it). Admins manage permissions through `/permissions`, role / user bindings through
 `/roles/:id/permissions` and `/users/:id/permissions`, and teams (`kh_team` / `kh_team_member`) through
 `/teams` (admin only). Document routes also check `document:*` codes (review decisions still need
-`ROLE_REVIEWER` / `ROLE_ADMIN`), and author / creator / updater always come from the logged-in user;
-there is no document ownership check, tokens are not revocable and login / reset codes have no rate limit. This is separate from UserPlatform (ADR-0018). Token verification uses
+`ROLE_REVIEWER` / `ROLE_ADMIN`), and author / creator / updater always come from the logged-in user.
+`AuthUser.teamIds` is rebuilt on every authenticated request from team membership plus team leadership. Ordinary
+users can read their own documents and published documents that are public or belong to one of those teams;
+reviewers and admins can read all documents. Only the author or an admin can modify, publish, archive, delete or
+submit a document for review. Tokens are not revocable and login / reset codes have no rate limit. This is separate from UserPlatform (ADR-0018). Token verification uses
 passport-jwt (`JwtStrategy`), and user resolution is isolated in `AuthService.buildAuthUser()` so it can
 later move to UserPlatform-issued tokens. See
 [ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md) and
@@ -308,8 +311,10 @@ relations per chunk with the Qwen chat model from `src/infrastructure/chat-model
 `src/infrastructure/neo4j`. Each build deletes the document's previous graph first. Neo4j is required at
 startup like RabbitMQ and Elasticsearch. Delivery has the same no-outbox / no-DLQ limits as RAG.
 Logged-in users with the `search` permission can read the graph through
-`GET /graph/search|nodes|edges|overview`. The overview endpoint returns document, entity and request-derived tag
-nodes, their display edges, aggregate counts, popular entities and recent documents. See
+`GET /graph/search|nodes|edges|overview`. All graph queries are restricted to documents visible to the current
+user; entities and relationships must be traceable to visible documents. The overview endpoint returns document,
+entity and request-derived tag nodes, their display edges, visibility-scoped counts, popular entities and recent
+documents. See
 [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md),
 [ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md) and
 [ADR-0028](./decisions/0028-rag-business-graph-overview-and-cors.md).
@@ -319,8 +324,9 @@ nodes, their display edges, aggregate counts, popular entities and recent docume
 Publish also sends `RagBusinessSearchIndexMessageV1` with only the document ID. The consumer loads
 PostgreSQL metadata and the full Mongo body and overwrites one Elasticsearch `kh_document` record per
 document, using IK analyzers (`ik_max_word` at index time, `ik_smart` at query time). `POST /search`
-(permission code `search`) runs a weighted `multi_match` over title, summary and body with highlights.
-Read failures in Search and Graph queries are logged and return empty results; index writes still fail
+(permission code `search`) runs a weighted `multi_match` over title, summary and body with highlights. Ordinary
+users' search requests add a non-scoring visibility filter for public, authored or team documents; reviewers and
+admins remain unrestricted. Read failures in Search and Graph queries are logged and return empty results; index writes still fail
 the message. See [ADR-0021](./decisions/0021-document-search-index.md) and
 [ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md).
 
@@ -338,11 +344,13 @@ when knowledge-base evidence is insufficient; only the search query leaves the s
 `BOCHA_API_KEY` becomes a tool error rather than a startup failure. Each authenticated chat turn is stored in
 PostgreSQL under the user's `kh_ai_session` and `kh_ai_message` rows. `POST /ai/chat` accepts an optional
 `sessionId` and returns the resulting session ID; `/ai/sessions` endpoints list, create, rename and delete only
-the current user's sessions. Stored history is not sent back to the model as conversational context. Retrieval
-has no visibility, author or team filter. See
+the current user's sessions. Stored history is not sent back to the model as conversational context. BM25 and kNN
+both apply the current user's document visibility filter before top-K recall, so inaccessible chunks cannot displace
+visible evidence. See
 [ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md),
-[ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md) and
-[ADR-0030](./decisions/0030-rag-business-streaming-agent-and-web-search.md).
+[ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md),
+[ADR-0030](./decisions/0030-rag-business-streaming-agent-and-web-search.md) and
+[ADR-0031](./decisions/0031-rag-business-document-visibility.md).
 
 ## Architecture Decision Records
 
@@ -374,6 +382,7 @@ has no visibility, author or team filter. See
 | [ADR-0028](./decisions/0028-rag-business-graph-overview-and-cors.md)        | Graph overview, tag nodes and CORS allowlist         | Accepted   |
 | [ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md)               | User-owned persistent AI chat sessions               | Accepted   |
 | [ADR-0030](./decisions/0030-rag-business-streaming-agent-and-web-search.md) | Streaming Agent chat and optional web search         | Accepted   |
+| [ADR-0031](./decisions/0031-rag-business-document-visibility.md)            | Cross-store document visibility enforcement          | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.
