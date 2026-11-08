@@ -1,0 +1,260 @@
+apps/agentic-rag-client/app/_lib/api-client.ts
+  s_1e8562629bd9f5::t_b4be3d2e7d2d8b 1,5-8
+apps/agentic-rag-business-service/src/modules/ai/ai-stream.service.ts
+  s_cad6ff28dbe944::t_d5fc988ee2b681 126
+apps/agentic-rag-client/app/globals.css
+  s_1e8562629bd9f5::t_b5b967feefd945 903-909
+  s_1e8562629bd9f5::t_cad002a109e1e6 140-146
+apps/agentic-rag-business-service/src/modules/pipeline/type/pipeline.types.ts
+  s_cad6ff28dbe944::t_20338e059e04d6 21
+apps/agentic-rag-business-service/src/infrastructure/neo4j/type/graph-store.types.ts
+  s_cad6ff28dbe944::t_626973728e4b9c 17-18,95-96
+  s_cad6ff28dbe944::t_910042e7d77d98 1-2
+apps/agentic-rag-business-service/src/modules/auth/auth.service.spec.ts
+  s_cad6ff28dbe944::t_116e6cbd284da3 21
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/helpers/document-visibility.ts
+  s_cad6ff28dbe944::t_81e91f2958f9d7 1-55
+apps/agentic-rag-business-service/src/modules/team/team-mine.controller.ts
+  s_1e8562629bd9f5::t_35d870625c25b0 1-26
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_cad6ff28dbe944::t_28e2be5e44e711 104
+  s_cad6ff28dbe944::t_3f140e56266d81 116
+  h_329e897ccf6193 159
+apps/agentic-rag-business-service/src/modules/search/search.controller.ts
+  s_cad6ff28dbe944::t_77b23b0944d94d 3,22,27
+  h_329e897ccf6193 6-7
+  s_cad6ff28dbe944::t_3603c42ea0ebf0 34
+apps/agentic-rag-business-service/src/infrastructure/neo4j/helpers/document-visibility.ts
+  s_cad6ff28dbe944::t_ad71b72a7f6872 1-28
+apps/agentic-rag-business-service/src/modules/document/document.controller.ts
+  h_329e897ccf6193 86,91-92,134-135,139-140
+docs/architecture/decisions/0031-rag-business-document-visibility.md
+  s_cad6ff28dbe944::t_a2cfe3ab2a3b1d 1-34,37-88
+  s_cad6ff28dbe944::t_883fb477a38080 35-36
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/search-index.service.ts
+  s_cad6ff28dbe944::t_fb844d5f732109 229-230
+  s_cad6ff28dbe944::t_c1e44cd91b8da3 58,162-165
+  s_cad6ff28dbe944::t_6756e807878e1d 97-125
+  s_cad6ff28dbe944::t_c3c1df915145a6 295,298-300
+  s_cad6ff28dbe944::t_40afd17bd3c8e5 9-13
+  s_cad6ff28dbe944::t_b0d05f9a2062a4 252-270
+apps/agentic-rag-business-service/src/modules/document/document-review.service.ts
+  s_cad6ff28dbe944::t_969c4450566551 54
+  s_cad6ff28dbe944::t_3d709f2b494ad7 3
+  h_329e897ccf6193 27,78,82-84
+apps/agentic-rag-client/app/_views/ProfilePage.tsx
+  h_329e897ccf6193 5,7,13,22-25,62,64-66,71-82
+  s_1e8562629bd9f5::t_014920afa65e48 110,117
+  s_1e8562629bd9f5::t_77caa4ec7c767e 4
+  s_1e8562629bd9f5::t_0c31bfe1f7846a 84,87
+apps/agentic-rag-client/app/_components/app-layout.tsx
+  s_1e8562629bd9f5::t_b26bbc98e7a449 48-51
+  h_329e897ccf6193 21,23,38,93,189-193
+apps/agentic-rag-client/app/_utils/knowledge-hub.ts
+  s_1e8562629bd9f5::t_108a6a6815b64f 1,34-63
+docs/architecture/README.md
+  s_cad6ff28dbe944::t_a9eb26a27cff65 281-285,314-317
+  h_329e897ccf6193 327-329,347-349
+  s_cad6ff28dbe944::t_c4b74b4b458b99 351-353
+  s_cad6ff28dbe944::t_8f090f6e2ae3f8 385
+apps/agentic-rag-client/app/_types/knowledge-hub.ts
+  s_1e8562629bd9f5::t_fa4b508e0231df 270-273
+  s_1e8562629bd9f5::t_d5480024532165 12
+  h_329e897ccf6193 57-58
+apps/agentic-rag-business-service/src/modules/ai/hybrid-retrieval.service.ts
+  s_cad6ff28dbe944::t_2d2415fc78fa1c 68
+  s_cad6ff28dbe944::t_55ba3c05cb243d 3-4
+  s_cad6ff28dbe944::t_ebddb79c48220e 49,52-56,59-61
+apps/agentic-rag-client/app/_components/chat-conversation.tsx
+  s_1e8562629bd9f5::t_c2070f2e7ed433 30
+apps/agentic-rag-business-service/src/modules/ai/ai-chat.service.spec.ts
+  s_cad6ff28dbe944::t_ba2f26495c4ede 55
+apps/agentic-rag-business-service/src/modules/document/repository/document.repository.ts
+  s_cad6ff28dbe944::t_f29f9971d9a2be 4,83-101
+  s_cad6ff28dbe944::t_ff8f49b76e90fb 6
+  s_cad6ff28dbe944::t_ba2a1c0f929865 62-64,66-69
+apps/agentic-rag-business-service/src/modules/team/repository/team.repository.ts
+  s_cad6ff28dbe944::t_ea0c74968a2f2e 32-54,56-73
+  s_cad6ff28dbe944::t_e6c2f654a478e2 55
+apps/agentic-rag-business-service/src/modules/pipeline/helpers/to-search-index-document.ts
+  s_cad6ff28dbe944::t_1ee682ffa4bc1a 24
+apps/agentic-rag-client/app/_components/chat-retrieve-card.tsx
+  s_1e8562629bd9f5::t_5545e152a88500 10
+apps/agentic-rag-business-service/src/modules/pipeline/type/chunk-params.types.ts
+  s_cad6ff28dbe944::t_88a87f133e31c5 9
+apps/agentic-rag-business-service/src/modules/document/document.module.ts
+  s_cad6ff28dbe944::t_1e37d9ce73140c 4-5
+  h_329e897ccf6193 38-39
+apps/agentic-rag-business-service/src/modules/pipeline/graph-build.service.ts
+  s_cad6ff28dbe944::t_11c951dd3237af 54-55
+  s_cad6ff28dbe944::t_3eaa442c8904ea 67
+apps/agentic-rag-business-service/src/modules/document/document-parse.service.spec.ts
+  s_cad6ff28dbe944::t_75eb0ba65db9b3 21
+apps/agentic-rag-client/app/_views/DashboardPage.tsx
+  s_1e8562629bd9f5::t_0cdad5699c75ec 15
+  s_1e8562629bd9f5::t_2460aa2a79d7bd 90
+  h_329e897ccf6193 120-127
+apps/agentic-rag-client/app/_views/DocumentsPage.tsx
+  s_1e8562629bd9f5::t_78cab36ddafe15 167-172
+  h_329e897ccf6193 23-25,34,49,77-80,101-106,120
+  s_1e8562629bd9f5::t_605b18bb3f76a4 178-204
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/type/search-document.types.ts
+  s_cad6ff28dbe944::t_fe8cee3c0513e2 1-2,33
+  h_329e897ccf6193 18
+  s_cad6ff28dbe944::t_ad71f36098c48f 44-45
+apps/agentic-rag-business-service/src/modules/user/type/user.types.ts
+  s_cad6ff28dbe944::t_d77039496d8e12 16-17
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/type/chunk-hit.types.ts
+  h_329e897ccf6193 29-30
+  s_cad6ff28dbe944::t_604d9b7d8e7bce 1-2
+apps/agentic-rag-client/app/_views/SearchPage.tsx
+  s_1e8562629bd9f5::t_11627cb1b1432a 131
+  h_329e897ccf6193 68
+  s_1e8562629bd9f5::t_41e7012fcc4c21 123,159
+  s_1e8562629bd9f5::t_92b9014bc8ffce 60-62
+  s_1e8562629bd9f5::t_fd6e713e2c4a1f 116
+  s_1e8562629bd9f5::t_7e42a499e13c72 10-15
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/type/indexable-chunk.types.ts
+  s_cad6ff28dbe944::t_350920f6ae0ca9 13
+apps/agentic-rag-business-service/src/modules/pipeline/chunking.service.ts
+  s_cad6ff28dbe944::t_d5fbe4dd1c9f82 5,91
+apps/agentic-rag-business-service/src/modules/document/document-index-sync.service.ts
+  s_cad6ff28dbe944::t_b91ccbf6c204ca 2-4
+  h_329e897ccf6193 18-24,26-29,47-67
+apps/agentic-rag-business-service/src/modules/document/document.service.ts
+  s_cad6ff28dbe944::t_67abe30707482a 171,176-177
+  s_cad6ff28dbe944::t_5c368ed3270af4 448
+  s_cad6ff28dbe944::t_a1c72024f19f93 326
+  s_cad6ff28dbe944::t_176fa6779bc66a 24-27
+  s_cad6ff28dbe944::t_e1c3290471020a 460-472
+  s_cad6ff28dbe944::t_9aa09d06542e83 412
+  s_cad6ff28dbe944::t_c14c5a9c7a7805 287-290,298-299
+  h_329e897ccf6193 6,154-157,159-160,166-169
+  s_cad6ff28dbe944::t_04585b8602e2bf 164-165
+apps/agentic-rag-business-service/src/modules/ai/ai-chat.service.ts
+  s_cad6ff28dbe944::t_f6ee724f2f9e04 56
+apps/agentic-rag-client/app/_lib/api.ts
+  s_1e8562629bd9f5::t_33d4430a0db830 19
+  h_329e897ccf6193 171-172
+apps/agentic-rag-business-service/src/modules/ai/hybrid-retrieval.service.spec.ts
+  s_cad6ff28dbe944::t_50b6bd8c3f9f7f 74-77
+  h_329e897ccf6193 50
+apps/agentic-rag-business-service/src/modules/team/team.module.ts
+  s_1e8562629bd9f5::t_49ecb628edf0b6 7
+  h_329e897ccf6193 16
+apps/agentic-rag-client/app/_views/DocumentEditPage.tsx
+  s_1e8562629bd9f5::t_605e243cef0e4f 66
+  s_1e8562629bd9f5::t_b7dceb0a8387a9 3,5-6,8-10,16,19-26,32-39,41-46,50-55,58-65,71-76,78-80,84,90,94-101,103,107,125-130,133-147
+apps/agentic-rag-business-service/src/modules/auth/guards/auth.guards.spec.ts
+  s_cad6ff28dbe944::t_e8aa9ab5cbb838 27
+apps/agentic-rag-business-service/src/modules/pipeline/pipeline.orchestrator.ts
+  s_cad6ff28dbe944::t_dd1c19d9473eed 154
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/vector-index.service.ts
+  s_cad6ff28dbe944::t_a63205cd9259d2 15-19
+  s_cad6ff28dbe944::t_b9696fc8e8a2dd 335
+  s_cad6ff28dbe944::t_8e83346133d4d6 435
+  s_cad6ff28dbe944::t_85d0f339c9d81b 361-379
+  s_cad6ff28dbe944::t_3e04084bd4c8eb 83
+  s_cad6ff28dbe944::t_8380459037ae57 261-270,272-273
+  s_cad6ff28dbe944::t_a842c9bf8106c0 101-135
+  s_cad6ff28dbe944::t_9234535359712f 239,242-246
+  s_cad6ff28dbe944::t_44bf8e9ba7d3bc 252-254
+  s_cad6ff28dbe944::t_b7aeae4e1826b1 1,9-12
+  s_cad6ff28dbe944::t_6251a1959e52bc 301-303,305-313,319
+  s_cad6ff28dbe944::t_f0b4e078fcc08d 346,348
+apps/agentic-rag-business-service/src/modules/document/document-review.service.spec.ts
+  s_cad6ff28dbe944::t_c4606e1f9242c9 64
+apps/agentic-rag-business-service/src/modules/ai/ai.controller.ts
+  s_cad6ff28dbe944::t_9d80e450cfc847 50-51,55-56
+apps/agentic-rag-client/app/_views/GraphPage.tsx
+  s_1e8562629bd9f5::t_a09f6fd78d18fd 142-144,165
+  h_329e897ccf6193 98
+apps/agentic-rag-business-service/src/modules/graph/graph.controller.ts
+  s_cad6ff28dbe944::t_a3d133b4d49b1a 45,49-54
+  h_329e897ccf6193 38,60,64,67-68
+  s_cad6ff28dbe944::t_87b950ae48877d 6-7,27,31
+  s_cad6ff28dbe944::t_b35561bef0fad2 75,79-80
+apps/agentic-rag-business-service/src/modules/document/document.service.spec.ts
+  s_cad6ff28dbe944::t_b85e4e5519b533 29
+  h_329e897ccf6193 4-6,89-91
+  s_1e8562629bd9f5::t_e43cc30c76217b 37
+  s_cad6ff28dbe944::t_72ae1568cd4332 112-114
+apps/agentic-rag-business-service/src/modules/team/team.controller.ts
+  s_cad6ff28dbe944::t_28f24b3df757f8 45
+  s_cad6ff28dbe944::t_c6b08f6c7abb6e 57
+  s_cad6ff28dbe944::t_208c46f6444fb1 70
+  s_cad6ff28dbe944::t_f3a32aa4becc59 132
+  s_cad6ff28dbe944::t_e5114839f29a1e 17
+  s_cad6ff28dbe944::t_630dff014d48d4 32
+  s_cad6ff28dbe944::t_759a5a556018bc 82-83,94
+  s_cad6ff28dbe944::t_34ca72eb697bed 107,120
+apps/agentic-rag-business-service/src/infrastructure/elasticsearch/helpers/build-chunk-document.ts
+  s_cad6ff28dbe944::t_38b126d76c859e 16
+apps/agentic-rag-client/app/_views/admin/TeamsPage.tsx
+  s_1e8562629bd9f5::t_381bb5666cd1f8 4-15,34-38,41,43,48-49,54-98,103-105,119,130-135,147-148,150,208-219,221,226-229,231-234,252-277
+apps/agentic-rag-business-service/src/modules/user/user.service.spec.ts
+  s_cad6ff28dbe944::t_c68aa97e85eab5 105
+  s_cad6ff28dbe944::t_9389697cd6cd72 100
+  s_cad6ff28dbe944::t_308793145f5ddd 10
+  h_329e897ccf6193 56-58,77,82
+apps/agentic-rag-business-service/src/modules/user/user.module.ts
+  s_cad6ff28dbe944::t_0f3b8b7cf36a6a 37
+  s_cad6ff28dbe944::t_02089972e34264 4
+apps/agentic-rag-business-service/src/modules/team/team.service.ts
+  s_cad6ff28dbe944::t_06ecf2452366c6 27-52
+apps/agentic-rag-business-service/src/infrastructure/neo4j/graph-store.service.ts
+  s_cad6ff28dbe944::t_d81c2ee743e269 414-417
+  s_cad6ff28dbe944::t_20d8ff4e8b1ce2 8-11
+  h_329e897ccf6193 14-17,95-96,105-106,346-353,355,362-363,396,398-407,592,595-598,601
+  s_cad6ff28dbe944::t_c14d4815c5c542 360-361,364
+  s_cad6ff28dbe944::t_d38928d9a3a6b7 455,457-476
+  s_cad6ff28dbe944::t_38621295995121 693-700
+  s_cad6ff28dbe944::t_3ae38a5426e033 625,629,634
+  s_cad6ff28dbe944::t_4fea180ec8e19c 118-153
+  s_cad6ff28dbe944::t_de2e15357fd681 331,334-338
+  s_cad6ff28dbe944::t_704b59067ee0c6 608,611-612,617
+  s_cad6ff28dbe944::t_1e7160f053fa34 496-500
+  s_cad6ff28dbe944::t_9098bb82361c04 384,387-390
+  s_cad6ff28dbe944::t_34f88ba614760d 559,563,565-578,580-581,584
+  s_cad6ff28dbe944::t_f2a82eb76d7f9b 647-648,678-680
+  s_cad6ff28dbe944::t_66db88afdeb69d 668
+apps/agentic-rag-business-service/src/common/type/document-access.types.ts
+  s_cad6ff28dbe944::t_9b083a0cfd27bf 1-17
+apps/agentic-rag-client/app/_views/DocumentDetailPage.tsx
+  s_1e8562629bd9f5::t_b1a602416fc944 5,12-18,27,32-35,37-43,48,56-65,67-68,74,77-79,94,122,148
+apps/agentic-rag-business-service/src/modules/user/user.service.ts
+  s_cad6ff28dbe944::t_b02d549009378c 11,31,37
+  s_cad6ff28dbe944::t_319902ceff34ba 92,94,98-99,108
+apps/agentic-rag-business-service/src/modules/document/helpers/document-access.ts
+  s_cad6ff28dbe944::t_a492fdf18f90f9 1-3,8-30,32-37,39-55
+  s_cad6ff28dbe944::t_932939d2cf0a7f 4-7,31,38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "61ccba541971a1332f8b752ae24f2c52d483e602",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_1e8562629bd9f5": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_9610568c-0b01-4347-a79e-a1e2f3740dca",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    },
+    "s_cad6ff28dbe944": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_189688a3-a58b-40e2-b76c-f60b8ed86164",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
