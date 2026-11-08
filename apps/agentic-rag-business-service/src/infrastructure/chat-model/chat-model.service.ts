@@ -13,6 +13,8 @@ import { ChatOpenAI } from '@langchain/openai';
  * - `model`：KG 实体关系抽取，低温度（0.1）求稳定，超时 `CHAT_MODEL_TIMEOUT_MS`
  * - `answerModel`：非流式 RAG 问答（/ai/chat），温度 0.2，超时 `AI_CHAT_TIMEOUT_MS`（可选，缺省 60000）
  * - `streamAnswerModel`：流式 Agent 问答，关闭 usage 流并开启模型思考
+ * - `compactModel`：对话摘要和记忆分类，温度 0，不开启思考
+ * - `queryRewriteModel`：检索查询改写，温度 0，超时 `AI_QUERY_REWRITE_TIMEOUT_MS`（缺省 15000）
  *
  * 环境变量：
  * - `QWEN_LLM_API_KEY` / `QWEN_CODER_TURBO_MODEL_BASE_URL`（与 Embedding 共用）
@@ -27,6 +29,10 @@ class ChatModelService {
   readonly answerModel: ChatOpenAI;
   /** RAG 流式 Agent 问答用 */
   readonly streamAnswerModel: ChatOpenAI;
+  /** 对话摘要和记忆分类用 */
+  readonly compactModel: ChatOpenAI;
+  /** 检索查询改写用 */
+  readonly queryRewriteModel: ChatOpenAI;
 
   /**
    * @description 按环境变量构造抽取与问答两个千问客户端
@@ -40,6 +46,9 @@ class ChatModelService {
     const model = config.getOrThrow<string>('CHAT_MODEL_NAME');
     const timeout = config.getOrThrow<number>('CHAT_MODEL_TIMEOUT_MS');
     const answerTimeout = Number(config.get('AI_CHAT_TIMEOUT_MS') ?? 60000);
+    const rewriteTimeout = Number(
+      config.get('AI_QUERY_REWRITE_TIMEOUT_MS') ?? 15000,
+    );
 
     this.model = new ChatOpenAI({
       apiKey,
@@ -75,6 +84,24 @@ class ChatModelService {
       configuration: { baseURL: baseUrl },
       // 千问开启思考模式。
       modelKwargs: { enable_thinking: true },
+    });
+    this.compactModel = new ChatOpenAI({
+      apiKey,
+      model,
+      temperature: 0,
+      timeout: answerTimeout,
+      maxRetries: 0,
+      useResponsesApi: false,
+      configuration: { baseURL: baseUrl },
+    });
+    this.queryRewriteModel = new ChatOpenAI({
+      apiKey,
+      model,
+      temperature: 0,
+      timeout: rewriteTimeout,
+      maxRetries: 0,
+      useResponsesApi: false,
+      configuration: { baseURL: baseUrl },
     });
   }
 }

@@ -344,13 +344,18 @@ when knowledge-base evidence is insufficient; only the search query leaves the s
 `BOCHA_API_KEY` becomes a tool error rather than a startup failure. Each authenticated chat turn is stored in
 PostgreSQL under the user's `kh_ai_session` and `kh_ai_message` rows. `POST /ai/chat` accepts an optional
 `sessionId` and returns the resulting session ID; `/ai/sessions` endpoints list, create, rename and delete only
-the current user's sessions. Stored history is not sent back to the model as conversational context. BM25 and kNN
-both apply the current user's document visibility filter before top-K recall, so inaccessible chunks cannot displace
-visible evidence. See
+the current user's sessions. PostgreSQL remains the durable transcript, while Redis caches the latest human/AI
+working window and refills from PostgreSQL on a miss. With history present, a compact Qwen call rewrites follow-up
+questions into standalone retrieval queries and can skip retrieval for greetings. Optional Mem0 Platform memory
+stores classified user preferences across sessions and task context within one session; memory is background only,
+and policy/process facts still require current knowledge-base evidence. Streaming Agent history is summarized after
+12 messages while keeping the latest 6. BM25 and kNN both apply the current user's document visibility filter before
+top-K recall, so inaccessible chunks cannot displace visible evidence. See
 [ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md),
 [ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md),
-[ADR-0030](./decisions/0030-rag-business-streaming-agent-and-web-search.md) and
-[ADR-0031](./decisions/0031-rag-business-document-visibility.md).
+[ADR-0030](./decisions/0030-rag-business-streaming-agent-and-web-search.md),
+[ADR-0031](./decisions/0031-rag-business-document-visibility.md) and
+[ADR-0032](./decisions/0032-rag-business-chat-memory-and-query-rewrite.md).
 
 ## Architecture Decision Records
 
@@ -383,6 +388,7 @@ visible evidence. See
 | [ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md)               | User-owned persistent AI chat sessions               | Accepted   |
 | [ADR-0030](./decisions/0030-rag-business-streaming-agent-and-web-search.md) | Streaming Agent chat and optional web search         | Accepted   |
 | [ADR-0031](./decisions/0031-rag-business-document-visibility.md)            | Cross-store document visibility enforcement          | Accepted   |
+| [ADR-0032](./decisions/0032-rag-business-chat-memory-and-query-rewrite.md)  | Chat memory tiers and retrieval query rewriting      | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

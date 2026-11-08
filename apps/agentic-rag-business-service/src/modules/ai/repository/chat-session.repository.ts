@@ -89,6 +89,26 @@ class ChatSessionRepository {
   }
 
   /**
+   * @description 查询会话最近 N 条消息，数据库倒序截取后恢复为时间正序
+   * @param sessionId string，会话 ID
+   * @param limit number，最多返回条数，至少 1
+   * @returns Promise<AiMessageEntity[]>，最近消息，按时间和 ID 正序
+   */
+  async findRecentMessages(
+    sessionId: string,
+    limit: number,
+  ): Promise<AiMessageEntity[]> {
+    // SQL：SELECT * FROM kh_ai_message WHERE session_id = :sessionId
+    // ORDER BY created_at DESC, id DESC LIMIT :limit；取出后在内存 reverse。
+    const rows = await this.messageRepo.find({
+      where: { sessionId },
+      order: { createdAt: 'DESC', id: 'DESC' },
+      take: Math.max(limit, 1),
+    });
+    return rows.reverse();
+  }
+
+  /**
    * @description 保存一轮用户与助手消息
    * @param messages Partial<AiMessageEntity>[]，本轮两条消息
    * @returns Promise<AiMessageEntity[]>，落库后的消息

@@ -148,6 +148,23 @@ describe('Business service (e2e)', () => {
         // KgExtractionService 构造时会调 model.withStructuredOutput
         model: { withStructuredOutput: () => ({ invoke: async () => ({}) }) },
         answerModel: { invoke: async () => ({ content: '先做金丝雀 [1]。' }) },
+        compactModel: {
+          withStructuredOutput: () => ({
+            invoke: async () => ({
+              write_user: false,
+              write_session: false,
+              reason: 'e2e',
+            }),
+          }),
+        },
+        queryRewriteModel: {
+          withStructuredOutput: () => ({
+            invoke: async () => ({
+              standalone_query: '金丝雀怎么做',
+              need_retrieve: true,
+            }),
+          }),
+        },
       })
       // 普通 HTTP e2e 不连接真实模型流，流式服务替换为空实现
       .overrideProvider(AiStreamService)

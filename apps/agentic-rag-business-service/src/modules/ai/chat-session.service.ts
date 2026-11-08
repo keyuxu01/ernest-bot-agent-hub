@@ -12,15 +12,23 @@ import {
 } from './helpers/title-from-question';
 import { ChatSessionRepository } from './repository/chat-session.repository';
 import type { ChatSource } from './type/ai-chat.types';
+import { ChatLongMemoryService } from './chat-long-memory.service';
+import { ChatShortMemoryService } from './chat-short-memory.service';
 
 /** AI 会话生命周期与问答消息持久化 */
 @Injectable()
 class ChatSessionService {
   /**
-   * @description 注入 AI 会话数据访问层
+   * @description 注入 AI 会话数据访问层与两级记忆
    * @param sessionRepo ChatSessionRepository，读写 kh_ai_session / kh_ai_message
+   * @param shortMemory ChatShortMemoryService，Redis 工作窗口
+   * @param longMemory ChatLongMemoryService，Mem0 会话层记忆
    */
-  constructor(private readonly sessionRepo: ChatSessionRepository) {}
+  constructor(
+    private readonly sessionRepo: ChatSessionRepository,
+    private readonly shortMemory: ChatShortMemoryService,
+    private readonly longMemory: ChatLongMemoryService,
+  ) {}
 
   /**
    * @description 分页查询当前用户的会话，按最后更新时间倒序
@@ -106,6 +114,8 @@ class ChatSessionService {
     await this.getOwned(userId, id);
     await this.sessionRepo.deleteMessages(id);
     await this.sessionRepo.deleteSession(id);
+    await this.shortMemory.clear(userId, id);
+    await this.longMemory.clearSession(userId, id);
     return { message: '已删除' };
   }
 
@@ -119,6 +129,19 @@ class ChatSessionService {
   async listMessages(userId: string, sessionId: string) {
     await this.getOwned(userId, sessionId);
     return this.sessionRepo.findMessages(sessionId);
+  }
+
+  /**
+   * @description 查询当前用户会话最近 N 条消息，供 Redis miss 时回填工作窗口
+   * @param userId string，当前用户 ID
+   * @param sessionId string，会话 ID
+   * @param limit number，最多返回条数
+   * @returns Promise<AiMessageEntity[]>，按时间正序的最近消息
+   * @throws NotFoundException 会话不存在或不属于当前用户
+   */
+  async listRecentMessages(userId: string, sessionId: string, limit: number) {
+    await this.getOwned(userId, sessionId);
+    return this.sessionRepo.findRecentMessages(sessionId, limit);
   }
 
   /**

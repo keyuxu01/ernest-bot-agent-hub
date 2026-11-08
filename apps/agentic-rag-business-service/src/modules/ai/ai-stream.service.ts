@@ -1,18 +1,28 @@
-import { HumanMessage } from '@langchain/core/messages';
+import { HumanMessage, type BaseMessage } from '@langchain/core/messages';
 import { toUIMessageStream } from '@ai-sdk/langchain';
 import { Injectable, Logger } from '@nestjs/common';
 import { createUIMessageStream, pipeUIMessageStreamToResponse } from 'ai';
 import type { Response } from 'express';
-import { createAgent, modelCallLimitMiddleware, tool } from 'langchain';
+import {
+  createAgent,
+  modelCallLimitMiddleware,
+  summarizationMiddleware,
+  tool,
+} from 'langchain';
 import { z } from 'zod';
 import { ChatModelService } from '../../infrastructure/chat-model/chat-model.service';
 import type { ChunkHit } from '../../infrastructure/elasticsearch/type/chunk-hit.types';
 import { BochaWebSearchService } from '../../infrastructure/web-search/bocha-web-search.service';
 import type { AuthUser } from '../user/type/user.types';
 import { ChatSessionService } from './chat-session.service';
+import { ChatShortMemoryService } from './chat-short-memory.service';
+import { ChatLongMemoryService } from './chat-long-memory.service';
+import { ChatQueryRewriteService } from './chat-query-rewrite.service';
 import { AI_STREAM_SYSTEM_PROMPT } from './constants/ai-chat.constants';
+import { CHAT_SUMMARY_PROMPT } from './constants/chat-memory.constants';
 import type { ChatStreamDto } from './dto/chat-stream.dto';
 import { buildContext, toSources } from './helpers/rag-answer';
+import { dbRowsToMessages } from './helpers/chat-memory';
 import { lastUserText } from './helpers/last-user-text';
 import { mapReasoningStream } from './helpers/map-reasoning-stream';
 import { titleFromQuestion } from './helpers/title-from-question';
@@ -35,12 +45,18 @@ class AiStreamService {
    * @param retrieval HybridRetrievalService，检索知识库资料
    * @param sessions ChatSessionService，维护用户会话并持久化问答
    * @param webSearch BochaWebSearchService，知识库不足时查询公开网页
+   * @param shortMemory ChatShortMemoryService，Redis 工作窗口
+   * @param longMemory ChatLongMemoryService，Mem0 用户层/会话层记忆
+   * @param queryRewrite ChatQueryRewriteService，消解追问指代并判断是否检索
    */
   constructor(
     chatModel: ChatModelService,
     private readonly retrieval: HybridRetrievalService,
     private readonly sessions: ChatSessionService,
     private readonly webSearch: BochaWebSearchService,
+    private readonly shortMemory: ChatShortMemoryService,
+    private readonly longMemory: ChatLongMemoryService,
+    private readonly queryRewrite: ChatQueryRewriteService,
   ) {
     this.agent = createAgent({
       model: chatModel.streamAnswerModel,
@@ -67,6 +83,12 @@ class AiStreamService {
       ],
       systemPrompt: AI_STREAM_SYSTEM_PROMPT,
       middleware: [
+        summarizationMiddleware({
+          model: chatModel.compactModel,
+          trigger: { messages: 12 },
+          keep: { messages: 6 },
+          summaryPrompt: CHAT_SUMMARY_PROMPT,
+        }),
         // 单次请求最多调用 4 次模型，避免 web_search 循环；超限时正常结束。
         modelCallLimitMiddleware({ runLimit: 4, exitBehavior: 'end' }),
       ],
@@ -89,6 +111,7 @@ class AiStreamService {
     const topK = dto.topK ?? 5;
     let persistSessionId = dto.sessionId;
     let persistSources: ChatSource[] = [];
+    let persistHistory: BaseMessage[] = [];
 
     // SDK 只提供 UI Message 协议；会话、RAG、data-* 和 Agent 流在 execute 中编排。
     const stream = createUIMessageStream<RagBusinessAiStreamMessage>({
@@ -116,25 +139,43 @@ class AiStreamService {
           type: 'data-session',
           data: { sessionId: session.id },
         });
-        writer.write({
-          type: 'data-status',
-          data: { stage: 'retrieve', text: '正在检索知识库…' },
-        });
 
-        let hits: ChunkHit[] = [];
-        try {
-          hits = await this.retrieval.retrieve(question, topK, user);
-        } catch (error) {
-          const detail = error instanceof Error ? error.message : String(error);
-          this.logger.warn(`RAG 检索失败：${detail}`);
+        // short memo
+        const history = await this.loadWorkingHistory(user.userId, session.id);
+        persistHistory = history;
+        if (history.length) {
+          writer.write({
+            type: 'data-status',
+            data: { stage: 'rewrite', text: '正在理解问题…' },
+          });
         }
+        const plan = await this.queryRewrite.rewrite(question, history);
+        if (plan.needRetrieve) {
+          writer.write({
+            type: 'data-status',
+            data: { stage: 'retrieve', text: '正在检索知识库…' },
+          });
+        }
+
+        const retrievePromise = plan.needRetrieve
+          ? this.retrieval.retrieve(plan.query, topK, user).catch((error) => {
+              const detail =
+                error instanceof Error ? error.message : String(error);
+              this.logger.warn(`RAG 检索失败：${detail}`);
+              return [];
+            })
+          : Promise.resolve<ChunkHit[]>([]);
+        const [hits, memoryHits] = await Promise.all([
+          retrievePromise,
+          this.longMemory.search(user.userId, session.id, plan.query),
+        ]);
 
         const sources = toSources(hits);
         persistSources = sources;
         writer.write({
           type: 'data-retrieve',
           data: {
-            query: question,
+            query: plan.query,
             items: sources.map((source) => ({
               index: source.index,
               documentId: source.documentId,
@@ -155,9 +196,18 @@ class AiStreamService {
 
         const prompt = hits.length
           ? `检索到的资料：\n${buildContext(hits)}\n\n用户问题：${question}`
-          : `知识库没有召回到相关内容。\n\n用户问题：${question}`;
+          : plan.needRetrieve
+            ? `知识库没有召回到相关内容。\n\n用户问题：${question}`
+            : `用户问题：${question}`;
+        const memoryMessage = this.longMemory.buildSystemMessage(memoryHits);
         const langchainStream = await this.agent.stream(
-          { messages: [new HumanMessage(prompt)] },
+          {
+            messages: [
+              ...(memoryMessage ? [memoryMessage] : []),
+              ...history,
+              new HumanMessage(prompt),
+            ],
+          },
           // messages 提供模型 token / 思考；tools 提供 web_search 调用事件。
           { streamMode: ['messages', 'tools'] },
         );
@@ -203,25 +253,67 @@ class AiStreamService {
           ? persistSources.filter((source) => used.has(source.index))
           : [];
         if (!question || !persistSessionId) return;
+        const finalAnswer = answer || '未能生成回答。';
 
         try {
           await this.sessions.appendTurn(
             user.userId,
             persistSessionId,
             question,
-            answer || '未能生成回答。',
+            finalAnswer,
             sources,
+          );
+          await this.shortMemory.appendTurn(
+            user.userId,
+            persistSessionId,
+            persistHistory,
+            question,
+            finalAnswer,
           );
         } catch (error) {
           const detail = error instanceof Error ? error.message : String(error);
           this.logger.warn(`流式对话落库失败：${detail}`);
         }
+        void this.longMemory.rememberTurn(
+          user.userId,
+          persistSessionId,
+          question,
+          finalAnswer,
+        );
       },
       onError: (error) =>
         error instanceof Error ? error.message : String(error),
     });
 
     await pipeUIMessageStreamToResponse({ response, stream });
+  }
+
+  /**
+   * @description 加载流式会话工作窗口：优先 Redis，miss 时从 PostgreSQL 最近消息回填
+   * @param userId string，用户 ID
+   * @param sessionId string，会话 ID
+   * @returns Promise<BaseMessage[]>，按时间正序的 human/ai 工作消息
+   * @throws NotFoundException 会话不存在或不属于当前用户
+   */
+  private async loadWorkingHistory(
+    userId: string,
+    sessionId: string,
+  ): Promise<BaseMessage[]> {
+    const cached = await this.shortMemory.tryLoad(userId, sessionId);
+    if (cached) return cached;
+    const rows = await this.sessions.listRecentMessages(
+      userId,
+      sessionId,
+      this.shortMemory.windowSize,
+    );
+    const history = dbRowsToMessages(rows);
+    if (history.length) {
+      await this.shortMemory.save(userId, sessionId, history);
+      this.logger.log(
+        `短期记忆从库回填：sessionId=${sessionId}, n=${history.length}`,
+      );
+    }
+    return history;
   }
 }
 

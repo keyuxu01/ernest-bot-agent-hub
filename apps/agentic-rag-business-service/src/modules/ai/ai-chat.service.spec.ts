@@ -3,6 +3,9 @@ import type { ChatModelService } from '../../infrastructure/chat-model/chat-mode
 import type { ChunkHit } from '../../infrastructure/elasticsearch/type/chunk-hit.types';
 import { AiChatService } from './ai-chat.service';
 import type { ChatSessionService } from './chat-session.service';
+import type { ChatShortMemoryService } from './chat-short-memory.service';
+import type { ChatLongMemoryService } from './chat-long-memory.service';
+import type { ChatQueryRewriteService } from './chat-query-rewrite.service';
 import type { HybridRetrievalService } from './hybrid-retrieval.service';
 
 function hit(n: number, content = `正文${n}`): ChunkHit {
@@ -18,15 +21,36 @@ function hit(n: number, content = `正文${n}`): ChunkHit {
 
 const invoke = vi.fn();
 const retrieval = { retrieve: vi.fn() };
-const sessions = { appendTurn: vi.fn() };
+const sessions = { appendTurn: vi.fn(), listRecentMessages: vi.fn() };
+const shortMemory = {
+  appendTurn: vi.fn(),
+  save: vi.fn(),
+  tryLoad: vi.fn(),
+  windowSize: 20,
+};
+const longMemory = {
+  buildSystemMessage: vi.fn(),
+  rememberTurn: vi.fn(),
+  search: vi.fn(),
+};
+const queryRewrite = { rewrite: vi.fn() };
 let service: AiChatService;
 
 beforeEach(() => {
   vi.clearAllMocks();
+  queryRewrite.rewrite.mockImplementation(async (question: string) => ({
+    query: question,
+    needRetrieve: true,
+  }));
+  longMemory.search.mockResolvedValue({ user: [], session: [] });
+  longMemory.buildSystemMessage.mockReturnValue(null);
   service = new AiChatService(
     { answerModel: { invoke } } as unknown as ChatModelService,
     retrieval as unknown as HybridRetrievalService,
     sessions as unknown as ChatSessionService,
+    shortMemory as unknown as ChatShortMemoryService,
+    longMemory as unknown as ChatLongMemoryService,
+    queryRewrite as unknown as ChatQueryRewriteService,
   );
 });
 

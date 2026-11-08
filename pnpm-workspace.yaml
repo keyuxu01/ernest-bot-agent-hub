@@ -4,6 +4,7 @@ packages:
 # pnpm 11：未列出的依赖默认不跑 install/postinstall 脚本；跑脚本前需批准（pnpm approve-builds）
 allowBuilds:
   '@modelcontextprotocol/ext-apps': false
+  better-sqlite3: false
   core-js: true
   esbuild: true
   tesseract.js: true
