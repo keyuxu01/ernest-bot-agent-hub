@@ -9,9 +9,10 @@ import { ChatOpenAI } from '@langchain/openai';
  * 实际模型是千问；厂商 SDK 构造集中在 infrastructure，业务侧只拿配置好的实例，
  * 自己决定 prompt 与结构化输出 schema。
  *
- * 两个实例：
+ * 三个实例：
  * - `model`：KG 实体关系抽取，低温度（0.1）求稳定，超时 `CHAT_MODEL_TIMEOUT_MS`
- * - `answerModel`：RAG 问答（/ai/chat），温度 0.2，超时 `AI_CHAT_TIMEOUT_MS`（可选，缺省 60000）
+ * - `answerModel`：非流式 RAG 问答（/ai/chat），温度 0.2，超时 `AI_CHAT_TIMEOUT_MS`（可选，缺省 60000）
+ * - `streamAnswerModel`：流式 Agent 问答，关闭 usage 流并开启模型思考
  *
  * 环境变量：
  * - `QWEN_LLM_API_KEY` / `QWEN_CODER_TURBO_MODEL_BASE_URL`（与 Embedding 共用）
@@ -22,8 +23,10 @@ import { ChatOpenAI } from '@langchain/openai';
 class ChatModelService {
   /** KG 抽取用 */
   readonly model: ChatOpenAI;
-  /** RAG 问答用 */
+  /** RAG 非流式问答用 */
   readonly answerModel: ChatOpenAI;
+  /** RAG 流式 Agent 问答用 */
+  readonly streamAnswerModel: ChatOpenAI;
 
   /**
    * @description 按环境变量构造抽取与问答两个千问客户端
@@ -36,6 +39,7 @@ class ChatModelService {
     );
     const model = config.getOrThrow<string>('CHAT_MODEL_NAME');
     const timeout = config.getOrThrow<number>('CHAT_MODEL_TIMEOUT_MS');
+    const answerTimeout = Number(config.get('AI_CHAT_TIMEOUT_MS') ?? 60000);
 
     this.model = new ChatOpenAI({
       apiKey,
@@ -54,10 +58,23 @@ class ChatModelService {
       model,
       // 问答允许少量表述变化
       temperature: 0.2,
-      timeout: Number(config.get('AI_CHAT_TIMEOUT_MS') ?? 60000),
+      timeout: answerTimeout,
       maxRetries: 0,
       useResponsesApi: false,
       configuration: { baseURL: baseUrl },
+    });
+    this.streamAnswerModel = new ChatOpenAI({
+      apiKey,
+      model,
+      temperature: 0.2,
+      timeout: answerTimeout,
+      maxRetries: 0,
+      useResponsesApi: false,
+      // DashScope 流式响应不需要额外 usage 块，避免适配器生成无关事件。
+      streamUsage: false,
+      configuration: { baseURL: baseUrl },
+      // 千问开启思考模式。
+      modelKwargs: { enable_thinking: true },
     });
   }
 }

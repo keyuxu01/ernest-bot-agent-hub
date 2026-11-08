@@ -48,7 +48,7 @@ describe('HybridRetrievalService.retrieve', () => {
       hybridTopK: 30,
       rrfC: 40,
     });
-    expect(reranker.rerank).toHaveBeenCalledWith('问题', fused, 1);
+    expect(reranker.rerank).toHaveBeenCalledWith('问题', fused, fused.length);
     expect(result).toEqual([hit('c', 0.9)]);
   });
 

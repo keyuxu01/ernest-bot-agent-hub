@@ -8,6 +8,11 @@ type DashScopeRerankResponse = {
       relevance_score: number;
     }>;
   };
+  /** 某些兼容部署把 results 直接放在顶层 */
+  results?: Array<{
+    index: number;
+    relevance_score: number;
+  }>;
   /** 出错时的错误信息 */
   message?: string;
   /** 出错时的错误码 */

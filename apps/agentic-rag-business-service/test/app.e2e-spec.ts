@@ -13,6 +13,7 @@ import request from 'supertest';
 import { VectorIndexService } from './../src/infrastructure/elasticsearch/vector-index.service';
 import { GraphStoreService } from './../src/infrastructure/neo4j/graph-store.service';
 import { ChatModelService } from './../src/infrastructure/chat-model/chat-model.service';
+import { AiStreamService } from './../src/modules/ai/ai-stream.service';
 import { EmbeddingService } from './../src/infrastructure/embedding/embedding.service';
 import { RerankerService } from './../src/infrastructure/rerank/reranker.service';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -146,6 +147,9 @@ describe('Business service (e2e)', () => {
         model: { withStructuredOutput: () => ({ invoke: async () => ({}) }) },
         answerModel: { invoke: async () => ({ content: '先做金丝雀 [1]。' }) },
       })
+      // 普通 HTTP e2e 不连接真实模型流，流式服务替换为空实现
+      .overrideProvider(AiStreamService)
+      .useValue({ streamChat: async () => undefined })
       // Neo4j 启动时会连库并建约束；e2e 只验 HTTP 面，替换为空实现
       .overrideProvider(GraphStoreService)
       .useValue({

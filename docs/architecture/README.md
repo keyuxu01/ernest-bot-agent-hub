@@ -326,48 +326,54 @@ the message. See [ADR-0021](./decisions/0021-document-search-index.md) and
 
 ## RAG Retrieval and Chat Boundary
 
-`POST /rag/search` and `POST /ai/chat` (permission code `search`) read `kh_chunk` through
+`POST /rag/search`, `POST /ai/chat` and `POST /ai/chat/stream` (permission code `search`) read `kh_chunk` through
 `HybridRetrievalService` in `src/modules/ai`: the question is embedded, BM25 (IK) and kNN run in parallel
 in `VectorIndexService`, results are fused with Reciprocal Rank Fusion, then reranked by DashScope
-`text-rerank` through `src/infrastructure/rerank`. Embedding failure falls back to keyword-only; rerank
-failure keeps RRF order. Chat numbers the retrieved chunks, asks the Qwen model
-(`ChatModelService.answerModel`) to answer only from them with `[n]` citations, and returns the cited
-sources as excerpts. Each authenticated chat turn is stored in PostgreSQL under the user's `kh_ai_session` and
-`kh_ai_message` rows. `POST /ai/chat` accepts an optional `sessionId` and returns the resulting session ID;
-`/ai/sessions` endpoints list, create, rename and delete only the current user's sessions. Stored history is not
-sent back to the model as conversational context. Retrieval has no visibility, author or team filter. See
-[ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md) and
-[ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md).
+`text-rerank`. Reranked results below `RAG_MIN_SCORE` (default `0.4`) are removed before the final top-K;
+embedding failure falls back to keyword-only and rerank failure keeps RRF order. Non-streaming chat numbers the
+retrieved chunks, asks the Qwen model (`ChatModelService.answerModel`) to answer only from them with `[n]`
+citations, and returns the cited sources as excerpts. Streaming chat uses LangChain Agent and AI SDK UI Message
+Stream to emit session, retrieval, source, reasoning, tool and text events. The Agent can call Bocha Web Search
+when knowledge-base evidence is insufficient; only the search query leaves the service, and a missing optional
+`BOCHA_API_KEY` becomes a tool error rather than a startup failure. Each authenticated chat turn is stored in
+PostgreSQL under the user's `kh_ai_session` and `kh_ai_message` rows. `POST /ai/chat` accepts an optional
+`sessionId` and returns the resulting session ID; `/ai/sessions` endpoints list, create, rename and delete only
+the current user's sessions. Stored history is not sent back to the model as conversational context. Retrieval
+has no visibility, author or team filter. See
+[ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md),
+[ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md) and
+[ADR-0030](./decisions/0030-rag-business-streaming-agent-and-web-search.md).
 
 ## Architecture Decision Records
 
-| ADR                                                                      | Decision                                             | Status     |
-| ------------------------------------------------------------------------ | ---------------------------------------------------- | ---------- |
-| [ADR-0001](./decisions/0001-use-zod-contracts.md)                        | Zod-based shared runtime contracts                   | Accepted   |
-| [ADR-0002](./decisions/0002-use-shadcn-tailwind.md)                      | shadcn/ui and Tailwind CSS for frontend UI           | Accepted   |
-| [ADR-0003](./decisions/0003-separate-ai-stream-rpc-and-mcp.md)           | Separate AI stream, business API and MCP boundaries  | Accepted   |
-| [ADR-0004](./decisions/0004-evaluate-orpc.md)                            | Evaluate oRPC for Web-to-service APIs                | Proposed   |
-| [ADR-0005](./decisions/0005-evaluate-mcp-nest.md)                        | Evaluate `@rekog/mcp-nest` v2 for the MCP service    | Proposed   |
-| [ADR-0007](./decisions/0007-use-rabbitmq.md)                             | RabbitMQ for asynchronous messaging                  | Accepted   |
-| [ADR-0008](./decisions/0008-use-redis.md)                                | Redis for cache and distributed coordination         | Accepted   |
-| [ADR-0009](./decisions/0009-defer-kubernetes.md)                         | Defer Kubernetes during phase 1                      | Accepted   |
-| [ADR-0010](./decisions/0010-use-tanstack-query.md)                       | TanStack Query for browser server state              | Accepted   |
-| [ADR-0011](./decisions/0011-use-vercel-and-railway.md)                   | Use Vercel Web with Railway Backend Workloads        | Accepted   |
-| [ADR-0012](./decisions/0012-use-commonjs-nestjs.md)                      | CommonJS NestJS applications with NodeNext           | Accepted   |
-| [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md) | PostgreSQL metadata with MongoDB document content    | Accepted   |
-| [ADR-0014](./decisions/0014-use-mineru-cloud-for-document-parsing.md)    | MinerU cloud API for upload document parsing         | Superseded |
-| [ADR-0015](./decisions/0015-use-in-process-document-parsers.md)          | In-process parsers for upload document parsing       | Accepted   |
-| [ADR-0016](./decisions/0016-use-elasticsearch-for-rag-chunks.md)         | Elasticsearch + Qwen embeddings for RAG chunks       | Accepted   |
-| [ADR-0017](./decisions/0017-place-qwen-embedding-in-infrastructure.md)   | Qwen embedding client in `src/infrastructure`        | Accepted   |
-| [ADR-0021](./decisions/0021-document-search-index.md)                    | Separate document Search snapshots from RAG chunks   | Accepted   |
-| [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md)            | Neo4j knowledge graph built from published documents | Accepted   |
-| [ADR-0023](./decisions/0023-document-publish-review-workflow.md)         | Publish review workflow and status-driven index sync | Accepted   |
-| [ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md)     | RagBusiness built-in accounts, JWT auth and roles    | Accepted   |
-| [ADR-0025](./decisions/0025-rag-business-permission-codes-and-teams.md)  | RagBusiness permission-code RBAC and teams           | Accepted   |
-| [ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md)  | RagBusiness full-text search and graph read APIs     | Accepted   |
-| [ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md)   | RagBusiness hybrid retrieval and RAG chat            | Accepted   |
-| [ADR-0028](./decisions/0028-rag-business-graph-overview-and-cors.md)     | Graph overview, tag nodes and CORS allowlist         | Accepted   |
-| [ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md)            | User-owned persistent AI chat sessions               | Accepted   |
+| ADR                                                                         | Decision                                             | Status     |
+| --------------------------------------------------------------------------- | ---------------------------------------------------- | ---------- |
+| [ADR-0001](./decisions/0001-use-zod-contracts.md)                           | Zod-based shared runtime contracts                   | Accepted   |
+| [ADR-0002](./decisions/0002-use-shadcn-tailwind.md)                         | shadcn/ui and Tailwind CSS for frontend UI           | Accepted   |
+| [ADR-0003](./decisions/0003-separate-ai-stream-rpc-and-mcp.md)              | Separate AI stream, business API and MCP boundaries  | Accepted   |
+| [ADR-0004](./decisions/0004-evaluate-orpc.md)                               | Evaluate oRPC for Web-to-service APIs                | Proposed   |
+| [ADR-0005](./decisions/0005-evaluate-mcp-nest.md)                           | Evaluate `@rekog/mcp-nest` v2 for the MCP service    | Proposed   |
+| [ADR-0007](./decisions/0007-use-rabbitmq.md)                                | RabbitMQ for asynchronous messaging                  | Accepted   |
+| [ADR-0008](./decisions/0008-use-redis.md)                                   | Redis for cache and distributed coordination         | Accepted   |
+| [ADR-0009](./decisions/0009-defer-kubernetes.md)                            | Defer Kubernetes during phase 1                      | Accepted   |
+| [ADR-0010](./decisions/0010-use-tanstack-query.md)                          | TanStack Query for browser server state              | Accepted   |
+| [ADR-0011](./decisions/0011-use-vercel-and-railway.md)                      | Use Vercel Web with Railway Backend Workloads        | Accepted   |
+| [ADR-0012](./decisions/0012-use-commonjs-nestjs.md)                         | CommonJS NestJS applications with NodeNext           | Accepted   |
+| [ADR-0013](./decisions/0013-use-postgresql-and-mongodb-for-documents.md)    | PostgreSQL metadata with MongoDB document content    | Accepted   |
+| [ADR-0014](./decisions/0014-use-mineru-cloud-for-document-parsing.md)       | MinerU cloud API for upload document parsing         | Superseded |
+| [ADR-0015](./decisions/0015-use-in-process-document-parsers.md)             | In-process parsers for upload document parsing       | Accepted   |
+| [ADR-0016](./decisions/0016-use-elasticsearch-for-rag-chunks.md)            | Elasticsearch + Qwen embeddings for RAG chunks       | Accepted   |
+| [ADR-0017](./decisions/0017-place-qwen-embedding-in-infrastructure.md)      | Qwen embedding client in `src/infrastructure`        | Accepted   |
+| [ADR-0021](./decisions/0021-document-search-index.md)                       | Separate document Search snapshots from RAG chunks   | Accepted   |
+| [ADR-0022](./decisions/0022-use-neo4j-for-knowledge-graph.md)               | Neo4j knowledge graph built from published documents | Accepted   |
+| [ADR-0023](./decisions/0023-document-publish-review-workflow.md)            | Publish review workflow and status-driven index sync | Accepted   |
+| [ADR-0024](./decisions/0024-rag-business-built-in-auth-and-roles.md)        | RagBusiness built-in accounts, JWT auth and roles    | Accepted   |
+| [ADR-0025](./decisions/0025-rag-business-permission-codes-and-teams.md)     | RagBusiness permission-code RBAC and teams           | Accepted   |
+| [ADR-0026](./decisions/0026-rag-business-search-and-graph-read-apis.md)     | RagBusiness full-text search and graph read APIs     | Accepted   |
+| [ADR-0027](./decisions/0027-rag-business-hybrid-retrieval-and-chat.md)      | RagBusiness hybrid retrieval and RAG chat            | Accepted   |
+| [ADR-0028](./decisions/0028-rag-business-graph-overview-and-cors.md)        | Graph overview, tag nodes and CORS allowlist         | Accepted   |
+| [ADR-0029](./decisions/0029-rag-business-ai-chat-sessions.md)               | User-owned persistent AI chat sessions               | Accepted   |
+| [ADR-0030](./decisions/0030-rag-business-streaming-agent-and-web-search.md) | Streaming Agent chat and optional web search         | Accepted   |
 
 ADR status values are `Proposed`, `Accepted`, `Rejected`, `Superseded` and `Deprecated`. Accepted ADRs
 are not edited to reverse a decision; a new ADR supersedes the old one.

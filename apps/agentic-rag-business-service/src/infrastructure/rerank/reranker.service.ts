@@ -79,8 +79,8 @@ class RerankerService {
         return null;
       }
 
-      // results 已按 relevance_score 降序
-      const results = body.output?.results ?? [];
+      // 标准 DashScope 返回 output.results；兼容部分部署的顶层 results。
+      const results = body.output?.results ?? body.results ?? [];
       if (!results.length) {
         this.logger.warn('Rerank 返回空结果，降级为 RRF');
         return null;

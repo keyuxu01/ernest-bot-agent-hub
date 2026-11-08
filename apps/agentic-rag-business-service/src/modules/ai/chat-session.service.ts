@@ -76,6 +76,26 @@ class ChatSessionService {
   }
 
   /**
+   * @description 指定会话仍为默认标题时，用首问摘要覆盖；自定义标题保持不变
+   * @param userId string，当前用户 ID
+   * @param id string，会话 ID
+   * @param question string，本次用户问题
+   * @returns Promise<AiSessionEntity>，保存后的会话
+   * @throws NotFoundException 会话不存在或不属于当前用户
+   */
+  async touchTitle(
+    userId: string,
+    id: string,
+    question: string,
+  ): Promise<AiSessionEntity> {
+    const session = await this.getOwned(userId, id);
+    if (session.title === DEFAULT_CHAT_SESSION_TITLE) {
+      session.title = titleFromQuestion(question);
+    }
+    return this.sessionRepo.saveSession(session);
+  }
+
+  /**
    * @description 删除当前用户拥有的会话及全部消息
    * @param userId string，当前用户 ID
    * @param id string，会话 ID

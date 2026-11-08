@@ -44,6 +44,15 @@ function toCitedSources(answer: string, hits: ChunkHit[]): ChatSource[] {
 }
 
 /**
+ * @description 把全部召回块按当前位置转换为连续编号的溯源条目
+ * @param hits ChunkHit[]，精排后的块
+ * @returns ChatSource[]，编号从 1 开始的全部溯源
+ */
+function toSources(hits: ChunkHit[]): ChatSource[] {
+  return hits.map((hit, index) => toSource(index + 1, hit));
+}
+
+/**
  * @description 召回块 → 溯源条目（只给摘录）
  * @param index number，资料编号
  * @param hit ChunkHit，对应的块
@@ -71,4 +80,4 @@ function excerpt(content: string): string {
   return `${text.slice(0, EXCERPT_LEN)}...`;
 }
 
-export { buildContext, toCitedSources };
+export { buildContext, toCitedSources, toSources };

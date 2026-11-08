@@ -7,14 +7,18 @@ import {
   Patch,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequirePermission } from '../auth/decorators/require-permission.decorator';
 import { PermissionCode } from '../user/constants/permission.constants';
 import type { AuthUser } from '../user/type/user.types';
 import { AiChatService } from './ai-chat.service';
+import { AiStreamService } from './ai-stream.service';
 import { ChatSessionService } from './chat-session.service';
 import { ChatDto } from './dto/chat.dto';
+import { ChatStreamDto } from './dto/chat-stream.dto';
 import { RagSearchDto } from './dto/rag-search.dto';
 import {
   CreateSessionDto,
@@ -29,11 +33,13 @@ class AiController {
   /**
    * @description 注入问答、混合检索与会话服务
    * @param aiChat AiChatService，检索后调 LLM 作答并保存会话
+   * @param aiStream AiStreamService，通过 AI SDK UI Message Stream 流式作答
    * @param retrieval HybridRetrievalService，kh_chunk 混合检索
    * @param sessions ChatSessionService，管理当前用户的 AI 会话与消息
    */
   constructor(
     private readonly aiChat: AiChatService,
+    private readonly aiStream: AiStreamService,
     private readonly retrieval: HybridRetrievalService,
     private readonly sessions: ChatSessionService,
   ) {}
@@ -59,6 +65,23 @@ class AiController {
   @RequirePermission(PermissionCode.search)
   chat(@Body() dto: ChatDto, @CurrentUser() user: AuthUser) {
     return this.aiChat.chat(dto.content, dto.topK ?? 5, user, dto.sessionId);
+  }
+
+  /**
+   * @description POST /ai/chat/stream：LangChain Agent 流式作答，经 @ai-sdk/langchain 转成 UI Message Stream
+   * @param dto ChatStreamDto，AI SDK useChat 消息、可选会话 ID 与 topK
+   * @param user AuthUser，当前登录用户
+   * @param response Response，Nest Express 原始响应
+   * @returns Promise<void>，流式响应由 AiStreamService 直接写入
+   */
+  @Post('ai/chat/stream')
+  @RequirePermission(PermissionCode.search)
+  streamChat(
+    @Body() dto: ChatStreamDto,
+    @CurrentUser() user: AuthUser,
+    @Res() response: Response,
+  ) {
+    return this.aiStream.streamChat(dto, user, response);
   }
 
   /**

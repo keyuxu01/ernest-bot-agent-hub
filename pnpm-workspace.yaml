@@ -11,3 +11,8 @@ allowBuilds:
 # @nestjs-modules/mailer 的可选 peer：@types/mjml 4.18.x / 5.4.x 依赖尚未发布的 @types/mjml-core（上游发布错误），固定到可解析版本
 overrides:
   '@types/mjml': 5.0.0
+  # langchain@1.5.10 的源提交锁定这组传递版本；更新版本要求 @langchain/core >=1.3，
+  # 与当前后端统一的 1.2.x 不兼容。
+  '@langchain/langgraph': 1.4.14
+  '@langchain/langgraph-checkpoint': 1.1.5
+  '@langchain/langgraph-sdk': 1.10.2

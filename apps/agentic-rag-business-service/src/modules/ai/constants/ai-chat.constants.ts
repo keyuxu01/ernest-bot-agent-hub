@@ -15,7 +15,15 @@ const RAG_ANSWER_SYSTEM_PROMPT =
   '编号必须与资料列表一致，不要标注未使用的编号，不要编造文档标题或链接。' +
   '回答简洁，必要时列出条目。';
 
+/** 流式 Agent 提示词：知识库优先，必要时调用公开网页搜索 */
+const AI_STREAM_SYSTEM_PROMPT =
+  '你是企业知识库助手。优先根据「检索到的资料」回答。' +
+  '资料不足、需要时效性或外部公开信息时，调用 web_search。' +
+  '依据资料的陈述句末标 [n]，与资料编号一致。' +
+  '联网结果用标题+链接说明，不要编造。资料不够就明确说不知道。';
+
 export {
+  AI_STREAM_SYSTEM_PROMPT,
   CITATION_RE,
   CONTEXT_SNIPPET_LEN,
   EXCERPT_LEN,

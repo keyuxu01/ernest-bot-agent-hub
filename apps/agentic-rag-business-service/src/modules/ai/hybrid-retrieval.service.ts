@@ -11,11 +11,14 @@ import { RerankerService } from '../../infrastructure/rerank/reranker.service';
  * 问题向量化 → 关键词 + 向量两路召回 → RRF 粗融合 → reranker 精排 → 取前 topK。
  * 向量化失败只走关键词；rerank 失败按 RRF 顺序返回。
  *
- * 环境变量：`RAG_HYBRID_TOP_K`（每路召回数，缺省 20）、`RAG_RRF_C`（缺省 60）
+ * 环境变量：`RAG_HYBRID_TOP_K`（每路召回数，缺省 20）、`RAG_RRF_C`（缺省 60）、
+ * `RAG_MIN_SCORE`（rerank 相关度下限，缺省 0.4；RRF 降级时不生效）
  */
 @Injectable()
 class HybridRetrievalService {
   private readonly logger = new Logger(HybridRetrievalService.name);
+  /** rerank relevance_score 下限（0-1） */
+  private readonly minScore: number;
   private readonly hybridTopK: number;
   private readonly rrfC: number;
 
@@ -34,10 +37,11 @@ class HybridRetrievalService {
   ) {
     this.hybridTopK = Number(config.get('RAG_HYBRID_TOP_K') ?? 20);
     this.rrfC = Number(config.get('RAG_RRF_C') ?? 60);
+    this.minScore = Number(config.get('RAG_MIN_SCORE') ?? 0.4);
   }
 
   /**
-   * @description 混合检索：召回 → RRF → rerank，返回最相关的 topK 块
+   * @description 混合检索：召回 → RRF → rerank → 最低相关度过滤，返回最相关的 topK 块
    * @param query string，用户问题
    * @param topK number，最终返回条数，默认 5
    * @returns Promise<ChunkHit[]>，精排成功时 score 为 rerank 分，否则为 RRF 分；没有命中返回 []
@@ -57,10 +61,19 @@ class HybridRetrievalService {
       return [];
     }
 
-    // ③ rerank 精排（失败为 null）
-    const reranked = await this.reranker.rerank(query, fused, topK);
+    // ③ rerank 全部候选，再按相关度下限过滤并截取 topK。
+    const reranked = await this.reranker.rerank(query, fused, fused.length);
     if (reranked?.length) {
-      return reranked.slice(0, topK);
+      const kept =
+        this.minScore > 0
+          ? reranked.filter((hit) => hit.score >= this.minScore)
+          : reranked;
+      const top = kept.slice(0, topK);
+      this.logger.log(
+        `检索过滤：rerank=${reranked.length}, minScore=${this.minScore}, ` +
+          `best=${reranked[0]?.score?.toFixed(3) ?? '-'}, kept=${kept.length}, return=${top.length}`,
+      );
+      return top;
     }
     // rerank 失败：按 RRF 顺序截取
     return fused.slice(0, topK);
