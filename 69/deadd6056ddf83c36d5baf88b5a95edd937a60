@@ -1,0 +1,74 @@
+apps/agentic-rag-business-service/src/modules/ai/chat-short-memory.service.ts
+  s_cad6ff28dbe944::t_1bb7bbc1594128 146-148
+  s_cad6ff28dbe944::t_cc6afa37138420 15-16,28,42-46,50,53,58,63-66,76,79,89,101,104,116-120,124
+  s_cad6ff28dbe944::t_a8d23bbcf448b6 1-14,17-27,29-41,47-49,51-52,54-57,59-62,67-75,77-78,80-86,88,90-100,102-103,105-115,121-123,125-145,153-157
+  s_cad6ff28dbe944::t_eb29ebd795d67f 87,149-152
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  s_cad6ff28dbe944::t_dc819a906e5b9d 151-167
+docs/guides/rag-chat-memory-testing.md
+  s_cad6ff28dbe944::t_49eee4e340837c 1-8,17-69
+  s_cad6ff28dbe944::t_d8874e23709af3 9-16
+apps/agentic-rag-business-service/src/modules/ai/schemas/chat-memory-classification.zod.ts
+  s_cad6ff28dbe944::t_38d2746b69b189 1-16
+apps/agentic-rag-business-service/src/modules/ai/chat-long-memory.service.ts
+  s_cad6ff28dbe944::t_d3e22fdd27e16f 1-178
+apps/agentic-rag-business-service/src/modules/ai/schemas/chat-query-rewrite.zod.ts
+  s_cad6ff28dbe944::t_d8a2410d2bc684 1-13
+apps/agentic-rag-business-service/src/modules/ai/chat-session.service.ts
+  s_cad6ff28dbe944::t_9e5821c0f8619d 15-16
+  h_329e897ccf6193 22,24-25,28-30,117-118
+  s_cad6ff28dbe944::t_29f87b18461537 135-146
+apps/agentic-rag-business-service/src/infrastructure/mem0/mem0.module.ts
+  s_cad6ff28dbe944::t_2a5886369f4377 1-11
+apps/agentic-rag-business-service/src/infrastructure/mem0/mem0-memory.service.ts
+  s_a1fa52a7a4df45::t_475aca43cc7927 14,22
+  s_a1fa52a7a4df45::t_a6768e39793d4d 23-27
+  s_cad6ff28dbe944::t_1e687ce21a073f 1-13,15-21,28-84
+pnpm-workspace.yaml
+  s_cad6ff28dbe944::t_6b4c93e1f1aa19 7
+apps/agentic-rag-business-service/src/infrastructure/chat-model/chat-model.service.ts
+  s_cad6ff28dbe944::t_2e4546f08862b4 88-105
+  s_cad6ff28dbe944::t_503955859329e7 16-17
+  h_329e897ccf6193 32-35,49-51
+apps/agentic-rag-business-service/src/modules/ai/repository/chat-session.repository.ts
+  s_cad6ff28dbe944::t_17a97dd43663d2 91
+  s_cad6ff28dbe944::t_0cd0fffefbdaba 92-110
+apps/agentic-rag-business-service/src/modules/ai/constants/ai-chat.constants.ts
+  h_329e897ccf6193 10,12-15
+  s_cad6ff28dbe944::t_078410ffdfef9e 23-24
+apps/agentic-rag-business-service/src/modules/ai/helpers/chat-memory.ts
+  s_cad6ff28dbe944::t_b635907357f7dc 1-79
+apps/agentic-rag-business-service/package.json
+  s_cad6ff28dbe944::t_95ecf53f0130f3 59
+apps/agentic-rag-business-service/src/infrastructure/mem0/schemas/mem0-search-response.zod.ts
+  s_cad6ff28dbe944::t_430fd140d451ed 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "69deadd6056ddf83c36d5baf88b5a95edd937a60",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_a1fa52a7a4df45": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_277a85d9-f5f6-4d17-ac2a-b6d98df554b7",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    },
+    "s_cad6ff28dbe944": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_189688a3-a58b-40e2-b76c-f60b8ed86164",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
