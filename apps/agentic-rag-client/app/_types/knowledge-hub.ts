@@ -1,3 +1,6 @@
+import type { RefObject } from 'react';
+import type { UIMessage } from 'ai';
+
 export interface AuthUser {
   userId: string;
   username: string;
@@ -80,6 +83,28 @@ export interface ChatSource {
   score: number;
 }
 
+export interface CiteItem {
+  index?: number;
+  documentId: string;
+  documentTitle: string;
+  heading?: string | null;
+  excerpt?: string;
+}
+
+export interface SourceCiteListProps {
+  items: CiteItem[];
+  scope: string;
+  activeIndex?: number | null;
+  onSelect?: (index: number) => void;
+}
+
+export interface AnswerMarkdownProps {
+  text: string;
+  sources?: CiteItem[];
+  scope: string;
+  onCite?: (index: number) => void;
+}
+
 export interface ChatResult {
   sessionId: string | null;
   answer: string;
@@ -107,6 +132,37 @@ export interface ChatBubble {
   content: string;
   sources?: ChatSource[] | null;
 }
+
+export interface RetrieveHit {
+  index: number;
+  documentId: string;
+  documentTitle: string;
+  heading: string | null;
+}
+
+export interface WebSearchHit {
+  title: string;
+  url: string;
+  snippet: string;
+  siteName?: string;
+}
+
+export interface WebSearchResult {
+  query: string;
+  items: WebSearchHit[];
+  error?: string;
+}
+
+export type KhUIMessage = UIMessage<
+  unknown,
+  {
+    status: { stage: string; text: string };
+    think: { text: string };
+    sources: ChatSource[];
+    retrieve: { query: string; items: RetrieveHit[] };
+    session: { sessionId: string };
+  }
+>;
 
 export interface GraphHit {
   id: string;
@@ -234,4 +290,56 @@ export interface PermissionNode {
   permissionCode: string;
   permissionType: number;
   children?: PermissionNode[];
+}
+
+export interface ChatSessionSidebarProps {
+  activeSessionId?: string;
+  busy: boolean;
+  sessions: ChatSession[];
+  onCreate: () => void;
+  onRemove: (id: string) => void;
+  onSelect: (id: string) => void;
+}
+
+export interface ChatConversationProps {
+  errorMessage?: string;
+  input: string;
+  loading: boolean;
+  logRef: RefObject<HTMLDivElement | null>;
+  messages: KhUIMessage[];
+  streaming: boolean;
+  onInputChange: (value: string) => void;
+  onLogScroll: () => void;
+  onSend: () => void;
+  onStop: () => void;
+}
+
+export interface ChatMessagePartsProps {
+  messageId: string;
+  parts: KhUIMessage['parts'];
+  role: KhUIMessage['role'];
+  showSources?: boolean;
+}
+
+export interface RetrieveCardProps {
+  query: string;
+  items: RetrieveHit[];
+}
+
+export interface ThinkBlockProps {
+  text: string;
+  streaming?: boolean;
+}
+
+export interface WebSearchCardProps {
+  part: {
+    state: string;
+    input?: unknown;
+    output?: unknown;
+    errorText?: string;
+  };
+}
+
+export interface ChatProcessPartsProps {
+  parts: KhUIMessage['parts'];
 }

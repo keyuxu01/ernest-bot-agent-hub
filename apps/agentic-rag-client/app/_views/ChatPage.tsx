@@ -3,46 +3,50 @@
 import { ChatConversation } from '../_components/chat-conversation';
 import { ChatSessionSidebar } from '../_components/chat-session-sidebar';
 import { useChatPage } from '../_hooks/use-chat-page';
-import { useNavigate } from '../_lib/navigation';
 
 /**
- * @description Compose persisted AI chat sessions with the active conversation.
+ * @description Compose persisted chat sessions with the streamed AI conversation.
  */
 const ChatPage = () => {
-  const navigate = useNavigate();
   const {
     createSession,
+    errorMessage,
     input,
     loading,
     logRef,
     messages,
+    onLogScroll,
     removeSession,
     send,
     sessionId,
     sessions,
     setInput,
-    setTopK,
-    topK,
+    stop,
+    streaming,
+    switchSession,
   } = useChatPage();
 
   return (
     <div className="kh-page kh-chat-layout">
       <ChatSessionSidebar
         activeSessionId={sessionId}
+        busy={streaming}
         sessions={sessions}
         onCreate={() => void createSession()}
-        onRemove={id => void removeSession(id)}
-        onSelect={id => navigate(`/chat?session=${id}`)}
+        onRemove={removeSession}
+        onSelect={switchSession}
       />
       <ChatConversation
+        errorMessage={errorMessage}
         input={input}
         loading={loading}
         logRef={logRef}
         messages={messages}
-        topK={topK}
+        streaming={streaming}
         onInputChange={setInput}
-        onSend={asRagOnly => void send(asRagOnly)}
-        onTopKChange={setTopK}
+        onLogScroll={onLogScroll}
+        onSend={() => void send()}
+        onStop={() => void stop()}
       />
     </div>
   );

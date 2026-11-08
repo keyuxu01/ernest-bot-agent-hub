@@ -3,22 +3,14 @@
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Empty } from 'antd';
 import type { MouseEvent } from 'react';
-import type { ChatSession } from '../_types/knowledge-hub';
+import type { ChatSessionSidebarProps } from '../_types/knowledge-hub';
 import { formatTime } from '../_utils/knowledge-hub';
 
-type ChatSessionSidebarProps = {
-  activeSessionId?: string;
-  sessions: ChatSession[];
-  onCreate: () => void;
-  onRemove: (id: string) => void;
-  onSelect: (id: string) => void;
-};
-
 /**
- * @description Render persisted AI chat sessions and session actions.
+ * @description Render persisted AI chat sessions and disable session changes while streaming.
  */
 const ChatSessionSidebar = (props: ChatSessionSidebarProps) => {
-  const { activeSessionId, onCreate, onRemove, onSelect, sessions } = props;
+  const { activeSessionId, busy, onCreate, onRemove, onSelect, sessions } = props;
 
   const handleRemove = (event: MouseEvent, id: string) => {
     event.stopPropagation();
@@ -27,7 +19,13 @@ const ChatSessionSidebar = (props: ChatSessionSidebarProps) => {
 
   return (
     <aside className="kh-chat-sessions">
-      <Button type="primary" icon={<PlusOutlined />} block onClick={onCreate}>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        block
+        disabled={busy}
+        onClick={onCreate}
+      >
         新对话
       </Button>
       <div className="kh-chat-session-list">
@@ -37,11 +35,11 @@ const ChatSessionSidebar = (props: ChatSessionSidebarProps) => {
           sessions.map(session => (
             <div
               key={session.id}
-              className={`kh-chat-session-item${activeSessionId === session.id ? ' active' : ''}`}
+              className={`kh-chat-session-item${activeSessionId === session.id ? ' active' : ''}${busy ? ' disabled' : ''}`}
               onClick={() => onSelect(session.id)}
             >
-              <span className="kh-chat-session-title">{session.title}</span>
-              <span className="kh-chat-session-meta">
+              <div className="kh-chat-session-title">{session.title}</div>
+              <div className="kh-chat-session-meta">
                 <span>{formatTime(session.updatedAt)}</span>
                 <Button
                   type="text"
@@ -50,7 +48,7 @@ const ChatSessionSidebar = (props: ChatSessionSidebarProps) => {
                   icon={<DeleteOutlined />}
                   onClick={event => handleRemove(event, session.id)}
                 />
-              </span>
+              </div>
             </div>
           ))
         )}

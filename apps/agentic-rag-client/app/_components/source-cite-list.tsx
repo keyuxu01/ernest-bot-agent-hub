@@ -1,77 +1,61 @@
 'use client';
 
 import { Link } from '../_lib/navigation';
+import type { SourceCiteListProps } from '../_types/knowledge-hub';
+import { citeAnchorId } from '../_utils/citations';
 import { FileTypeIcon } from './file-type-icon';
 
-export interface CiteItem {
-  index?: number;
-  documentId: string;
-  documentTitle: string;
-  heading?: string | null;
-  excerpt?: string;
-}
-
 /**
- * RAG / 检索引用卡片。标题新开标签打开文档，避免问答页被冲掉。
+ * @description Render horizontal citation cards for sources used by one assistant answer.
  */
-export function SourceCiteList({ items }: { items: CiteItem[] }) {
+const SourceCiteList = (props: SourceCiteListProps) => {
+  const { activeIndex, items, onSelect, scope } = props;
   if (!items.length) return null;
+
   return (
     <div className="kh-cite-list">
-      {items.map((s, i) => (
-        <Link
-          key={`${s.documentId}-${s.index ?? i}`}
-          className="kh-cite"
-          to={`/documents/${s.documentId}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <FileTypeIcon name={s.documentTitle} />
-          <div className="kh-cite-body">
-            <div className="kh-cite-title">
-              {s.index != null ? `[${s.index}] ` : ''}
-              {s.documentTitle}
+      <div className="kh-cite-list-title">引用文档 ({items.length})</div>
+      <div className="kh-cite-rail">
+        {items.map((source, itemIndex) => {
+          const index = source.index ?? itemIndex + 1;
+          return (
+            <div
+              key={`${source.documentId}-${index}`}
+              id={citeAnchorId(scope, index)}
+              className={`kh-cite${activeIndex === index ? ' active' : ''}`}
+              onClick={() => onSelect?.(index)}
+            >
+              <FileTypeIcon name={source.documentTitle} size={28} />
+              <div className="kh-cite-body">
+                <div className="kh-cite-title" title={source.documentTitle}>
+                  [{index}] {source.documentTitle}
+                </div>
+                {source.heading ? (
+                  <div className="kh-cite-heading" title={source.heading}>
+                    {source.heading}
+                  </div>
+                ) : null}
+                {source.excerpt ? (
+                  <div className="kh-cite-meta" title={source.excerpt}>
+                    {source.excerpt}
+                  </div>
+                ) : null}
+                <Link
+                  className="kh-cite-open"
+                  to={`/documents/${source.documentId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={event => event.stopPropagation()}
+                >
+                  查看原文
+                </Link>
+              </div>
             </div>
-            {s.heading ? <div className="kh-cite-heading">{s.heading}</div> : null}
-            {s.excerpt ? <div className="kh-cite-excerpt">{s.excerpt}</div> : null}
-          </div>
-        </Link>
-      ))}
+          );
+        })}
+      </div>
     </div>
   );
-}
+};
 
-/** 把回答里的 [n] 做成指向对应文档的链接 */
-export function AnswerWithCitations({
-  text,
-  sources,
-}: {
-  text: string;
-  sources?: CiteItem[];
-}) {
-  const byIndex = new Map(
-    (sources ?? []).filter(s => s.index != null).map(s => [s.index as number, s]),
-  );
-  const parts = text.split(/(\[\d+\])/);
-  return (
-    <>
-      {parts.map((part, i) => {
-        const match = part.match(/^\[(\d+)\]$/);
-        if (!match) return <span key={i}>{part}</span>;
-        const src = byIndex.get(Number(match[1]));
-        if (!src) return <span key={i}>{part}</span>;
-        return (
-          <Link
-            key={i}
-            className="kh-cite-inline"
-            to={`/documents/${src.documentId}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {part}
-          </Link>
-        );
-      })}
-    </>
-  );
-}
+export { SourceCiteList };

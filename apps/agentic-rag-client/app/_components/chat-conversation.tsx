@@ -1,27 +1,25 @@
 'use client';
 
-import { Button, Empty, Input, Listy, Space, Typography } from 'antd';
-import type { RefObject } from 'react';
-import { Link } from '../_lib/navigation';
-import type { ChatBubble } from '../_types/knowledge-hub';
-
-type ChatConversationProps = {
-  input: string;
-  loading: boolean;
-  logRef: RefObject<HTMLDivElement | null>;
-  messages: ChatBubble[];
-  topK: number;
-  onInputChange: (value: string) => void;
-  onSend: (asRagOnly?: boolean) => void;
-  onTopKChange: (value: number) => void;
-};
+import { Button, Empty, Input, Space, Typography } from 'antd';
+import type { ChatConversationProps } from '../_types/knowledge-hub';
+import { ChatMessageParts } from './chat-message-parts';
 
 /**
- * @description Render current AI chat messages and question controls.
+ * @description Render streamed AI chat messages, process events, and question controls.
  */
 const ChatConversation = (props: ChatConversationProps) => {
-  const { input, loading, logRef, messages, onInputChange, onSend, onTopKChange, topK } =
-    props;
+  const {
+    errorMessage,
+    input,
+    loading,
+    logRef,
+    messages,
+    onInputChange,
+    onLogScroll,
+    onSend,
+    onStop,
+    streaming,
+  } = props;
 
   return (
     <div className="kh-chat-main">
@@ -29,40 +27,31 @@ const ChatConversation = (props: ChatConversationProps) => {
         知识问答
       </Typography.Title>
       <Typography.Paragraph type="secondary">
-        走混合检索后再生成。无召回不会调模型。问答会写入左侧会话，「仅检索」不落库。
+        流式回答会展示知识库检索、思考与联网搜索过程，并写入左侧会话。
       </Typography.Paragraph>
-      <div className="kh-chat-log" ref={logRef}>
+      <div className="kh-chat-log" ref={logRef} onScroll={onLogScroll}>
         {messages.length === 0 ? (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description="输入问题开始一段对话"
           />
         ) : (
-          messages.map((entry, index) => (
-            <div key={index} className={`kh-bubble ${entry.role}`}>
-              {entry.content}
-              {entry.sources?.length ? (
-                <Listy
-                  items={entry.sources}
-                  rowKey={source => `${source.documentId}-${source.index}`}
-                  virtual={false}
-                  style={{ marginTop: 8, background: '#fff', borderRadius: 8 }}
-                  styles={{ item: { padding: '8px 12px' } }}
-                  itemRender={source => (
-                    <span>
-                      [{source.index}]{' '}
-                      <Link to={`/documents/${source.documentId}`}>
-                        {source.documentTitle}
-                      </Link>
-                      {source.heading ? ` / ${source.heading}` : ''}
-                      <span className="kh-chat-source-excerpt">{source.excerpt}</span>
-                    </span>
-                  )}
+          messages.map((entry, index) => {
+            const liveAssistant =
+              streaming && entry.role === 'assistant' && index === messages.length - 1;
+            return (
+              <div key={entry.id} className={`kh-bubble ${entry.role}`}>
+                <ChatMessageParts
+                  messageId={entry.id}
+                  parts={entry.parts}
+                  role={entry.role}
+                  showSources={!liveAssistant}
                 />
-              ) : null}
-            </div>
-          ))
+              </div>
+            );
+          })
         )}
+        {errorMessage ? <div className="kh-chat-error">{errorMessage}</div> : null}
       </div>
       <Space.Compact style={{ width: '100%' }}>
         <Input
@@ -73,27 +62,17 @@ const ChatConversation = (props: ChatConversationProps) => {
           value={input}
           disabled={loading}
           onChange={event => onInputChange(event.target.value)}
-          onPressEnter={() => onSend(false)}
+          onPressEnter={onSend}
         />
-        <Input
-          id="chat-top-k"
-          name="chat-top-k"
-          size="large"
-          style={{ width: 80 }}
-          value={topK}
-          onChange={event => onTopKChange(Number(event.target.value) || 5)}
-        />
-        <Button size="large" loading={loading} onClick={() => onSend(true)}>
-          仅检索
-        </Button>
-        <Button
-          type="primary"
-          size="large"
-          loading={loading}
-          onClick={() => onSend(false)}
-        >
-          发送
-        </Button>
+        {streaming ? (
+          <Button size="large" onClick={onStop}>
+            停止
+          </Button>
+        ) : (
+          <Button type="primary" size="large" onClick={onSend}>
+            发送
+          </Button>
+        )}
       </Space.Compact>
     </div>
   );
