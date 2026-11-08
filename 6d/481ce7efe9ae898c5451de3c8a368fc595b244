@@ -1,0 +1,88 @@
+apps/agentic-rag-business-service/src/infrastructure/web-search/type/web-search.types.ts
+  s_cad6ff28dbe944::t_9b2596b425556a 1-14
+apps/agentic-rag-business-service/src/infrastructure/web-search/bocha-web-search.service.ts
+  s_cad6ff28dbe944::t_1abb46fd39e6ec 1-88
+docs/architecture/README.md
+  s_cad6ff28dbe944::t_cc1fc55b1b9ae5 329,332-345,349-376
+apps/agentic-rag-business-service/src/modules/ai/helpers/last-user-text.ts
+  s_cad6ff28dbe944::t_80b2e4ab18e070 1-7,9-22
+apps/agentic-rag-business-service/src/modules/ai/hybrid-retrieval.service.ts
+  s_cad6ff28dbe944::t_44e6ee48dda307 40
+  s_cad6ff28dbe944::t_c0af93c1384155 64-65,67-76
+  s_cad6ff28dbe944::t_732966f2661d73 44
+  s_cad6ff28dbe944::t_5756ec7be1dafb 20-21
+apps/agentic-rag-business-service/src/infrastructure/rerank/reranker.service.ts
+  s_cad6ff28dbe944::t_4ba82def138948 82-83
+apps/agentic-rag-business-service/src/modules/ai/chat-session.service.ts
+  s_cad6ff28dbe944::t_737af01fe7e7ed 79-97
+docs/architecture/decisions/0030-rag-business-streaming-agent-and-web-search.md
+  s_cad6ff28dbe944::t_129f6fae3fe7c8 23-24,46-47
+  s_cad6ff28dbe944::t_6957c08d0681b8 1-22,25-45,48-72
+pnpm-workspace.yaml
+  s_cad6ff28dbe944::t_19647a3a9d2656 14-18
+apps/agentic-rag-business-service/src/modules/ai/constants/ai-chat.constants.ts
+  s_cad6ff28dbe944::t_74a70938d0ed94 18-24,26
+apps/agentic-rag-business-service/src/infrastructure/rerank/type/rerank.types.ts
+  s_cad6ff28dbe944::t_7e06b024bb9d04 11-15
+apps/agentic-rag-business-service/src/infrastructure/chat-model/chat-model.service.ts
+  h_329e897ccf6193 26,28-29,42,61,66-76
+  s_cad6ff28dbe944::t_ffcb744288372f 12,14
+  s_cad6ff28dbe944::t_3f6f1c1798e735 77
+  s_cad6ff28dbe944::t_b256e57f43c2b4 15
+apps/agentic-rag-business-service/src/modules/ai/helpers/rag-answer.ts
+  s_cad6ff28dbe944::t_15e0e39ed930f2 83
+  s_cad6ff28dbe944::t_b4b06e42fa9b76 47-54
+apps/agentic-rag-business-service/src/modules/ai/ai.controller.ts
+  s_cad6ff28dbe944::t_9e9d1761429036 10,12,18,21
+  s_cad6ff28dbe944::t_4c054bedafcd89 71-86
+  s_cad6ff28dbe944::t_3aa843fc67dedc 36
+  s_cad6ff28dbe944::t_720ddf3fbe518f 42
+apps/agentic-rag-business-service/src/modules/ai/dto/chat-stream.dto.ts
+  s_cad6ff28dbe944::t_abd86e0385e1a7 1-44
+apps/agentic-rag-business-service/src/modules/ai/hybrid-retrieval.service.spec.ts
+  s_cad6ff28dbe944::t_1a14a7921a9c37 51
+apps/agentic-rag-business-service/src/modules/ai/helpers/map-reasoning-stream.ts
+  s_cad6ff28dbe944::t_024a9170ddcf30 1-40,42-51
+apps/agentic-rag-business-service/src/modules/ai/ai.module.ts
+  s_cad6ff28dbe944::t_9d77bf8825ff5c 7,9
+apps/agentic-rag-business-service/src/infrastructure/web-search/schemas/bocha-web-search-response.zod.ts
+  s_cad6ff28dbe944::t_b95f252df81458 1-5,7-28
+  s_cad6ff28dbe944::t_7c80fd730c4643 6
+apps/agentic-rag-business-service/src/modules/ai/type/ai-stream.types.ts
+  s_cad6ff28dbe944::t_0bb217cf18802c 1-23
+apps/agentic-rag-business-service/.env.example
+  s_cad6ff28dbe944::t_e6ec6955b22406 53-54,65-66
+apps/agentic-rag-business-service/package.json
+  s_cad6ff28dbe944::t_8d44f31d467105 26,48,57
+apps/agentic-rag-business-service/src/infrastructure/web-search/web-search.module.ts
+  s_cad6ff28dbe944::t_c32e995edbbdc4 1-11
+apps/agentic-rag-business-service/test/app.e2e-spec.ts
+  h_329e897ccf6193 151-152
+  s_cad6ff28dbe944::t_7ac751cced19ac 150
+  s_cad6ff28dbe944::t_568d95c3170db3 16
+apps/agentic-rag-business-service/src/modules/ai/ai-stream.service.ts
+  s_cad6ff28dbe944::t_1b5d19d0e02217 164-174
+  s_cad6ff28dbe944::t_6cf47de0ae152f 177-178,180-181
+  s_cad6ff28dbe944::t_e347b1bc75c16c 1-163,175-176,179,182-228
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "6d481ce7efe9ae898c5451de3c8a368fc595b244",
+  "prompts": {},
+  "humans": {
+    "h_329e897ccf6193": {
+      "author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  },
+  "sessions": {
+    "s_cad6ff28dbe944": {
+      "agent_id": {
+        "tool": "kiro-desktop",
+        "id": "sess_189688a3-a58b-40e2-b76c-f60b8ed86164",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "keyuxu01 <anMcq_Hx7SEOIcjZ.keyuxu01@noreply.gitcode.com>"
+    }
+  }
+}
